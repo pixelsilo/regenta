@@ -13,7 +13,10 @@
 		rate: 5.75,
 		service: null,
 	};
+	// Standard rent on the unsold share. Schemes can differ, so buyers can change it in the
+	// calc-input="rent" field; a calc-rent-rate attribute on the root changes the default for that instance.
 	const DEFAULT_RENT_RATE = 2.75;
+	const MAX_RENT_RATE = 10;
 
 	const currency = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP', maximumFractionDigits: 0 });
 	const currencyPence = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP', minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -62,13 +65,14 @@
 	}
 
 	function isValid(inputs) {
-		const { value, term, deposit, share, rate, service } = inputs;
+		const { value, term, deposit, share, rate, service, rentRate } = inputs;
 		return (
 			value > 0 &&
 			term > 0 && term <= 40 &&
 			deposit >= 0 && deposit <= 100 &&
 			share > 0 && share <= 100 &&
 			rate >= 0 && rate <= 25 &&
+			rentRate >= 0 && rentRate <= MAX_RENT_RATE &&
 			(service === null || service >= 0)
 		);
 	}
@@ -80,6 +84,7 @@
 		share: { suffix: '%' },
 		deposit: { suffix: '%' },
 		rate: { suffix: '%' },
+		rent: { suffix: '%' },
 		term: { suffix: 'years' },
 	};
 	// Calculate button while figures are out of date. Override per button with calc-stale-text.
@@ -196,7 +201,7 @@
 		root.setAttribute('calc-ready', '');
 		instanceCount += 1;
 
-		const rentRate = parseNumber(root.getAttribute('calc-rent-rate')) ?? DEFAULT_RENT_RATE;
+		const defaultRentRate = parseNumber(root.getAttribute('calc-rent-rate')) ?? DEFAULT_RENT_RATE;
 		const fields = Array.from(root.querySelectorAll('[calc-input]'));
 		uniquifyIds(root, fields, instanceCount);
 		const buttons = Array.from(root.querySelectorAll('[calc-action="calculate"]')).map((button) => {
@@ -212,12 +217,16 @@
 
 		function readInputs() {
 			const inputs = { ...DEFAULTS };
+			let rentField = null;
 			fields.forEach((field) => {
 				const key = field.getAttribute('calc-input');
 				if (key in inputs) {
 					inputs[key] = parseNumber(field.value);
+				} else if (key === 'rent') {
+					rentField = parseNumber(field.value);
 				}
 			});
+			inputs.rentRate = rentField ?? defaultRentRate;
 			// Only the service charge may be left blank; anything else blank falls back to its default.
 			Object.keys(DEFAULTS).forEach((key) => {
 				if (inputs[key] === null && key !== 'service') {
@@ -246,14 +255,14 @@
 			setOutput('deposit-pct', `${plain.format(inputs.deposit)}%`);
 			setOutput('rate', `${plain.format(inputs.rate)}%`);
 			setOutput('term', plain.format(inputs.term));
-			setOutput('rent-rate', `${plain.format(rentRate)}%`);
+			setOutput('rent-rate', Number.isFinite(inputs.rentRate) ? `${plain.format(inputs.rentRate)}%` : '–');
 
 			if (!valid) {
 				['share-price', 'deposit', 'mortgage', 'monthly-mortgage', 'monthly-rent', 'monthly-service', 'total'].forEach((name) => setOutput(name, '–'));
 				return;
 			}
 
-			const result = calculate({ ...inputs, rentRate });
+			const result = calculate(inputs);
 			setOutput('share-price', currency.format(result.sharePrice));
 			setOutput('deposit', currency.format(result.depositAmount));
 			setOutput('mortgage', currency.format(result.mortgageAmount));
@@ -288,6 +297,8 @@
 			const key = field.getAttribute('calc-input');
 			if (!field.value && key in DEFAULTS && DEFAULTS[key] !== null) {
 				field.value = key === 'value' ? plain.format(DEFAULTS[key]) : DEFAULTS[key];
+			} else if (!field.value && key === 'rent') {
+				field.value = defaultRentRate;
 			}
 			addAffixes(field);
 			field.addEventListener('input', () => setStale(true));

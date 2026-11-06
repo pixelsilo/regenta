@@ -1,4 +1,5 @@
-// Stamp Duty Land Tax (SDLT) calculator – England & Northern Ireland, residential rates from 1 April 2025.
+// Stamp Duty Land Tax (SDLT) calculator – England & Northern Ireland, residential rates from 1 April 2025
+// (unchanged at the Autumn Budget, 28 October 2026). Optional 2% non-UK resident surcharge.
 // Runs on every element with calc="stamp-duty"; each instance is scoped to its own wrapper,
 // so several calculators (of this or other types) can sit on the same page.
 (() => {
@@ -20,6 +21,8 @@
 		[500000, 5],
 	];
 	const FIRST_TIME_MAX_PRICE = 500000; // Above this, first-time buyer relief is lost entirely.
+	// Non-UK residents pay 2% on top of whichever rates apply (including first-time buyer and additional rates).
+	const NON_RESIDENT_SURCHARGE = 2;
 
 	const DEFAULT_PRICE = 400000;
 	const DEFAULT_BUYER = 'moving';
@@ -40,21 +43,24 @@
 		return Number.isFinite(number) ? number : NaN;
 	}
 
+	const addRate = (bands, extra) => bands.map(([limit, rate]) => [limit, rate + extra]);
+
 	function bandsFor(price, buyer) {
 		if (buyer === 'first-time' && price <= FIRST_TIME_MAX_PRICE) {
 			return { bands: FIRST_TIME_BANDS, reliefApplied: true };
 		}
 		if (buyer === 'additional') {
 			if (price < ADDITIONAL_MIN_PRICE) {
-				return { bands: [[Infinity, 0]], belowAdditionalMinimum: true };
+				return { bands: STANDARD_BANDS, belowAdditionalMinimum: true };
 			}
-			return { bands: STANDARD_BANDS.map(([limit, rate]) => [limit, rate + ADDITIONAL_SURCHARGE]) };
+			return { bands: addRate(STANDARD_BANDS, ADDITIONAL_SURCHARGE) };
 		}
 		return { bands: STANDARD_BANDS, reliefLost: buyer === 'first-time' };
 	}
 
-	function calculate(price, buyer) {
-		const { bands, ...flags } = bandsFor(price, buyer);
+	function calculate(price, buyer, nonResident = false) {
+		const { bands: baseBands, ...flags } = bandsFor(price, buyer);
+		const bands = nonResident ? addRate(baseBands, NON_RESIDENT_SURCHARGE) : baseBands;
 		let lower = 0;
 		const breakdown = [];
 
@@ -69,7 +75,7 @@
 
 		// HMRC rounds SDLT down to the whole pound.
 		const total = Math.floor(breakdown.reduce((sum, band) => sum + band.tax, 0));
-		return { total, breakdown, effectiveRate: price > 0 ? (total / price) * 100 : 0, ...flags };
+		return { total, breakdown, effectiveRate: price > 0 ? (total / price) * 100 : 0, nonResident, ...flags };
 	}
 
 	function bandLabel({ lower, upper, rate }) {
@@ -79,7 +85,12 @@
 		return `${range} at ${plain.format(rate)}%`;
 	}
 
-	function buyerNote(price, buyer) {
+	function buyerNote(price, buyer, nonResident) {
+		const note = baseBuyerNote(price, buyer);
+		return nonResident ? `${note} Includes the 2% surcharge for buyers who aren’t UK resident.` : note;
+	}
+
+	function baseBuyerNote(price, buyer) {
 		if (buyer === 'first-time') {
 			return Number.isFinite(price) && price > FIRST_TIME_MAX_PRICE
 				? 'First-time buyer relief isn’t available on homes over £500,000, so standard rates apply to the whole price.'
@@ -87,7 +98,7 @@
 		}
 		if (buyer === 'additional') {
 			return Number.isFinite(price) && price > 0 && price < ADDITIONAL_MIN_PRICE
-				? 'Additional properties under £40,000 don’t pay Stamp Duty.'
+				? 'The additional property surcharge doesn’t apply to homes under £40,000.'
 				: 'Includes the 5% surcharge on additional properties, such as second homes and buy-to-lets.';
 		}
 		return 'Standard rates apply when you’re buying a home to replace your main residence.';
@@ -162,6 +173,7 @@
 
 		const priceField = root.querySelector('[calc-input="price"]');
 		const radios = Array.from(root.querySelectorAll('input[type="radio"][calc-input="buyer"]'));
+		const nonResidentBoxes = Array.from(root.querySelectorAll('input[type="checkbox"][calc-input="non-resident"]'));
 		const breakdownEl = root.querySelector('[calc-breakdown]');
 		const buttons = Array.from(root.querySelectorAll('[calc-action="calculate"]')).map((button) => {
 			// Webflow wraps the button text in a child element; swap that so the button's own markup stays intact.
@@ -188,6 +200,7 @@
 		}
 
 		const selectedBuyer = () => radios.find((radio) => radio.checked)?.value ?? DEFAULT_BUYER;
+		const isNonResident = () => nonResidentBoxes.some((box) => box.checked);
 
 		function setOutput(name, text) {
 			root.querySelectorAll(`[calc-output="${name}"]`).forEach((el) => {
@@ -196,10 +209,10 @@
 		}
 
 		function syncOptions() {
-			radios.forEach((radio) => {
-				radio.closest('label')?.classList.toggle(SELECTED_CLASS, radio.checked);
+			[...radios, ...nonResidentBoxes].forEach((input) => {
+				input.closest('label')?.classList.toggle(SELECTED_CLASS, input.checked);
 			});
-			setOutput('buyer-note', buyerNote(parseNumber(priceField.value), selectedBuyer()));
+			setOutput('buyer-note', buyerNote(parseNumber(priceField.value), selectedBuyer(), isNonResident()));
 		}
 
 		// Results only refresh when the user presses Calculate (or Enter). Until then the results are dimmed
@@ -251,7 +264,7 @@
 				return;
 			}
 
-			const result = calculate(price, selectedBuyer());
+			const result = calculate(price, selectedBuyer(), isNonResident());
 			renderBreakdown(result.breakdown);
 			setOutput('total', currency.format(result.total));
 			setOutput('effective-rate', `Effective rate: ${plain.format(Math.round(result.effectiveRate * 100) / 100)}% of the purchase price`);
@@ -275,7 +288,7 @@
 				priceField.value = plain.format(number);
 			}
 		});
-		radios.forEach((radio) => {
+		[...radios, ...nonResidentBoxes].forEach((radio) => {
 			radio.addEventListener('change', () => {
 				syncOptions();
 				setStale(true);
