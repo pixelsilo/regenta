@@ -5,6 +5,9 @@
 (() => {
 	const ROOT_SELECTOR = '[calc="stamp-duty"]';
 	let instanceCount = 0;
+	const instances = [];
+	const DISCLAIMER = 'Estimate of Stamp Duty Land Tax for residential purchases in England and Northern Ireland, using the rates in force from 1 April 2025 (unchanged at the Autumn Budget 2026). It does not cover Scotland (LBTT), Wales (LTT), Shared Ownership elections or other reliefs. It is not tax or legal advice; a solicitor or tax adviser should confirm the amount payable.';
+	const BUYER_TYPES = { first_time_buyer: 'first-time', moving_home: 'moving', additional_property: 'additional' };
 
 	// Each band: [upper limit of the band, rate %]. Bands run from the previous limit to this one.
 	const STANDARD_BANDS = [
@@ -247,6 +250,19 @@
 			}));
 		}
 
+		instances.push({
+			fill({ price, buyer, nonResident }) {
+				priceField.value = plain.format(price);
+				radios.forEach((radio) => {
+					radio.checked = radio.value === buyer;
+				});
+				nonResidentBoxes.forEach((box) => {
+					box.checked = nonResident;
+				});
+				update();
+			},
+		});
+
 		function update() {
 			const price = parseNumber(priceField.value);
 			const valid = Number.isFinite(price) && price > 0;
@@ -304,9 +320,63 @@
 		update();
 	}
 
+	// WebMCP (https://developer.chrome.com/docs/ai/webmcp): exposes the calculator as a tool that AI agents in the
+	// browser can call. Feature-detected, so browsers without WebMCP are unaffected. Registered once per page.
+	let webMcpRegistered = false;
+
+	function registerWebMcp() {
+		const modelContext = document.modelContext;
+		if (webMcpRegistered || !instances.length || typeof modelContext?.registerTool !== 'function') {
+			return;
+		}
+		webMcpRegistered = true;
+		Promise.resolve(modelContext.registerTool({
+			name: 'calculate_stamp_duty',
+			description: "Calculates Stamp Duty Land Tax on a residential purchase in England or Northern Ireland using Regenta's calculator, with a band-by-band breakdown and the effective rate. Covers first-time buyers (including relief up to £500,000), people moving home, additional properties (5% surcharge) and buyers who are not UK resident (2% surcharge). The calculator on the page updates to show the same figures.",
+			inputSchema: {
+				type: 'object',
+				properties: {
+					property_price: { type: 'number', description: 'Purchase price in pounds, e.g. 425000.' },
+					buyer_type: { type: 'string', enum: Object.keys(BUYER_TYPES), description: 'first_time_buyer: has never owned a home anywhere. moving_home: replacing their main residence. additional_property: will own more than one home, such as a second home or buy-to-let. Defaults to moving_home.' },
+					non_uk_resident: { type: 'boolean', description: 'True if the buyer is not UK resident for SDLT purposes, which adds 2% to every band. Defaults to false.' },
+				},
+				required: ['property_price'],
+			},
+			annotations: { readOnlyHint: true },
+			execute: async (args = {}) => {
+				const rawPrice = args.property_price;
+				const price = typeof rawPrice === 'number' ? rawPrice : parseNumber(rawPrice);
+				if (!Number.isFinite(price) || price <= 0 || price > 1000000000) {
+					throw new Error(`property_price must be a positive number of pounds (received ${JSON.stringify(rawPrice)}).`);
+				}
+				const buyerKey = args.buyer_type ?? 'moving_home';
+				const buyer = BUYER_TYPES[buyerKey];
+				if (!buyer) {
+					throw new Error(`buyer_type must be one of ${Object.keys(BUYER_TYPES).join(', ')} (received ${JSON.stringify(buyerKey)}).`);
+				}
+				const nonResident = args.non_uk_resident === true || args.non_uk_resident === 'true';
+				const result = calculate(price, buyer, nonResident);
+				instances[0].fill({ price, buyer, nonResident });
+				return JSON.stringify({
+					inputs: { property_price: price, buyer_type: buyerKey, non_uk_resident: nonResident },
+					total_stamp_duty: result.total,
+					effective_rate_percent: Math.round(result.effectiveRate * 100) / 100,
+					breakdown: result.breakdown.map((band) => ({ band: bandLabel(band), tax: Math.floor(band.tax) })),
+					note: buyerNote(price, buyer, nonResident),
+					currency: 'GBP',
+					disclaimer: DISCLAIMER,
+				});
+			},
+		})).catch((error) => {
+			webMcpRegistered = false;
+			console.warn('[stamp-duty-calculator] WebMCP tool not registered:', error);
+		});
+	}
+
 	function initializeCalculators() {
 		injectStyles();
 		document.querySelectorAll(ROOT_SELECTOR).forEach(createCalculator);
+		registerWebMcp();
 	}
 
 	window.StampDutyCalculator = { calculate, parseNumber, init: initializeCalculators };
