@@ -4,8 +4,6 @@
 (() => {
 	const ROOT_SELECTOR = '[calc="shared-ownership"]';
 	let instanceCount = 0;
-	const instances = [];
-	const DISCLAIMER = 'Illustrative estimate only. It is not a mortgage offer, financial advice or confirmation of affordability. Actual rates, rent, service charges and eligibility vary by home, lender and personal circumstances; speak to a qualified mortgage adviser before committing.';
 
 	const DEFAULTS = {
 		value: 400000,
@@ -320,21 +318,6 @@
 			}
 		});
 
-		// Lets the WebMCP tool show the agent's figures in this calculator, so the page matches what the agent reports.
-		instances.push({
-			fill(values) {
-				fields.forEach((field) => {
-					const key = field.getAttribute('calc-input');
-					if (!(key in values)) {
-						return;
-					}
-					const value = values[key];
-					field.value = value === null ? '' : (key === 'value' || key === 'service') ? plain.format(value) : value;
-				});
-				update();
-			},
-		});
-
 		// Stop Enter from submitting any wrapping Webflow form.
 		root.querySelectorAll('form').forEach((form) => {
 			form.addEventListener('submit', (event) => event.preventDefault());
@@ -343,84 +326,9 @@
 		update();
 	}
 
-	// WebMCP (https://developer.chrome.com/docs/ai/webmcp): exposes the calculator as a tool that AI agents in the
-	// browser can call. Feature-detected, so browsers without WebMCP are unaffected. Registered once per page.
-	let webMcpRegistered = false;
-
-	function toolNumber(raw, name, { min, max, fallback = null, optional = false }) {
-		if (raw === undefined || raw === null || raw === '') {
-			if (optional || fallback !== null) {
-				return fallback;
-			}
-			throw new Error(`${name} is required.`);
-		}
-		const number = typeof raw === 'number' ? raw : parseNumber(raw);
-		if (!Number.isFinite(number) || number < min || number > max) {
-			throw new Error(`${name} must be a number between ${min} and ${max} (received ${JSON.stringify(raw)}).`);
-		}
-		return number;
-	}
-
-	const round2 = (n) => Math.round(n * 100) / 100;
-
-	function registerWebMcp() {
-		const modelContext = document.modelContext;
-		if (webMcpRegistered || !instances.length || typeof modelContext?.registerTool !== 'function') {
-			return;
-		}
-		webMcpRegistered = true;
-		Promise.resolve(modelContext.registerTool({
-			name: 'estimate_shared_ownership_monthly_costs',
-			description: "Estimates the monthly cost of buying a Shared Ownership home in England using Regenta's calculator: share price, deposit, mortgage amount, monthly mortgage repayment (repayment mortgage), monthly rent on the share the buyer does not own, optional service charge and the total. Use it when someone asks what a Shared Ownership home would cost per month. The calculator on the page updates to show the same figures.",
-			inputSchema: {
-				type: 'object',
-				properties: {
-					market_value: { type: 'number', description: 'Full market value of the home in pounds, e.g. 400000.' },
-					share_percent: { type: 'number', description: 'Percentage share being bought. Usually 25 to 75. Defaults to 25.' },
-					deposit_percent: { type: 'number', description: 'Deposit as a percentage of the share price. Defaults to 5.' },
-					interest_rate_percent: { type: 'number', description: 'Annual mortgage interest rate. Defaults to 5.75, an assumed average rate.' },
-					mortgage_term_years: { type: 'number', description: 'Mortgage term in years. Defaults to 30.' },
-					rent_rate_percent: { type: 'number', description: "Annual rent as a percentage of the share not owned. Defaults to 2.75, the standard rate; some schemes are lower, so use the scheme's own rate if known." },
-					monthly_service_charge: { type: 'number', description: 'Monthly service charge in pounds, if known. Leave out to exclude it.' },
-				},
-				required: ['market_value'],
-			},
-			annotations: { readOnlyHint: true },
-			execute: async (args = {}) => {
-				const inputs = {
-					value: toolNumber(args.market_value, 'market_value', { min: 1000, max: 100000000 }),
-					share: toolNumber(args.share_percent, 'share_percent', { min: 1, max: 100, fallback: DEFAULTS.share }),
-					deposit: toolNumber(args.deposit_percent, 'deposit_percent', { min: 0, max: 100, fallback: DEFAULTS.deposit }),
-					rate: toolNumber(args.interest_rate_percent, 'interest_rate_percent', { min: 0, max: 25, fallback: DEFAULTS.rate }),
-					term: toolNumber(args.mortgage_term_years, 'mortgage_term_years', { min: 1, max: 40, fallback: DEFAULTS.term }),
-					rentRate: toolNumber(args.rent_rate_percent, 'rent_rate_percent', { min: 0, max: MAX_RENT_RATE, fallback: DEFAULT_RENT_RATE }),
-					service: toolNumber(args.monthly_service_charge, 'monthly_service_charge', { min: 0, max: 10000, optional: true }),
-				};
-				const result = calculate(inputs);
-				instances[0].fill({ value: inputs.value, share: inputs.share, deposit: inputs.deposit, rate: inputs.rate, term: inputs.term, rent: inputs.rentRate, service: inputs.service });
-				return JSON.stringify({
-					inputs: { market_value: inputs.value, share_percent: inputs.share, deposit_percent: inputs.deposit, interest_rate_percent: inputs.rate, mortgage_term_years: inputs.term, rent_rate_percent: inputs.rentRate, monthly_service_charge: inputs.service },
-					share_price: round2(result.sharePrice),
-					deposit: round2(result.depositAmount),
-					mortgage_amount: round2(result.mortgageAmount),
-					monthly_mortgage_repayment: round2(result.monthlyMortgage),
-					monthly_rent: round2(result.monthlyRent),
-					monthly_service_charge: inputs.service === null ? 'not included' : round2(result.monthlyService),
-					estimated_total_monthly_cost: round2(result.totalMonthly),
-					currency: 'GBP',
-					disclaimer: DISCLAIMER,
-				});
-			},
-		})).catch((error) => {
-			webMcpRegistered = false;
-			console.warn('[shared-ownership-calculator] WebMCP tool not registered:', error);
-		});
-	}
-
 	function initializeCalculators() {
 		injectStyles();
 		document.querySelectorAll(ROOT_SELECTOR).forEach(createCalculator);
-		registerWebMcp();
 	}
 
 	window.SharedOwnershipCalculator = { calculate, monthlyRepayment, parseNumber, init: initializeCalculators };
