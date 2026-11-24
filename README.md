@@ -72,6 +72,10 @@ Both play once and don't animate under `prefers-reduced-motion`. Webflow keeps t
 
 Where it's used: `grow-children` on the stats strip, the featured-developments cards, the news strip cards and the Home "strategic partner" banner (text, then image); `grow-group` on the Our Services carousel; `grow` on single elements everywhere else. Use `ps="grow-children"` on the parent for any row that should stagger. A Collection Item with its own grid placement gets a Webflow `w-node-…` id that repeats on every card, and a per-item scroll trigger then only animates the last card in the row (that was the case for the featured-developments and news strip cards, which now use `grow-children`).
 
+## Footer (no code)
+
+The footer is the `footer` component in Webflow (on every page). Redesigned 24 Nov 2026, staging only so far: two cards at the top (buying a home → Property Search; developers and housing associations → Contact Us), then logo and one-line intro, Buy a home (property search, Shared Ownership, FAQs, both calculators), Our services (Services collection list), Company, and Get in touch. Bottom bar: Privacy Policy, ©, company and VAT numbers. The section's bottom padding (5rem) keeps the bar clear of the fixed cookie settings button. The `.footer-date` span is filled by the `copyright-year` global. The old version is kept as the unused component "footer (old, backup 24 Nov 2026)"; delete it once the new one is live and approved.
+
 ## Custom code in the CMS
 
 The Developments collection has a "Custom Code" rich-text field. In use on 24 Nov 2026:
