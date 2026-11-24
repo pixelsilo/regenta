@@ -8,12 +8,17 @@ import hideOnTouch from './global/hide-on-touch.js';
 import grow from './global/grow.js';
 import safariShift from './global/safari-shift.js';
 import nav from './global/nav.js';
+import testimonialSlider from './global/testimonial-slider.js';
+import development from './global/development.js';
+import pageExtras from './global/page-extras.js';
+import map from './modules/map.js';
+import autoScroll from './modules/auto-scroll.js';
 
 // Site-wide behaviour that runs on every page
-const GLOBALS = [copyrightYear, formatPrice, hideOnTouch, grow, safariShift, nav];
+const GLOBALS = [copyrightYear, formatPrice, hideOnTouch, grow, safariShift, nav, testimonialSlider, development, pageExtras];
 
 // Opt-in modules, mounted on [data-module="<name>"] roots
-const MODULES = {};
+const MODULES = { map, 'auto-scroll': autoScroll };
 
 function boot() {
   GLOBALS.forEach((init) => {
