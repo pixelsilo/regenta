@@ -27,6 +27,7 @@ const GLOBALS = [copyrightYear, formatPrice, hideOnTouch, grow, safariShift, nav
 const MODULES = { map, 'auto-scroll': autoScroll };
 
 function boot() {
+  window.__regentaBooted = true; // the loader shows hidden content if this never happens
   GLOBALS.forEach((init) => {
     try {
       init();
