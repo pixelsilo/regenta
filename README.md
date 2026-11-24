@@ -2,7 +2,7 @@
 
 Custom JavaScript for the Regenta UK Webflow site (site `68362e432005a0afe1416a06`). Vite builds it into `dist/site.js`, which is committed and served by jsDelivr from a git tag. One small snippet in the Webflow **footer** (`snippets/loader.html`) loads it. This is the same setup as Cocos Organic.
 
-**Status (24 Nov 2026):** being moved over. The loader is in Site settings > Footer on `v2.1.0` (staging only so far) and carries the site-wide globals. Page code and embeds still hold the rest. Copies of the original code are in `snippets/`. The migration plan is below.
+**Status (24 Nov 2026):** being moved over. The loader is in Site settings > Footer on `v2.2.0` (staging only so far) and carries the site-wide globals. Page code and embeds still hold the rest. Copies of the original code are in `snippets/`. The migration plan is below.
 
 ## Develop
 
@@ -55,12 +55,29 @@ Copies of the code on the site as of 24 Nov 2026, kept so any step can be undone
 - `snippets/embeds/`: every embed that contains a script or style, taken from the published HTML. These show the rendered output (CMS values filled in), not the Designer source.
 - This repo is public, so the Make webhook and Formspark addresses and the Google Maps keys are replaced with `REDACTED`. The originals are still in Webflow until later steps replace them. The only Maps key in use is the one on /property-search (Regenta Website project in Google Cloud, restricted to regenta.co.uk and regenta-uk.webflow.io).
 
+## Custom code in the CMS
+
+The Developments collection has a "Custom Code" rich-text field. In use on 24 Nov 2026:
+
+- `jigsaw`, `dominion-house`: show the External gallery tab before Internal (script + style).
+- `the-beacons` (archived): reorders the overview and USPs sections.
+
+If more developments need this, a CMS switch plus a small module would be better than pasting script into each item. Many developments also have iframes (video embeds) in their rich text; those are content, not code.
+
 ## Migration plan
 
 0. ✅ Save copies of the code and set up Vite with the loader. No site change.
 1. ✅ (staging, 24 Nov) Removed dead code: the commented-out Slick on Home, and the broken map code and duplicate cmsfilter on the success and error pages. Home2, Christmas Home and SO Home are left alone because they're becoming drafts. The calculator loaders turned out not to be duplicated. The 404 page's `/develpoment/` redirect script is replaced by a 301 rule in Site settings > Publishing: `/develpoment/(.*)` → `/property-search`.
 2. ✅ (staging, 24 Nov, `v2.0.0`) Site-wide globals into the bundle: footer year, `ps="grow"`, Safari button shift, price format, `ps-hide="on-touch"`. The loader went into Site settings > Footer, replacing the old footer scripts, and the two head scripts were removed. Then `v2.1.0`: the mobile menu toggle and navbar fade from the navigation component's embed (embed removed).
-3. Development template, Property Search, Contact map, success-page text, news, services. One `map` module, using only the Property Search Maps key.
+3. ✅ (staging, 24 Nov, `v2.2.0`) Development template, Property Search, Contact map, success-page text, news and services moved into the bundle:
+   - `map` module (`[data-module="map"]`) on Property Search (`data-pins="location-item"`), Contact Us and the Developments template (lat/lng/name bound to CMS fields). The Maps key sits in `data-maps-key` in Webflow, not in this public repo.
+   - `auto-scroll` module on the development hero gallery.
+   - `global/development.js`: captions, unit filter, brochure panel, development navbar menu, price list, share button ("at Regenta", was "at SiteSales").
+   - `global/testimonial-slider.js` replaces the unpinned `slider.js` (the root file can go once this is live).
+   - `global/page-extras.js`: success/error page text, Property Search location dropdown, news YouTube autoplay, services Lottie resize.
+   - Removed from Webflow: the map/gallery/caption/filter/slider code in the template footer, the brochure, navbar and share embeds (the price list embed keeps only its CSS), the location dropdown embed, and the Property Search, Contact, news, services and success-page code.
+   - Still on the Developments template: the forms code (step 5), the hero CSS (step 6), the Finsweet accordion loader, and the noindex script in the head (remove once the CMS "Sitemap indexing" switch is set on unlisted developments).
+   - Kept as before: the old embed's "click #default-sort on load" never ran (the gallery code replaced `window.onload`), so it isn't in the bundle either.
 4. Calculators and the Shared Ownership FAQ into the bundle.
 5. Forms: native Webflow submit plus a signed webhook to a worker (`regenta-private`), forwarding to Make. Contact Us uses Webflow email notifications. Remove the cookie-consent gate. Keep the `formSubmission` dataLayer event until GTM has been checked. Then rotate the old Make and Formspark addresses.
 6. CSS from Site settings into a global `code_css` embed. Optionally move from Finsweet Attributes v1 to v2.
