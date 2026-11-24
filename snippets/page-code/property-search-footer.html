@@ -1,0 +1,236 @@
+<!-- Google Maps API -->
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDllk94aIof2CRIlKRbfUycZ7a4i_XMz3A&callback=initMap" type="text/javascript"></script>
+<!-- Maps Load -->
+<script>
+	// Run code when page loads
+  window.addEventListener('load', function () {
+
+		// Create a locations array
+    var locations = []
+
+		// Add .location-wrapper class to the location Collection Item
+    var dynPlaces = document.querySelectorAll('.w-dyn-item.location-item');   
+
+  	// Define variables for the map info window
+    dynPlaces.forEach( function(elem) {
+
+			// Create places array
+      var place = [];
+
+  		// Define variables for each place
+      var dataTitle = elem.querySelector('.data---slug').innerText; // Define slug for targeting the information window
+      var dataLat = Number(elem.querySelector('.data---latitude').innerText); // Define latitude point for pin
+      var dataLong = Number(elem.querySelector('.data---longitude').innerText); // Define longitude point for pin
+      var infoWindowContent = elem.querySelector('.data---info-window').innerHTML; // Define content wrapper for the information window
+
+      place.push(dataTitle, infoWindowContent, dataLat, dataLong); // Add variables to each place
+
+      locations.push(place);   // Add each place to the locations array
+    });
+
+		// Map settings
+    var map = new google.maps.Map(document.getElementById('map'), {
+      mapTypeId: google.maps.MapTypeId.ROADMAP,
+      streetViewControl: false,
+      mapTypeControl: false,
+      fullscreenControl: false,
+      scrollwheel: false,
+      
+      // Json map styling via https://mapstyle.withgoogle.com
+      styles: [
+  {
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#f5f5f5"
+      }
+    ]
+  },
+  {
+    "elementType": "labels.icon",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#616161"
+      }
+    ]
+  },
+  {
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      {
+        "color": "#f5f5f5"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.land_parcel",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#bdbdbd"
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#eeeeee"
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#757575"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#e5e5e5"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#9e9e9e"
+      }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#ffffff"
+      }
+    ]
+  },
+  {
+    "featureType": "road.arterial",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#757575"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#dadada"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#616161"
+      }
+    ]
+  },
+  {
+    "featureType": "road.local",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#9e9e9e"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.line",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#e5e5e5"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.station",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#eeeeee"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#c9c9c9"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#9e9e9e"
+      }
+    ]
+  }
+]
+    });
+
+    // Create info windows
+    var infowindow = new google.maps.InfoWindow();
+
+		// Create markers
+    function createMarker(latlng, html) {
+      var marker = new google.maps.Marker({
+        position: latlng,
+        map: map,
+        icon: "https://cdn.prod.website-files.com/68362e432005a0afe1416a06/6842c1858ab95beb6b0339ee_regenta-pin.png"
+      });
+
+ 		// Define info window for each marker
+      google.maps.event.addListener(marker, 'click', function() {
+        infowindow.setContent(html);
+        infowindow.open(map, marker);
+      });
+      return marker;
+    }
+
+    gmarkers = [];
+    for (var i = 0; i < locations.length; i++) {
+      gmarkers[locations[i][0]] =
+        createMarker(new google.maps.LatLng(locations[i][2], locations[i][3]), // passing lat and long
+                                locations[i][1]); // passing Info-window information
+    }
+    
+		// Create map center and zoom
+		var center = new google.maps.LatLng(51.5074, -0.1278); // London, UK
+		var zoom = 10;
+		// Set map center and zoom
+		map.setCenter(center);
+		map.setZoom(zoom);
+    
+  }, false);
+</script>

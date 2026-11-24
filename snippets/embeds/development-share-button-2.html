@@ -1,0 +1,20 @@
+<!-- Captured from the published live HTML on 24 Nov 2026 (rendered output, CMS values filled in). Seen on: development/fulham-quarter -->
+<!--- Share Button --->
+<script>
+document.getElementById('shareBtn').addEventListener('click', async () => {
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: 'Discover Fulham Quarter  at SiteSales',
+        text: 'Fulham Quarter  - Brand new 1, 2 &amp; 3 bedroom apartments available for Shared Ownership, located in the desirable area of Parsons Green in West London.',
+        url: window.location.href,
+      });
+      console.log('Sharing was successful.');
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
+  } else {
+    console.log('Web Share API is not supported on this device or browser.');
+  }
+});
+</script>

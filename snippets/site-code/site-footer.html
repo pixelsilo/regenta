@@ -1,0 +1,114 @@
+<script>
+    var textElements = document.getElementsByClassName("footer-date");
+    for (var i = 0; i < textElements.length; i++) {
+        textElements[i].innerHTML = new Date().getFullYear();
+    }
+</script>
+
+<!-- PixelSilo - ps="grow"-->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const elements = document.querySelectorAll('[ps="grow"]');
+      let observer;
+
+      // Intersection Observer settings
+      const observerOptions = {
+        rootMargin: "-10% 0px",
+        threshold: 0.25,
+      };
+
+      // Function to apply staggered delay dynamically
+      const applyStaggeredDelay = (parent) => {
+        const delayFactor = 200; // 200ms per item
+        const slickInstance = $(parent).closest(".slick-slider");
+        const children = Array.from(parent.children).filter((child) =>
+          child.hasAttribute("ps")
+        );
+
+        if (slickInstance.length) {
+          // For slick sliders, stagger within the visible slides
+          const slickData = slickInstance.slick("getSlick");
+          const visibleSlides = slickData.options.slidesToShow || 1;
+          children.forEach((el, index) => {
+            const staggerIndex = index % visibleSlides; // cycles delay per visible slide
+            const delay = staggerIndex * delayFactor;
+            el.style.transitionDelay = `${delay}ms`;
+          });
+        } else {
+          // For non-slick elements (e.g., flex or grid), apply a cumulative delay
+          children.forEach((el, index) => {
+            const delay = index * delayFactor;
+            el.style.transitionDelay = `${delay}ms`;
+          });
+        }
+      };
+
+      // Observer callback function
+      const handleIntersection = (entries) => {
+        entries.forEach((entry) => {
+          const element = entry.target;
+          const parent = element.parentElement;
+
+          if (entry.isIntersecting) {
+            // Apply stagger only on first visibility
+            if (!parent.dataset.staggered) {
+              applyStaggeredDelay(parent);
+              parent.dataset.staggered = "true"; // Prevent reapplying
+            }
+            element.classList.add("is-visible");
+          } else {
+            element.classList.remove("is-visible");
+          }
+        });
+      };
+
+      // Initialize Observer
+      observer = new IntersectionObserver(handleIntersection, observerOptions);
+      elements.forEach((el) => observer.observe(el));
+
+      // Hook into Slick Slider to reapply staggered delays on resize or after change
+      if (window.jQuery) {
+        $(".slick-slider").on("afterChange", () => {
+          document.querySelectorAll(".slick-slider").forEach((slider) => {
+            applyStaggeredDelay(slider);
+          });
+        });
+
+        $(window).on("resize", () => {
+          document.querySelectorAll(".slick-slider").forEach((slider) => {
+            applyStaggeredDelay(slider);
+          });
+        });
+      }
+    });
+  </script>
+
+<!--- Shift .button-text - Safari Only :rolleyes: --->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+  if (isSafari) {
+    // Move elements with class .button-text
+    document.querySelectorAll('.button-text').forEach(el => {
+      el.style.transform = 'translateY(-0.2em)';
+      el.style.display = 'inline-block';
+    });
+
+    // Move just the inner text of elements with [shift="button-text"]
+    document.querySelectorAll('[shift="button-text"]').forEach(el => {
+      const originalText = el.textContent.trim();
+
+      // Clear current content
+      el.textContent = '';
+
+      // Create span, apply transform, and re-insert
+      const span = document.createElement('span');
+      span.textContent = originalText;
+      span.style.display = 'inline-block';
+      span.style.transform = 'translateY(-0.2em)';
+      el.appendChild(span);
+    });
+  }
+});
+</script>

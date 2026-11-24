@@ -1,0 +1,33 @@
+<script>
+attemptRedirect();
+
+function attemptRedirect()
+{
+  
+  // Table of redirects
+  // Uses a regex for the path matching, and redirects to a literal path
+  var redirects = [{
+    path: /^\/develpoment\/(.+)/gi,
+    redirect: "/property-search"
+  }];
+
+// Determine whether the 404 URL matches something in our redirect table 
+ for (const r of redirects) { 
+
+   if (r.path.test(window.location.pathname)) {
+
+     console.log(`matches, redirecting to ${r.redirect}`); 
+
+     // Write a 200 OK response 
+     // Probably irrelevant since we're about to 302 Redirect 
+     // <meta http-equiv="Status" content="200 OK" >
+     document.write(`<meta http-equiv="Status" content="200 OK" >`);
+     
+     window.location.href = r.redirect;
+     
+   }
+
+ }
+  
+}
+</script>

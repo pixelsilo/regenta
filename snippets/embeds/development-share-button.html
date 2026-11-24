@@ -1,0 +1,20 @@
+<!-- Captured from the published live HTML on 24 Nov 2026 (rendered output, CMS values filled in). Seen on: development/abbeywharf -->
+<!--- Share Button --->
+<script>
+document.getElementById('shareBtn').addEventListener('click', async () => {
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: 'Discover Abbey Wharf at SiteSales',
+        text: 'Abbey Wharf - Brand new development consisting of 1 bedroom apartments available for Shared Ownership with communal gardens and city views located in Abbey Quay in Barking.',
+        url: window.location.href,
+      });
+      console.log('Sharing was successful.');
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
+  } else {
+    console.log('Web Share API is not supported on this device or browser.');
+  }
+});
+</script>

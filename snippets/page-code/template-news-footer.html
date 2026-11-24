@@ -1,0 +1,22 @@
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const iframes = document.querySelectorAll('iframe.embedly-embed');
+
+    iframes.forEach(iframe => {
+      let src = iframe.getAttribute('src');
+
+      // Only apply to YouTube videos
+      if (src.includes("youtube.com/embed")) {
+        // Check if autoplay already exists
+        if (!src.includes("autoplay=1")) {
+          // Add autoplay param appropriately
+          const joinChar = src.includes("?") ? "&" : "?";
+          const newSrc = src + joinChar + "autoplay=1";
+
+          // Replace the src to force reload with autoplay
+          iframe.setAttribute('src', newSrc);
+        }
+      }
+    });
+  });
+</script>

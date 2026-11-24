@@ -1,0 +1,62 @@
+<!-- Captured from the published live HTML on 24 Nov 2026 (rendered output, CMS values filled in). Seen on: reports/market-report-q4-2024 -->
+<input class="hidden" type="text" name="report-name" value="Market Report Q4 2024">
+<input class="hidden" type="text" name="download-link" value="https://cdn.prod.website-files.com/68362e432005a0afe1416a06/69835840ae8c2b85d03e9776_Market%20Research%20report%20Q4%202025.pdf">
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // 1. Configuration
+    const encodedUrl = 'REDACTED-base64-make-webhook';
+    const formElement = document.getElementById('wf-form-register-interest');
+    const submitButton = document.querySelector('.button-3'); // Corrected button class
+
+    // 2. Cookie Helper Function
+    function getCookie(name) {
+        let match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        return match ? match[2] : null;
+    }
+
+    // 3. UI Check: Add tooltip if cookie is missing on page load
+    if (!getCookie('fs-cc')) {
+        submitButton.setAttribute('title', 'Please confirm your Cookie Privacy Preferences first');
+        submitButton.style.position = 'relative'; 
+    } else {
+        submitButton.removeAttribute('title');
+    }
+
+    // 4. Handle the Form Submission
+    formElement.addEventListener('submit', function(event) {
+        
+        // A. Check for consent first
+        if (!getCookie('fs-cc')) {
+            event.preventDefault(); // Stop the form from submitting
+            alert("Please confirm your Cookie Privacy Preferences first.");
+            return; // Exit the function entirely
+        }
+
+        // B. If consent exists, update the form action dynamically
+        formElement.setAttribute('action', atob(encodedUrl));
+
+        // C. Update the button text to show processing
+        submitButton.value = 'Please wait...';
+
+        // D. Collect Data for Google Tag Manager (Using corrected Case-Sensitive IDs)
+        const formData = {
+            'fname': document.getElementById('fname') ? document.getElementById('fname').value : '',
+            'lname': document.getElementById('lname') ? document.getElementById('lname').value : '',
+            'email': document.getElementById('email') ? document.getElementById('email').value : '',
+            'referrer': document.getElementById('referrer') ? document.getElementById('referrer').value : '',
+            'contact-email': document.getElementById('contact-email') ? document.getElementById('contact-email').checked : false,
+            'privacy-accepted': document.getElementById('privacy-accepted') ? document.getElementById('privacy-accepted').checked : false
+        };
+
+        // E. Push to Data Layer
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+            'event': 'formSubmission',
+            'formData': formData
+        });
+
+        // The script naturally finishes here and allows the form to submit to the Make.com webhook.
+    });
+});
+</script>

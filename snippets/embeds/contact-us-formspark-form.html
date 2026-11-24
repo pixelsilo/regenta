@@ -1,0 +1,55 @@
+<!-- Captured from the published live HTML on 24 Nov 2026 (rendered output, CMS values filled in). Seen on: contact-us -->
+<input type="hidden" name="_redirect" value="https://site-sales.co.uk/contact-form-success?department=Customer Services"/>
+<input class="hidden" type="text" name="department" value="Customer Services">
+<input type="hidden" name="_email.subject" value="Form Submisson - Contact Form" />
+<input type="hidden" name="_email.from" value="SiteSales Website" />
+<input type="hidden" name="_append" value="false" />
+<input type="checkbox" name="typeofuser" style="display:none" tabindex="-1" autocomplete="off" />
+
+<!--- FormSpark dynamic post action --->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const serviceContactForm = document.getElementById('main-contact-form');
+
+  if (serviceContactForm) {
+    serviceContactForm.action = 'https://submit-form.com/REDACTED';
+  } else {
+    console.error('Form with the ID "main-contact-form" not found');
+  }
+});
+</script>
+
+<!-- Add form fields to the data layer and update the button text -->
+<script>
+$(document).ready(function() {
+  $('#main-contact-form').submit(function(event) {
+    event.preventDefault();
+
+    // Change the submit button text to "Please wait..."
+    var submitButton = $(this).find('input[type="submit"]');
+    var originalButtonText = submitButton.val();
+    submitButton.val('Please wait...');
+
+    // Collect form field data
+    var formData = {
+      'title': $('#title').val(),
+      'fname': $('#fname').val(),
+      'lname': $('#lname').val(),
+      'email': $('#email').val(),
+      'phone': $('#phone').val(),
+      'message': $('#message').val(),
+      'privacy-accept': $('#privacy-accept').is(':checked')
+    };
+
+    // Push the form data to the data layer
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      'event': 'formSubmission',
+      'formData': formData
+    });
+
+    // Submit the form
+    this.submit();
+  });
+});
+</script>

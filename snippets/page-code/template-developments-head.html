@@ -1,0 +1,31 @@
+<!-- No Index Switch -->
+<script>
+var shouldIndexPage = {{wf {&quot;path&quot;:&quot;live-on-site&quot;,&quot;type&quot;:&quot;Bool&quot;\} }};
+function updateNoIndexTag() {
+  var noIndexTag = document.head.querySelector('meta[name="robots"][content="noindex"]');
+  if (shouldIndexPage) {
+    noIndexTag && document.head.removeChild(noIndexTag);
+  } else {
+    if (!noIndexTag) {
+      var meta = document.createElement('meta');
+      meta.name = 'robots';
+      meta.content = 'noindex';
+      document.head.appendChild(meta);
+    }
+  }
+}
+document.addEventListener('DOMContentLoaded', updateNoIndexTag);
+</script>
+
+<!--Heading colour overide -->
+<style>
+.development-rich-text h1,
+.development-rich-text h2,
+.development-rich-text h3,
+.development-rich-text h4,
+.development-rich-text h5,
+.development-rich-text h6 {
+  color: {{wf {&quot;path&quot;:&quot;main-colour&quot;,&quot;type&quot;:&quot;Color&quot;\} }};
+}
+</style>
+

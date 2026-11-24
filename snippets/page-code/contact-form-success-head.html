@@ -1,0 +1,23 @@
+<!-- [Attributes by Finsweet] CMS Filter -->
+<script async src="https://cdn.jsdelivr.net/npm/@finsweet/attributes-cmsfilter@1/cmsfilter.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Get the value of the "department" query parameter from the URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const successParam = urlParams.get('department');
+
+  // Find the element with an ID of "department-name"
+  const developmentName = document.getElementById('department-name');
+
+  // Set the text content of the element to the capitalized string from the query parameter
+  if (successParam) {
+    const words = successParam.split('-');
+    const capitalizedWords = words.map(word => word.charAt(0).toUpperCase() + word.slice(1));
+    const finalString = capitalizedWords.join(' ');
+    developmentName.textContent = finalString;
+  }
+});
+
+</script>
+

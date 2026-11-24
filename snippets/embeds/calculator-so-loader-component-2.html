@@ -1,0 +1,22 @@
+<!-- Captured from the published staging HTML on 24 Nov 2026 (rendered output, CMS values filled in). Seen on: calculator/calculator-dev -->
+<!-- Shared Ownership calculator loader. ?dev = load from VS Code Live Server, ?dev=off = back to the CDN.
+     New release: tag it in GitHub (e.g. v1.1.1) and change VERSION here and in the page settings of /shared-ownership-calculator. -->
+<script>
+(() => {
+  const VERSION = 'v1.1.0';
+  const FILE = 'so-calculator.js';
+  const KEY = 'ps-dev';
+  const loaded = (window.__psCalc = window.__psCalc || {});
+  if (loaded[FILE]) return;
+  loaded[FILE] = true;
+  const q = new URLSearchParams(location.search).get('dev');
+  try { if (q !== null) localStorage.setItem(KEY, q === 'off' ? '' : '1'); } catch (e) {}
+  let dev = false;
+  try { dev = localStorage.getItem(KEY) === '1'; } catch (e) {}
+  const base = dev ? 'http://127.0.0.1:5500' : 'https://cdn.jsdelivr.net/gh/pixelsilo/regenta@' + VERSION;
+  const s = document.createElement('script');
+  s.src = base + '/' + FILE + (dev ? '?t=' + Date.now() : '');
+  document.body.appendChild(s);
+  if (dev) console.info('[ps-dev] Loading ' + FILE + ' from ' + base);
+})();
+</script>

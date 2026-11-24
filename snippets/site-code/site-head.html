@@ -1,0 +1,84 @@
+<!-- Cookie Consent -->
+<script async src="https://cdn.jsdelivr.net/npm/@finsweet/cookie-consent@1/fs-cc.js" fs-cc-mode="opt-in"></script>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-TTDMB5W');</script>
+<!-- End Google Tag Manager -->
+
+<!-- Rich Text -->
+<script defer src="https://cdn.jsdelivr.net/npm/@finsweet/attributes-richtext@1/richtext.js"></script>
+<!-- CMS Slider -->
+<script defer type="module"
+src="https://cdn.jsdelivr.net/npm/@finsweet/attributes@2/attributes.js"
+fs-list
+></script>
+<!-- Mirror click events -->
+<script defer src="https://cdn.jsdelivr.net/npm/@finsweet/attributes-mirrorclick@1/mirrorclick.js"></script>
+<!-- Input Active Class -->
+<script defer src="https://cdn.jsdelivr.net/npm/@finsweet/attributes-inputactive@1/inputactive.js"></script>
+<!-- CMS Sort -->
+<script async src="https://cdn.jsdelivr.net/npm/@finsweet/attributes-cmssort@1/cmssort.js"></script>
+<!-- CMS Filter-->
+<script async src="https://cdn.jsdelivr.net/npm/@finsweet/attributes-cmsfilter@1/cmsfilter.js"></script>
+
+<!-- Format Prices -->
+<script>
+document.addEventListener('DOMContentLoaded', () => document.querySelectorAll('#price').forEach(div => div.textContent = (p => !isNaN(p) ? p.toLocaleString('en-US') : div.textContent)(parseFloat(div.textContent.trim()))));
+</script>
+
+<!--- ps-hide="on-touch" --->
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Function to handle element visibility
+    function handleVisibility() {
+      var isTouchDevice = window.matchMedia("(pointer: coarse)").matches || 'ontouchstart' in window;
+      var isSmallScreen = window.innerWidth <= 991;
+      var divsToResize = document.querySelectorAll('[ps-hide="on-touch"]');
+
+      divsToResize.forEach(function(div) {
+        if (isTouchDevice && isSmallScreen) {
+          div.style.width = '0px';
+          div.style.height = '0px';
+          div.style.overflow = 'hidden'; // Hides content on touch devices with small screens
+        } else {
+          div.style.width = '';
+          div.style.height = '';
+          div.style.overflow = ''; // Resets styles on larger screens or non-touch devices
+        }
+      });
+    }
+    // Run on load and resize
+    handleVisibility();
+    window.addEventListener("resize", handleVisibility);
+  });
+</script>
+
+<!-- pixelsilo.net - ps="grow"-->
+<style>
+/* Default hidden state */
+[ps="grow"] {
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+/* When element is in view */
+[ps="grow"].is-visible {
+    opacity: 1;
+    transform: scale(1);
+}
+/* Reset transition delay if is-visible class is removed */
+[ps="grow"]:not(.is-visible) {
+    transition-delay: 0s !important;
+}
+/* Forces visability in Webflow Editor */
+.w-editor [ps="grow"],
+.wf-editor [ps="grow"] {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+    transition: none !important;
+}
+</style>

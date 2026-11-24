@@ -1,0 +1,43 @@
+<!-- Captured from the published live HTML on 24 Nov 2026 (rendered output, CMS values filled in). Seen on: development/abbeywharf -->
+<input class="hidden" type="number" name="sendinblue-listid" value="">
+<input class="hidden" type="text" name="name" value="Abbey Wharf">
+<input class="hidden" type="text" name="slug" value="abbeywharf">
+<input class="hidden" type="text" name="brochureurl" value="https://drive.google.com/file/d/1Z4zb2mA7DZfoajI3KT1MzgedN0SzI6JP/view?usp=drive_link">
+<input class="hidden" type="text" name="developmentlogo" value="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/695d645793d89723e1bad434_Abbey%20Wharf_Logo.webp">
+<input class="hidden" type="text" name="mainimage" value="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/69ce3e224cc29ac85828488f_075_LowRes_Regenta_AbbeyWharf_Showhome_4K2A8758.webp">
+<input class="hidden" type="text" name="brandcolor" value="hsla(202.6530612244898, 71.01%, 72.94%, 1.00)">
+<input class="hidden" type="text" name="redirect" value="https://regenta.co.uk/success-message?success=">
+
+<!--- update bedrooms selection based on max bedrooms --->
+<script>
+var maxBedrooms = ;
+
+function updateBedroomOptions() {
+    var select = document.getElementById('bedrooms');
+    select.innerHTML = '<option value=""></option>';
+
+    for (var i = 1; i <= maxBedrooms; i++) {
+        var option = document.createElement('option');
+        option.value = i;
+        option.textContent = i;
+        select.appendChild(option);
+    }
+}
+
+updateBedroomOptions();
+</script>
+
+<!--- make extra from fields required if on --->
+<script>
+var shouldBeRequired = false;
+function updateRequiredFields() {
+    var ownershipField = document.getElementById('ownership');
+
+    if (shouldBeRequired) {
+        ownershipField.setAttribute('required', '');
+    } else {
+        ownershipField.removeAttribute('required');
+    }
+}
+updateRequiredFields();
+</script>

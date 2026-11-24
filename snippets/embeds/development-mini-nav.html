@@ -1,0 +1,30 @@
+<!-- Captured from the published live HTML on 24 Nov 2026 (rendered output, CMS values filled in). Seen on: development/abbeywharf, development/fulham-quarter -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const allToggles = document.querySelectorAll('[mini-nav="toggle"]');
+  const toggleButton = document.querySelector('.dnb-mobile_toggle');
+  const navPanel = document.querySelector('.dnb-mobile_component');
+
+  if (toggleButton && navPanel && allToggles.length) {
+    allToggles.forEach(el => {
+      el.addEventListener('click', (e) => {
+        // Prevent jump for links with href="#"
+        if (el.getAttribute('href') === '#') e.preventDefault();
+
+        const isOpen = navPanel.classList.contains('open');
+        const clickedToggleButton = el === toggleButton;
+
+        // Toggle if it's the main toggle button
+        if (clickedToggleButton) {
+          navPanel.classList.toggle('open');
+          toggleButton.classList.toggle('open');
+        } else {
+          // If it's a nav link, just close
+          navPanel.classList.remove('open');
+          toggleButton.classList.remove('open');
+        }
+      });
+    });
+  }
+});
+</script>

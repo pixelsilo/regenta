@@ -1,0 +1,25 @@
+<!--
+  Webflow > Site settings > Custom code > FOOTER
+  Bump VERSION to release (must be a pushed git tag). Never reuse v1.2.0 (deleted).
+  ?dev switches this browser to localhost, ?dev=off switches back.
+  Not pasted into Webflow yet: that happens in step 2 of the migration.
+-->
+<script>
+(() => {
+  const VERSION = 'v2.0.0';
+  const FILES = ['site.js'];
+  const REPO = 'https://cdn.jsdelivr.net/gh/pixelsilo/regenta@' + VERSION + '/dist';
+  const LOCAL = 'http://127.0.0.1:5500';
+  const KEY = 'ps-dev';
+  const q = new URLSearchParams(location.search).get('dev');
+  try { if (q !== null) localStorage.setItem(KEY, q === 'off' ? '' : '1'); } catch (e) {}
+  let dev = false;
+  try { dev = localStorage.getItem(KEY) === '1'; } catch (e) {}
+  if (dev) console.info('[regenta] DEV mode, loading from', LOCAL, '(?dev=off to exit)');
+  FILES.forEach((f) => {
+    const s = document.createElement('script');
+    s.src = (dev ? LOCAL : REPO) + '/' + f + (dev ? '?t=' + Date.now() : '');
+    document.body.appendChild(s);
+  });
+})();
+</script>

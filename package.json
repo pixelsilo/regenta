@@ -1,0 +1,15 @@
+{
+  "name": "regenta-webflow",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Custom code for the Regenta UK Webflow site, built with Vite and served via jsDelivr.",
+  "scripts": {
+    "dev": "vite build --watch --mode development",
+    "serve": "vite preview --host 127.0.0.1 --port 5500 --strictPort",
+    "build": "vite build"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0"
+  }
+}

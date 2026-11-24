@@ -1,0 +1,123 @@
+<!-- Captured from the published live HTML on 24 Nov 2026 (rendered output, CMS values filled in). Seen on: development/abbeywharf, development/fulham-quarter -->
+<!-- floorplan click on row -->
+<script>addEventListener('DOMContentLoaded', _ => document.querySelectorAll('.pg_row').forEach(r => r.onclick = _ => r.querySelector('.floorplan-lightbox-link')?.click()));</script>
+<!-- auto scroll list -->
+<script>addEventListener('DOMContentLoaded', () => document.querySelectorAll('.fs-sort_button-2').forEach(b => b.onclick = () => document.querySelector('.pg_cl').scrollTo(0, 0)));</script>
+<!-- #default-sort clicks on load -->
+<script>onload = () => document.querySelector("#default-sort").click();</script>
+
+<style>
+  /* For Webkit-based browsers */
+  .pg_cl::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .pg_cl::-webkit-scrollbar-track {
+    background-color: #F0F0F0;
+    border-radius: 4px;
+  }
+
+  .pg_cl::-webkit-scrollbar-thumb {
+    background-color: #C0C0C0;
+    border-radius: 4px;
+  }
+
+  .pg_cl::-webkit-scrollbar-thumb:hover {
+    background-color: #A0A0A0;
+  }
+
+  /* For Firefox */
+  .pg_cl {
+    scrollbar-width: thin;
+    scrollbar-color: #C0C0C0 #F0F0F0;
+  }
+[availability="available" i] {
+  color: #4CAF50;
+}
+
+/* Same color for both states (case-insensitive) */
+[availability="under offer" i],
+[availability="reserved" i] {
+  color: #FF2427;
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  // ---------- DOM ----------
+  const toggleLink        = document.querySelector('.toggle-link');
+  const toggleFrame       = document.querySelector('.toggle-frame');
+  const toggleSwitch      = document.querySelector('.toggle-switch');
+  const priceSharedButton = document.getElementById('price-shared-button');
+  const priceButton       = document.getElementById('price-button');
+  const priceSharedDivs   = document.querySelectorAll('[id=price-shared-div]');
+  const priceStandardDivs = document.querySelectorAll('[id=price-standard]');
+
+  if (!toggleLink || !toggleFrame || !toggleSwitch) return; // hard stop if core UI missing
+
+  // ---------- Helpers ----------
+  function hasSharedOwnershipTenure() {
+    // True if ANY element with fs-cmssort-field="tenure" indicates "Shared Ownership"
+    const nodes = document.querySelectorAll('[fs-cmssort-field="tenure"]');
+    return Array.from(nodes).some(el => {
+      const text = (el.textContent || '').trim().toLowerCase();
+      const val  = (el.value !== undefined ? String(el.value) : '').trim().toLowerCase();
+      const data = (el.getAttribute && el.getAttribute('data-value') ? el.getAttribute('data-value') : '').trim().toLowerCase();
+      const needle = 'shared ownership';
+      return text.includes(needle) || val.includes(needle) || data.includes(needle);
+    });
+  }
+
+  function showNodes(nodelist, show) {
+    nodelist.forEach(el => { if (el) el.classList.toggle('hidden', !show); });
+  }
+
+  function add(el, cls, on) { if (el) el.classList.toggle(cls, on); }
+
+  function flashRows() {
+    const rows = document.querySelectorAll('.pg_ci');
+    rows.forEach(row => {
+      const pricePercentage = row.querySelector('[id=price-percentage]');
+      const rowFlashDiv     = row.querySelector('.row-flash');
+      if (pricePercentage && pricePercentage.textContent.trim() && rowFlashDiv) {
+        rowFlashDiv.style.transition = 'opacity 0.5s';
+        rowFlashDiv.style.opacity = '0.5';
+        setTimeout(() => { rowFlashDiv.style.opacity = '0'; }, 500);
+      }
+    });
+  }
+
+  // ---------- State machine ----------
+  let isOn = false;
+
+  function applyState(on, {doFlash = false} = {}) {
+    isOn = on;
+
+    // Switch UI classes
+    add(toggleFrame,  'toggle-frame-on',  on);
+    add(toggleSwitch, 'toggle-switch-on', on);
+
+    // Buttons
+    if (priceSharedButton) priceSharedButton.classList.toggle('hidden', !on);
+    if (priceButton)       priceButton.classList.toggle('hidden', on);
+
+    // Content areas
+    showNodes(priceSharedDivs,   on);
+    showNodes(priceStandardDivs, !on);
+
+    // Optional flash when turning on
+    if (on && doFlash) flashRows();
+  }
+
+  // ---------- Initial state ----------
+  const defaultOn = hasSharedOwnershipTenure();
+  applyState(defaultOn, { doFlash: defaultOn });
+
+  // ---------- Interaction ----------
+  toggleLink.addEventListener('click', function (e) {
+    e.preventDefault();
+    const next = !isOn;
+    applyState(next, { doFlash: next });
+  });
+});
+</script>

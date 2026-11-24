@@ -1,0 +1,22 @@
+<!-- Captured from the published live HTML on 24 Nov 2026 (rendered output, CMS values filled in). Seen on: development/abbeywharf, development/fulham-quarter -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const openButtons = document.querySelectorAll('[brochure="open"]');
+  const closeButtons = document.querySelectorAll('[brochure="close"]');
+  const component = document.querySelector('.brochure-download_component');
+
+  openButtons.forEach(button => {
+    button.addEventListener('click', e => {
+      e.preventDefault();
+      component?.classList.add('open');
+    });
+  });
+
+  closeButtons.forEach(button => {
+    button.addEventListener('click', e => {
+      e.preventDefault();
+      component?.classList.remove('open');
+    });
+  });
+});
+</script>

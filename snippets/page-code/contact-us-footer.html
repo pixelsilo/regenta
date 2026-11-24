@@ -1,0 +1,23 @@
+<!-- Google Maps API -->
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDllk94aIof2CRIlKRbfUycZ7a4i_XMz3A&callback=initMap" type="text/javascript"></script>
+
+<!-- Maps Load -->
+<script>
+function initMap() {
+  const myLatLng = { lat: 51.516809128480595, lng: -0.0793568384598921 };
+  const map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 12,
+    center: myLatLng,
+  });
+
+  new google.maps.Marker({
+    position: myLatLng,
+    map,
+    title: "Regenta",
+    icon: "https://cdn.prod.website-files.com/68362e432005a0afe1416a06/6842c1858ab95beb6b0339ee_regenta-pin.png"
+  });
+}
+
+window.initMap = initMap;
+</script>
+

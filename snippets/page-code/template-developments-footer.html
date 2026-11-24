@@ -1,0 +1,223 @@
+<!-- Google Maps API -->
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDllk94aIof2CRIlKRbfUycZ7a4i_XMz3A&callback=initMap" type="text/javascript"></script>
+
+<!-- Maps Load -->
+<script>
+function initMap() {
+  const myLatLng = { lat: {{wf {&quot;path&quot;:&quot;latitude&quot;,&quot;type&quot;:&quot;PlainText&quot;\} }}, lng: {{wf {&quot;path&quot;:&quot;longitude&quot;,&quot;type&quot;:&quot;PlainText&quot;\} }} };
+  const map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 13,
+    center: myLatLng,
+  });
+
+  new google.maps.Marker({
+    position: myLatLng,
+    map,
+    title: "{{wf {&quot;path&quot;:&quot;name&quot;,&quot;type&quot;:&quot;PlainText&quot;\} }}",
+    icon: "https://cdn.prod.website-files.com/68362e432005a0afe1416a06/6842c1858ab95beb6b0339ee_regenta-pin.png"
+  });
+}
+
+window.initMap = initMap;
+</script>
+
+<!--- Scroll Hero --->
+<script>
+window.onload = function() {
+  const gallery = document.querySelector(".development-hero_gallery");
+
+  if (gallery) { // Check if the gallery element exists
+    const smoothScroll = (element, duration, distance, callback) => {
+      const startTime = performance.now();
+      const start = element.scrollLeft;
+
+      const easeInOutQuad = t => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+
+      const updateScroll = currentTime => {
+        const progress = Math.min((currentTime - startTime) / duration, 1);
+        element.scrollLeft = start + distance * easeInOutQuad(progress);
+        progress < 1 ? requestAnimationFrame(updateScroll) : callback?.();
+      };
+
+      requestAnimationFrame(updateScroll);
+    };
+
+    const autoScroll = () => {
+      const maxScroll = gallery.scrollWidth - gallery.clientWidth;
+      const scrollDuration = 10000;
+      const waitDuration = 1000;
+
+      const scrollToEnd = () => setTimeout(() => smoothScroll(gallery, scrollDuration, -maxScroll, scrollToStart), waitDuration);
+      const scrollToStart = () => setTimeout(() => smoothScroll(gallery, scrollDuration, maxScroll, scrollToEnd), waitDuration);
+
+      scrollToStart();
+    };
+
+    autoScroll();
+  }
+}
+</script>
+
+<!--- Scroll Smoothing --->
+<style>
+  .development-hero_gallery {
+    width: 100%;
+    display: flex;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  .scrolling {
+    animation: 20s linear infinite scroll;
+  }
+
+  @keyframes scroll {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(calc(-100% + 100vw)); }
+  }
+</style>
+
+<!--- Add alt tags as captions to galleries --->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  // Find all elements with the attribute ps-item="caption"
+  const captions = document.querySelectorAll('[ps-item="caption"]');
+
+  // Loop through each caption element
+  captions.forEach((caption) => {
+    // Find the sibling image element within the same parent
+    const siblingImage = caption.parentElement.querySelector('img');
+
+    // Check if the image exists and has an alt attribute
+    if (siblingImage && siblingImage.alt) {
+      // Set the caption text to the image's alt text
+      caption.textContent = siblingImage.alt;
+
+      // Set the display style to block if alt text is present
+      caption.style.display = "block";
+    } else {
+      // If no alt text is present, ensure the caption remains hidden
+      caption.style.display = "none";
+    }
+  });
+});
+</script>
+
+<!-- Dynamically Populate Unit type filters -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const listElements = document.querySelectorAll('[ps-filter="list"]');
+  if (listElements.length === 0) return;
+
+  const uniqueTexts = Array.from(listElements).reduce((texts, element) => {
+    const text = element.textContent.trim().toLowerCase();
+    if (!texts.includes(text)) texts.push(text);
+    return texts;
+  }, []);
+
+  const capitalize = (str) => str.replace(/\b\w/g, (char) => char.toUpperCase());
+
+  const filterForm = document.querySelector('[ps-filter="form"]');
+  if (!filterForm) return;
+
+  if (uniqueTexts.length === 1) {
+    filterForm.style.display = "none";
+    return;
+  }
+
+  const placeholderButton = filterForm.querySelector('[ps-filter="button"]');
+  const buttonContainer = filterForm.querySelector(".fs-checkbox_row");
+  if (!placeholderButton || !buttonContainer) return;
+
+  placeholderButton.querySelector("input").value = capitalize(uniqueTexts[0]);
+  placeholderButton.querySelector("span").textContent = capitalize(uniqueTexts[0]);
+
+  uniqueTexts.slice(1).forEach((text) => {
+    const clonedButton = placeholderButton.cloneNode(true);
+    const capitalizedText = capitalize(text);
+    clonedButton.querySelector("input").value = capitalizedText;
+    clonedButton.querySelector("input").id = `Radio-${text}`;
+    clonedButton.querySelector("span").textContent = capitalizedText;
+    clonedButton.querySelector("span").setAttribute("for", `Radio-${text}`);
+    buttonContainer.appendChild(clonedButton);
+  });
+});
+</script>
+
+<!-- Form Logic -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  // Get a cookie's value by name
+  const getCookie = (name) => {
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? match[2] : null;
+  };
+
+  // Decode a Base64 encoded string
+  const decodeBase64 = (str) => atob(str);
+
+  // Handle form behavior and push form data to the dataLayer
+  const handleFormBehavior = (formId, encodedUrl) => {
+    const formElement = document.getElementById(formId);
+    if (!formElement) return; // Exit if form is not found
+
+    const submitButton = formElement.querySelector('[type="submit"]');
+    if (!submitButton) return; // Exit if submit button is not found
+
+    // Set tooltip if cookie isn't present
+    if (!getCookie('fs-cc')) {
+      submitButton.setAttribute('title', 'Please confirm your Cookie Privacy Preferences first');
+    } else {
+      submitButton.removeAttribute('title');
+    }
+
+    formElement.addEventListener('submit', (event) => {
+      // Prevent submission if the required cookie is missing
+      if (!getCookie('fs-cc')) {
+        event.preventDefault();
+        alert("Please confirm your Cookie Privacy Preferences first.");
+        return;
+      }
+
+      // Decode the URL and update the form's action attribute
+      const decodedUrl = decodeBase64(encodedUrl);
+      formElement.setAttribute('action', decodedUrl);
+      console.log("Form action set to:", decodedUrl);
+
+      // Change the submit button text to "Please wait..."
+      submitButton.value = 'Please wait...';
+
+      // Collect form data and push to the dataLayer
+      const formData = {
+        title: formElement.querySelector('#title')?.value || '',
+        fname: formElement.querySelector('#fname')?.value || '',
+        lname: formElement.querySelector('#lname')?.value || '',
+        email: formElement.querySelector('#email')?.value || '',
+        phone: formElement.querySelector('#phone')?.value || '',
+        message: formElement.querySelector('#message')?.value || '',
+        referrer: formElement.querySelector('#referrer')?.value || '',
+        'contact-email': formElement.querySelector('#contact-email')?.checked || false,
+        'contact-sms': formElement.querySelector('#contact-sms')?.checked || false,
+        'contact-phone': formElement.querySelector('#contact-phone')?.checked || false,
+        'contact-post': formElement.querySelector('#contact-post')?.checked || false,
+        'privacy-accepted': formElement.querySelector('#privacy-accepted')?.checked || false
+      };
+
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'formSubmission',
+        formData: formData
+      });
+    });
+  };
+
+  // Attach behavior for the forms
+  handleFormBehavior('wf-form-register-interest', 'REDACTED-base64-make-webhook');
+  handleFormBehavior('wf-form-download-form', 'REDACTED-base64-make-webhook');
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/gh/pixelsilo/regenta/slider.js"></script>
+
+<!-- [Finsweet Attributes] Accordion -->
+<script>(()=>{var t="https://cdn.jsdelivr.net/npm/@finsweet/attributes-accordion@1/accordion.js",e=document.querySelector(`script[src="${t}"]`);e||(e=document.createElement("script"),e.async=!0,e.src=t,document.head.append(e));})();</script>

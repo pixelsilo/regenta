@@ -1,0 +1,43 @@
+<!-- Captured from the published live HTML on 24 Nov 2026 (rendered output, CMS values filled in). Seen on: development/fulham-quarter -->
+<input class="hidden" type="number" name="sendinblue-listid" value="">
+<input class="hidden" type="text" name="name" value="Fulham Quarter ">
+<input class="hidden" type="text" name="slug" value="fulham-quarter">
+<input class="hidden" type="text" name="brochureurl" value="https://www.dropbox.com/scl/fi/a0ahv2n6d7bx8hzf60fy5/5920-Regenta-Fulham-Quarter-SO-brochure_V8.pdf?rlkey=gisus2gq2ij3jqgzzla9zjewt&amp;st=zionwp92&amp;?dl=1">
+<input class="hidden" type="text" name="developmentlogo" value="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/6943ed15352a3e6a869b8526_Fulham%20Quarter%20logo.webp">
+<input class="hidden" type="text" name="mainimage" value="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/68d65fc0089504287819a39a_hartopp_lannoy_new_development_view01.webp">
+<input class="hidden" type="text" name="brandcolor" value="#00321c">
+<input class="hidden" type="text" name="redirect" value="https://regenta.co.uk/success-message?success=">
+
+<!--- update bedrooms selection based on max bedrooms --->
+<script>
+var maxBedrooms = 3;
+
+function updateBedroomOptions() {
+    var select = document.getElementById('bedrooms');
+    select.innerHTML = '<option value=""></option>';
+
+    for (var i = 1; i <= maxBedrooms; i++) {
+        var option = document.createElement('option');
+        option.value = i;
+        option.textContent = i;
+        select.appendChild(option);
+    }
+}
+
+updateBedroomOptions();
+</script>
+
+<!--- make extra from fields required if on --->
+<script>
+var shouldBeRequired = false;
+function updateRequiredFields() {
+    var ownershipField = document.getElementById('ownership');
+
+    if (shouldBeRequired) {
+        ownershipField.setAttribute('required', '');
+    } else {
+        ownershipField.removeAttribute('required');
+    }
+}
+updateRequiredFields();
+</script>

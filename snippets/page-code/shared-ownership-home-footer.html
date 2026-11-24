@@ -1,0 +1,93 @@
+<!-- Slick Slider --
+<script defer type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('.slider_cl').each(function() {
+        var $slider = $(this);
+        var responsiveAttr = $slider.attr('slider-responsive');
+        
+        if (!responsiveAttr) {
+            console.warn('No slider-responsive attribute found for', $slider);
+            return;
+        }
+        
+        var responsiveValues = responsiveAttr.split('-').map(parseFloat);
+        if (responsiveValues.length !== 3) {
+            console.error('Invalid slider-responsive format. Expected format: "3.5-2.5-1.5"');
+            return;
+        }
+
+        var slidesToShowDefault = responsiveValues[0];
+        var slidesToShowTablet = responsiveValues[1];
+        var slidesToShowMobile = responsiveValues[2];
+        
+        // Initialize the Slick Slider
+        $slider.slick({
+            dots: false,
+            infinite: false,
+            slidesToShow: slidesToShowDefault,
+            slidesToScroll: 1,
+            arrows: false,
+            touchThreshold: 300,
+            responsive: [
+                {
+                    breakpoint: 991,
+                    settings: { slidesToShow: slidesToShowTablet }
+                },
+                {
+                    breakpoint: 479,
+                    settings: { slidesToShow: slidesToShowMobile }
+                }
+            ]
+        });
+
+        // Function to update arrow states based on the current slide
+        function updateArrows(slider) {
+            var currentSlide = slider.slick('slickCurrentSlide');
+            var totalSlides = slider.slick('getSlick').slideCount;
+            var slidesToShow = slider.slick('slickGetOption', 'slidesToShow');
+
+            var $prevArrow = slider.closest('.section').find('.slider-prev');
+            var $nextArrow = slider.closest('.section').find('.slider-next');
+
+            // Disable the previous arrow if on the first slide
+            if (currentSlide === 0) {
+                $prevArrow.css('opacity', '0.5').prop('disabled', true);
+            } else {
+                $prevArrow.css('opacity', '1').prop('disabled', false);
+            }
+
+            // Disable the next arrow if on the last visible slide
+            if (currentSlide + slidesToShow >= totalSlides) {
+                $nextArrow.css('opacity', '0.5').prop('disabled', true);
+            } else {
+                $nextArrow.css('opacity', '1').prop('disabled', false);
+            }
+        }
+
+        // Initial arrow state update
+        updateArrows($slider);
+
+        // Update arrows after each slide change
+        $slider.on('afterChange', function(event, slick, currentSlide) {
+            updateArrows($(this));
+        });
+    });
+
+    // Custom arrow click handlers
+    $('.slider-prev').click(function() {
+        var slider = $(this).closest('.section').find('.slider_cl');
+        if (!$(this).prop('disabled')) {
+            slider.slick('slickPrev');
+        }
+    });
+
+    $('.slider-next').click(function() {
+        var slider = $(this).closest('.section').find('.slider_cl');
+        if (!$(this).prop('disabled')) {
+            slider.slick('slickNext');
+        }
+    });
+});
+</script> 
+---slider-->

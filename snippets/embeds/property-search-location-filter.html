@@ -1,0 +1,33 @@
+<!-- Captured from the published live HTML on 24 Nov 2026 (rendered output, CMS values filled in). Seen on: property-search, property-search-shared-ownership -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Get the location dropdown and the location names list
+    const locationDropdown = document.getElementById('field-3');
+    const locationNamesDiv = document.getElementById('location-names');
+    
+    // Initialize a set to store unique location names
+    const locationSet = new Set();
+    
+    // Get all location names from the div
+    const locationItems = locationNamesDiv.querySelectorAll('.location-name');
+    
+    // Loop through each location item and add unique locations to the set
+    locationItems.forEach(item => {
+        const locationName = item.textContent.trim();
+        if (locationName) {  // Only add non-empty names
+            locationSet.add(locationName);
+        }
+    });
+    
+    // Clear existing options in the dropdown (except the first one)
+    locationDropdown.innerHTML = '<option value="">Locations</option>';
+    
+    // Add the unique locations as options to the dropdown
+    locationSet.forEach(location => {
+        const option = document.createElement('option');
+        option.value = location;
+        option.textContent = location;
+        locationDropdown.appendChild(option);
+    });
+});
+</script>

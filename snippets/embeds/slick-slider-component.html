@@ -1,0 +1,118 @@
+<!-- Captured from the published live HTML on 24 Nov 2026 (rendered output, CMS values filled in). Seen on: about, careers, case-studies/barnardos-garden-village, contact-us, form-error, home, home2, property-search, property-search-shared-ownership, research-breakfast/london-residential-research-q3-26-download, research-breakfast/q3-26, services/customer-care, success-message -->
+<!-- Slick Slider -->
+<script defer type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+<style>
+.slider_ci {
+	display: inline-block;
+  opacity: 0;
+}
+.slider_cl {
+ 	display:block !important;
+}
+.slick-prev:hover,.slick-prev:focus,.slick-next:hover,.slick-next:focus {
+ 	outline: none;
+}
+.slick-slide{
+	outline: none !important; 
+margin-right: 1rem;
+}
+.slick-track {
+    display: flex !important;
+    align-items: top;
+}
+</style>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll('.slider_cl').forEach(function (slider) {
+    const responsiveAttr = slider.getAttribute('slider-responsive');
+
+    if (!responsiveAttr) {
+      console.warn('No slider-responsive attribute found for', slider);
+      return;
+    }
+
+    const responsiveValues = responsiveAttr.split('-').map(parseFloat);
+    if (responsiveValues.length !== 3) {
+      console.error('Invalid slider-responsive format. Expected format: "3.5-2.5-1.5"');
+      return;
+    }
+
+    const [slidesToShowDefault, slidesToShowTablet, slidesToShowMobile] = responsiveValues;
+
+    // Initialize the Slick Slider
+    $(slider).slick({
+      dots: false,
+      infinite: false,
+      slidesToShow: slidesToShowDefault,
+      slidesToScroll: 1,
+      arrows: false,
+      touchThreshold: 300,
+      responsive: [
+        {
+          breakpoint: 991,
+          settings: { slidesToShow: slidesToShowTablet }
+        },
+        {
+          breakpoint: 479,
+          settings: { slidesToShow: slidesToShowMobile }
+        }
+      ]
+    });
+
+    function updateArrows(sliderEl) {
+      const slickInstance = $(sliderEl).slick('getSlick');
+      const currentSlide = slickInstance.currentSlide;
+      const totalSlides = slickInstance.slideCount;
+      const slidesToShow = $(sliderEl).slick('slickGetOption', 'slidesToShow');
+
+      const section = sliderEl.closest('.section');
+      const prevArrow = section.querySelector('.slider-prev');
+      const nextArrow = section.querySelector('.slider-next');
+
+      if (currentSlide === 0) {
+        prevArrow.style.opacity = '0.5';
+        prevArrow.disabled = true;
+      } else {
+        prevArrow.style.opacity = '1';
+        prevArrow.disabled = false;
+      }
+
+      if (currentSlide + slidesToShow >= totalSlides) {
+        nextArrow.style.opacity = '0.5';
+        nextArrow.disabled = true;
+      } else {
+        nextArrow.style.opacity = '1';
+        nextArrow.disabled = false;
+      }
+    }
+
+    // Initial arrow state update
+    updateArrows(slider);
+
+    // Update arrows after each slide change
+    $(slider).on('afterChange', function () {
+      updateArrows(slider);
+    });
+  });
+
+  // Custom arrow click handlers
+  document.querySelectorAll('.slider-prev').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (!btn.disabled) {
+        const slider = btn.closest('.section').querySelector('.slider_cl');
+        $(slider).slick('slickPrev');
+      }
+    });
+  });
+
+  document.querySelectorAll('.slider-next').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (!btn.disabled) {
+        const slider = btn.closest('.section').querySelector('.slider_cl');
+        $(slider).slick('slickNext');
+      }
+    });
+  });
+});
+</script>
+<!-- End Slick Slider -->
