@@ -13,6 +13,7 @@ import development from './global/development.js';
 import pageExtras from './global/page-extras.js';
 import faq from './global/faq.js';
 import finsweet from './global/finsweet.js';
+import legacyFilterLinks from './global/legacy-filter-links.js';
 import sharedOwnershipCalculator from './calculators/shared-ownership.js';
 import stampDutyCalculator from './calculators/stamp-duty.js';
 import map from './modules/map.js';
@@ -20,7 +21,7 @@ import autoScroll from './modules/auto-scroll.js';
 
 // Site-wide behaviour that runs on every page.
 // Order matters: page fixes that change the DOM (prices, location options) run before finsweet loads the filters.
-const GLOBALS = [copyrightYear, formatPrice, hideOnTouch, grow, safariShift, nav, testimonialSlider, development, pageExtras, faq, sharedOwnershipCalculator, stampDutyCalculator, finsweet];
+const GLOBALS = [copyrightYear, formatPrice, hideOnTouch, grow, safariShift, nav, testimonialSlider, development, pageExtras, faq, sharedOwnershipCalculator, stampDutyCalculator, legacyFilterLinks, finsweet];
 
 // Opt-in modules, mounted on [data-module="<name>"] roots
 const MODULES = { map, 'auto-scroll': autoScroll };
