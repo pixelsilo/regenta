@@ -93,6 +93,12 @@ If more developments need this, a CMS switch plus a small module would be better
    - Checked on staging against the v1 results: all 26, Shared Ownership 17, bedrooms 2/3/4/5 → 21/10/4/0, West London 6, up to £300k 15, clear 26; slider, map toggle, sorting (asc/desc, numeric), unit-type filter (Granville Gardens Private Sale: House 3, Apartment 7) and the Shared Ownership price switch.
    - Property Search - SO and Fabrica Resales (leftovers) are still on v1 and keep loading the v1 scripts.
 
-Also decided: the leftover pages (Home2, Christmas Home, SO Home, Property Search - SO, Fabrica Resales, Calculator Dev) become Drafts. Development noindex uses the CMS "Sitemap indexing" switch instead of JS.
+9. ✅ (staging, 24 Nov) Tidy-ups:
+   - Leftover pages (Home2, Christmas Home, Shared Ownership - Home, Property Search - Shared Ownership, Fabrica Resales, Calculator Dev) are Drafts with `archived-…` slugs, so they stay in the Designer. Nothing on the site linked to them (all 120 sitemap pages checked). 301s in Site settings > Publishing cover the old addresses: `/home2`, `/christmas-home`, `/shared-ownership-home` → `/`; `/property-search-shared-ownership` → `/property-search?tenure_equal=Shared%20Ownership`; `/fabricaresales` → `/property-search`; `/calculator/calculator-dev` → `/calculator/shared-ownership-calculator`. (Webflow won't add a redirect for a path a page still uses, hence the slug change.)
+   - The Developments template's JS noindex switch is gone. To hide a development from search engines, turn off "Sitemap indexing" on its CMS item (the API doesn't expose that switch). The old script also removed any noindex tag when "Live on Site" was on, so it would have cancelled the switch. On 24 Nov the only developments with "Live on Site" off were archived, so nothing changed for live pages.
+   - The 404 page now has the `code-v2` component (site CSS: fluid font size, grow animation).
+   - Leftover v1 `fs-cmsfilter-field` attributes removed from the featured-developments component and the page-level card copies on the SO FAQ and both calculator pages. The Property Search form block still shows an old `fs-cmsfilter-element="filters"` in the published HTML that the API can't see or remove; nothing reads it.
+   - The plot list's default order is Webflow's own Collection List sort (price, ascending), so no default-sort script is needed.
+   - Calculator component descriptions updated (they still described the old loaders).
 
 Each step is one staging publish, checked on regenta-uk.webflow.io before the next.
