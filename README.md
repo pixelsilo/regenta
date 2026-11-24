@@ -2,7 +2,7 @@
 
 Custom JavaScript for the Regenta UK Webflow site (site `68362e432005a0afe1416a06`). Vite builds it into `dist/site.js`, which is committed and served by jsDelivr from a git tag. One small snippet in the Webflow **footer** (`snippets/loader.html`) loads it. This is the same setup as Cocos Organic.
 
-**Status (24 Nov 2026):** being moved over. The loader is in Site settings > Footer on `v2.5.2` (staging only so far) and carries the site-wide globals. Page code and embeds still hold the rest. Copies of the original code are in `snippets/`. The migration plan is below.
+**Status (24 Nov 2026):** being moved over. The loader is in Site settings > Footer on `v2.6.0` (staging only so far) and carries the site-wide globals. Page code and embeds still hold the rest. Copies of the original code are in `snippets/`. The migration plan is below.
 
 ## Develop
 
@@ -14,11 +14,12 @@ npm run serve   # terminal 2: serve dist/ at http://127.0.0.1:5500
 
 Then open the site (staging or live) with `?dev` on the end of the URL. That browser loads `http://127.0.0.1:5500/site.js` until you visit with `?dev=off`. Everyone else keeps getting the tagged CDN build. Use Chrome, because Safari blocks localhost scripts on https pages.
 
-**If a page looks empty in your browser** (sections missing, footer year blank, stats stuck at 0), that browser is probably still in dev mode with no local server running. Visit any page with `?dev=off`. The loader has a fail-safe for this and for CDN failures: if the bundle errors or hasn't started within 5 seconds, it adds `.rg-failed` to `<html>`, and the CSS in the `code-v2` embed then shows the `ps="grow"` sections. Other bundle features (stats counters, filters, maps) still need the bundle.
+**If bundle features don't work in your browser** (footer year blank, stats stuck at 0, no filters or maps), that browser is probably still in dev mode with no local server running. Visit any page with `?dev=off`; the console also warns about it.
 
 ## Conventions
 
 - Hook JS to attributes, never to Webflow classes or IDs.
+- Scroll reveals are Webflow interactions, not code (see Motion below).
 - Site-wide behaviour lives in `src/global/` and is listed in `GLOBALS` in `src/main.js`.
 - Opt-in modules live in `src/modules/`. They're registered in `MODULES` and mount on `[data-module="<name>"]`. A module is `export default function (root) {}` and only queries inside `root`. `data-ready` on a root means it has been initialised.
 - CMS values the JS needs go on elements as `data-` attributes, not printed into scripts.
@@ -56,6 +57,19 @@ Copies of the code on the site as of 24 Nov 2026, kept so any step can be undone
 - `snippets/page-code/`: Page settings head/footer for every page that has any, exactly as read through the API (CMS bindings included).
 - `snippets/embeds/`: every embed that contains a script or style, taken from the published HTML. These show the rendered output (CMS values filled in), not the Designer source.
 - This repo is public, so the Make webhook and Formspark addresses and the Google Maps keys are replaced with `REDACTED`. The originals are still in Webflow until later steps replace them. The only Maps key in use is the one on /property-search (Regenta Website project in Google Cloud, restricted to regenta.co.uk and regenta-uk.webflow.io).
+
+## Motion (native Webflow interactions, no code)
+
+The scroll reveals are Webflow interactions (Interactions panel), targeted by attribute so they work on any element on any page:
+
+| Attribute | Interaction | Effect |
+|---|---|---|
+| `ps="grow"` | `ps=grow` | the element fades in and scales up from 95% (0.6s, ease-out) when its top reaches 85% of the viewport |
+| `ps="grow-children"` | `ps=grow-children` | same effect on each direct child, staggered 0.2s (CMS card rows) |
+
+Both play once and don't animate under `prefers-reduced-motion`. Webflow keeps the elements hidden until its interactions runtime starts, so there's no flash and nothing depends on the bundle. Edit timing or easing in the Interactions panel.
+
+Use `ps="grow-children"` on the Collection List for rows of CMS cards. A Collection Item with its own grid placement gets a Webflow `w-node-…` id that repeats on every card, and a per-item scroll trigger then only animates the last card in the row (that was the case for the featured-developments and news strip cards, which now use `grow-children`).
 
 ## Custom code in the CMS
 

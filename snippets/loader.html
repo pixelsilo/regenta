@@ -2,12 +2,10 @@
   Webflow > Site settings > Custom code > FOOTER. Copy of what's live on staging (Webflow is the source of truth).
   Bump VERSION to release (must be a pushed git tag). Never reuse v1.2.0.
   ?dev switches this browser to localhost, ?dev=off switches back.
-  Fail-safe: if the bundle errors or hasn't started after 5s, <html> gets .rg-failed and the
-  CSS in the code-v2 embed shows the [ps="grow"] sections instead of leaving them hidden.
 -->
 <script>
 (() => {
-  const VERSION = 'v2.5.2';
+  const VERSION = 'v2.6.0';
   const FILES = ['site.js'];
   const REPO = 'https://cdn.jsdelivr.net/gh/pixelsilo/regenta@' + VERSION + '/dist';
   const LOCAL = 'http://127.0.0.1:5500';
@@ -17,15 +15,10 @@
   let dev = false;
   try { dev = localStorage.getItem(KEY) === '1'; } catch (e) {}
   if (dev) console.info('[regenta] DEV mode, loading from', LOCAL, '(?dev=off to exit)');
-  const failed = () => { if (!window.__regentaBooted) document.documentElement.classList.add('rg-failed'); };
-  setTimeout(failed, 5000);
   FILES.forEach((f) => {
     const s = document.createElement('script');
     s.src = (dev ? LOCAL : REPO) + '/' + f + (dev ? '?t=' + Date.now() : '');
-    s.onerror = () => {
-      failed();
-      if (dev) console.warn('[regenta] Local server not running. Visit with ?dev=off to use the live code.');
-    };
+    if (dev) s.onerror = () => console.warn('[regenta] Local server not running. Visit with ?dev=off to use the live code.');
     document.body.appendChild(s);
   });
 })();
