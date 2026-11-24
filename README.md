@@ -2,7 +2,7 @@
 
 Custom JavaScript for the Regenta UK Webflow site (site `68362e432005a0afe1416a06`). Vite builds it into `dist/site.js`, which is committed and served by jsDelivr from a git tag. One small snippet in the Webflow **footer** (`snippets/loader.html`) loads it. This is the same setup as Cocos Organic.
 
-**Status (24 Nov 2026):** being moved over. The loader is in Site settings > Footer on `v2.0.0` (staging only so far) and carries the site-wide globals. Page code and embeds still hold the rest. Copies of the original code are in `snippets/`. The migration plan is below.
+**Status (24 Nov 2026):** being moved over. The loader is in Site settings > Footer on `v2.1.0` (staging only so far) and carries the site-wide globals. Page code and embeds still hold the rest. Copies of the original code are in `snippets/`. The migration plan is below.
 
 ## Develop
 
@@ -59,7 +59,7 @@ Copies of the code on the site as of 24 Nov 2026, kept so any step can be undone
 
 0. ✅ Save copies of the code and set up Vite with the loader. No site change.
 1. ✅ (staging, 24 Nov) Removed dead code: the commented-out Slick on Home, and the broken map code and duplicate cmsfilter on the success and error pages. Home2, Christmas Home and SO Home are left alone because they're becoming drafts. The calculator loaders turned out not to be duplicated. The 404 page's `/develpoment/` redirect script is replaced by a 301 rule in Site settings > Publishing: `/develpoment/(.*)` → `/property-search`.
-2. ✅ (staging, 24 Nov, `v2.0.0`) Site-wide globals into the bundle: footer year, `ps="grow"`, Safari button shift, price format, `ps-hide="on-touch"`. The loader went into Site settings > Footer, replacing the old footer scripts, and the two head scripts were removed. The nav scripts live in an embed inside the nav component, so they move once the Designer is open (with the fix for pages that have no `.navbar_faded`).
+2. ✅ (staging, 24 Nov, `v2.0.0`) Site-wide globals into the bundle: footer year, `ps="grow"`, Safari button shift, price format, `ps-hide="on-touch"`. The loader went into Site settings > Footer, replacing the old footer scripts, and the two head scripts were removed. Then `v2.1.0`: the mobile menu toggle and navbar fade from the navigation component's embed (embed removed).
 3. Development template, Property Search, Contact map, success-page text, news, services. One `map` module, using only the Property Search Maps key.
 4. Calculators and the Shared Ownership FAQ into the bundle.
 5. Forms: native Webflow submit plus a signed webhook to a worker (`regenta-private`), forwarding to Make. Contact Us uses Webflow email notifications. Remove the cookie-consent gate. Keep the `formSubmission` dataLayer event until GTM has been checked. Then rotate the old Make and Formspark addresses.
