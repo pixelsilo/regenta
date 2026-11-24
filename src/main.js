@@ -7,9 +7,10 @@ import formatPrice from './global/format-price.js';
 import hideOnTouch from './global/hide-on-touch.js';
 import grow from './global/grow.js';
 import safariShift from './global/safari-shift.js';
+import nav from './global/nav.js';
 
 // Site-wide behaviour that runs on every page
-const GLOBALS = [copyrightYear, formatPrice, hideOnTouch, grow, safariShift];
+const GLOBALS = [copyrightYear, formatPrice, hideOnTouch, grow, safariShift, nav];
 
 // Opt-in modules, mounted on [data-module="<name>"] roots
 const MODULES = {};
