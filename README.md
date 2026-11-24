@@ -58,7 +58,7 @@ Copies of the code on the site as of 24 Nov 2026, kept so any step can be undone
 ## Migration plan
 
 0. ✅ Save copies of the code and set up Vite with the loader. No site change.
-1. ✅ (staging, 24 Nov) Removed dead code: the commented-out Slick on Home, and the broken map code and duplicate cmsfilter on the success and error pages. Home2, Christmas Home and SO Home are left alone because they're becoming drafts. The calculator loaders turned out not to be duplicated. Still to do: replace the 404 page's `/develpoment/` redirect script with a 301 in Site settings, waiting on Luke.
+1. ✅ (staging, 24 Nov) Removed dead code: the commented-out Slick on Home, and the broken map code and duplicate cmsfilter on the success and error pages. Home2, Christmas Home and SO Home are left alone because they're becoming drafts. The calculator loaders turned out not to be duplicated. The 404 page's `/develpoment/` redirect script is replaced by a 301 rule in Site settings > Publishing: `/develpoment/(.*)` → `/property-search`.
 2. Site-wide globals into the bundle: footer year, `ps="grow"`, Safari button shift, price format, `ps-hide="on-touch"` (moved to CSS), nav. Luke pastes the loader, and the same publish removes the old code.
 3. Development template, Property Search, Contact map, success-page text, news, services. One `map` module, using only the Property Search Maps key.
 4. Calculators and the Shared Ownership FAQ into the bundle.
