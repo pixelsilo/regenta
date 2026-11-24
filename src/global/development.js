@@ -14,18 +14,21 @@ function captions() {
   });
 }
 
-// Unit-type filter buttons built from the plots' unit types ([ps-filter="list|form|button"])
+// Unit-type filter buttons built from the plots' unit types ([ps-filter="list|form|button"]).
+// Each radio gets fs-list-field="type" + fs-list-value for Finsweet List v2 (the plot table's filter),
+// and the chosen radio's label gets .is-active (v1 used fs-cmsfilter-active="is-active").
 function unitFilter() {
   const list = document.querySelectorAll('[ps-filter="list"]');
   const form = document.querySelector('[ps-filter="form"]');
   if (!list.length || !form) return;
 
-  const types = [];
+  const types = new Map(); // lower-case key -> text as it appears in the CMS
   list.forEach((el) => {
-    const t = el.textContent.trim().toLowerCase();
-    if (!types.includes(t)) types.push(t);
+    const text = el.textContent.trim();
+    const key = text.toLowerCase();
+    if (key && !types.has(key)) types.set(key, text);
   });
-  if (types.length === 1) {
+  if (types.size === 1) {
     form.style.display = 'none';
     return;
   }
@@ -35,18 +38,30 @@ function unitFilter() {
   if (!button || !row) return;
   const cap = (s) => s.replace(/\b\w/g, (c) => c.toUpperCase());
 
-  button.querySelector('input').value = cap(types[0]);
-  button.querySelector('span').textContent = cap(types[0]);
-  types.slice(1).forEach((t) => {
+  const setup = (el, key, text) => {
+    const input = el.querySelector('input');
+    const label = el.querySelector('span');
+    input.value = cap(key);
+    input.setAttribute('fs-list-field', 'type');
+    input.setAttribute('fs-list-value', text);
+    label.textContent = cap(key);
+    return { input, label };
+  };
+
+  const [first, ...rest] = [...types.entries()];
+  const buttons = [setup(button, first[0], first[1])];
+  rest.forEach(([key, text]) => {
     const clone = button.cloneNode(true);
-    const input = clone.querySelector('input');
-    const label = clone.querySelector('span');
-    input.value = cap(t);
-    input.id = `Radio-${t}`;
-    label.textContent = cap(t);
-    label.setAttribute('for', `Radio-${t}`);
+    const { input, label } = setup(clone, key, text);
+    input.id = `Radio-${key}`;
+    label.setAttribute('for', `Radio-${key}`);
     row.appendChild(clone);
+    buttons.push({ input, label });
   });
+
+  const markActive = () => buttons.forEach(({ input, label }) => label.classList.toggle('is-active', input.checked));
+  form.addEventListener('change', markActive);
+  markActive();
 }
 
 // Brochure download panel: [brochure="open"] / [brochure="close"]
@@ -102,7 +117,7 @@ function plots() {
   const sharedDivs = document.querySelectorAll('[id=price-shared-div]');
   const fullDivs = document.querySelectorAll('[id=price-standard]');
 
-  const hasShared = Array.from(document.querySelectorAll('[fs-cmssort-field="tenure"]')).some((el) =>
+  const hasShared = Array.from(document.querySelectorAll('[fs-list-field="tenure"], [fs-cmssort-field="tenure"]')).some((el) =>
     [el.textContent, el.value, el.getAttribute('data-value')]
       .some((v) => String(v || '').trim().toLowerCase().includes('shared ownership')));
 

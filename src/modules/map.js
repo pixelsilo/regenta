@@ -2,8 +2,9 @@
 //   data-maps-key   Maps JS key (kept in Webflow, not in this public repo)
 //   Single pin:  data-lat, data-lng, data-title, data-zoom (default 13)
 //   Many pins:   data-pins="location-item" reads .w-dyn-item.location-item cards
-//                (.data---slug, .data---latitude, .data---longitude, .data---info-window),
-//                centred on London at zoom 10 with the grey style and info windows.
+//                (.data---latitude, .data---longitude, .data---info-window), centred on London
+//                at zoom 10 with the grey style and info windows. With Finsweet List v2 on the
+//                page, pins follow the filtered cards.
 // Was: page code on Property Search, Contact Us and the Developments template.
 import { loadMaps } from '../lib/maps.js';
 
@@ -32,12 +33,26 @@ const GREY = [
   { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#9e9e9e' }] },
 ];
 
-function readPins() {
-  return Array.from(document.querySelectorAll('.w-dyn-item.location-item')).map((el) => ({
-    lat: Number(el.querySelector('.data---latitude')?.textContent),
-    lng: Number(el.querySelector('.data---longitude')?.textContent),
-    html: el.querySelector('.data---info-window')?.innerHTML || '',
-  })).filter((p) => p.lat && p.lng);
+// One pin per development card: .data---latitude / .data---longitude / .data---info-window inside it.
+function pinFor(el) {
+  const lat = Number(el.querySelector('.data---latitude')?.textContent);
+  const lng = Number(el.querySelector('.data---longitude')?.textContent);
+  if (!lat || !lng) return null;
+  return { el, lat, lng, html: el.querySelector('.data---info-window')?.innerHTML || '' };
+}
+
+// The Finsweet List v2 instance that holds the development cards, if the page uses one.
+function findList(cardSelector) {
+  return new Promise((resolve) => {
+    if (!document.querySelector('[fs-list-element="list"]')) return resolve(null);
+    const timer = setTimeout(() => resolve(null), 8000); // list never started: fall back to all cards
+    window.FinsweetAttributes ||= [];
+    window.FinsweetAttributes.push(['list', (lists) => {
+      clearTimeout(timer);
+      const card = document.querySelector(cardSelector);
+      resolve(lists.find((l) => card && (l.listElement || l.wrapperElement)?.contains(card)) || null);
+    }]);
+  });
 }
 
 export default function map(root) {
@@ -57,12 +72,33 @@ export default function map(root) {
         styles: GREY,
       });
       const info = new InfoWindow();
-      readPins().forEach((p) => {
-        const marker = new Marker({ position: { lat: p.lat, lng: p.lng }, map: m, icon: PIN });
-        marker.addListener('click', () => {
-          info.setContent(p.html);
-          info.open(m, marker);
+      const CARDS = '.w-dyn-item.location-item';
+
+      // Pins follow the filtered list: when Finsweet List v2 re-renders the cards, only the
+      // visible developments keep their pin. Without a v2 list, every card gets a pin.
+      findList(CARDS).then((list) => {
+        const elements = list ? list.items.value.map((item) => item.element) : [...document.querySelectorAll(CARDS)];
+        const markers = new globalThis.Map();
+        elements.map(pinFor).filter(Boolean).forEach((p) => {
+          const marker = new Marker({ position: { lat: p.lat, lng: p.lng }, map: m, icon: PIN });
+          marker.addListener('click', () => {
+            info.setContent(p.html);
+            info.open(m, marker);
+          });
+          markers.set(p.el, marker);
         });
+        if (!list) return;
+
+        const show = (items) => {
+          const visible = new Set(items.map((item) => item.element));
+          markers.forEach((marker, el) => marker.setMap(visible.has(el) ? m : null));
+          info.close();
+        };
+        list.addHook('afterRender', (items) => {
+          show(items);
+          return items;
+        });
+        show(list.items.value.filter((item) => item.element.isConnected));
       });
       return;
     }
