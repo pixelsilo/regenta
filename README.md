@@ -74,7 +74,7 @@ Where it's used: `grow-children` on the stats strip, the featured-developments c
 
 ## Footer (no code)
 
-The footer is the `footer` component in Webflow (on every page). Redesigned 24 Nov 2026, staging only so far: two cards at the top (buying a home → Property Search; developers and housing associations → Contact Us), then logo and one-line intro, Buy a home (property search, Shared Ownership, FAQs, both calculators), Our services (Services collection list), Company, and Get in touch. Bottom bar: Privacy Policy, ©, company and VAT numbers. The section's bottom padding (5rem) keeps the bar clear of the fixed cookie settings button. The `.footer-date` span is filled by the `copyright-year` global. The old version is kept as the unused component "footer (old, backup 24 Nov 2026)"; delete it once the new one is live and approved.
+The footer is the `footer` component in Webflow (on every page). Redesigned 24 Nov 2026, staging only so far: the homepage hero line ("London's leading new homes sales and marketing specialist", script accents via `griffiths-font` spans) beside Get in touch; three link columns with ruled headings and large links (Buy a home: property search, Shared Ownership, FAQs, both calculators; Our services: Services collection list; Company); then the logo at full width. Bottom bar: Privacy Policy, ©, company and VAT numbers. The section's bottom padding (5rem) keeps the bar clear of the fixed cookie settings button. The `.footer-date` span is filled by the `copyright-year` global. The old version is kept as the unused component "footer (old, backup 24 Nov 2026)"; delete it once the new one is live and approved.
 
 ## Custom code in the CMS
 
