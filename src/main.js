@@ -2,8 +2,14 @@
 // Globals run on every page. Modules mount on [data-module="<name>"] roots.
 // Code is being moved in from Webflow step by step; see README.md and snippets/.
 
+import copyrightYear from './global/copyright-year.js';
+import formatPrice from './global/format-price.js';
+import hideOnTouch from './global/hide-on-touch.js';
+import grow from './global/grow.js';
+import safariShift from './global/safari-shift.js';
+
 // Site-wide behaviour that runs on every page
-const GLOBALS = [];
+const GLOBALS = [copyrightYear, formatPrice, hideOnTouch, grow, safariShift];
 
 // Opt-in modules, mounted on [data-module="<name>"] roots
 const MODULES = {};
