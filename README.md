@@ -53,7 +53,7 @@ Copies of the code on the site as of 24 Nov 2026, kept so any step can be undone
 - `snippets/site-code/`: Site settings head and footer, exactly as read through the API.
 - `snippets/page-code/`: Page settings head/footer for every page that has any, exactly as read through the API (CMS bindings included).
 - `snippets/embeds/`: every embed that contains a script or style, taken from the published HTML. These show the rendered output (CMS values filled in), not the Designer source.
-- This repo is public, so the Make webhook and Formspark addresses are replaced with `REDACTED`. The originals are still in Webflow until step 5 replaces them.
+- This repo is public, so the Make webhook and Formspark addresses and the Google Maps keys are replaced with `REDACTED`. The originals are still in Webflow until later steps replace them. The only Maps key in use is the one on /property-search (Regenta Website project in Google Cloud, restricted to regenta.co.uk and regenta-uk.webflow.io).
 
 ## Migration plan
 
