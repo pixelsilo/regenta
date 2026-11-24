@@ -2,7 +2,7 @@
 
 Custom JavaScript for the Regenta UK Webflow site (site `68362e432005a0afe1416a06`). Vite builds it into `dist/site.js`, which is committed and served by jsDelivr from a git tag. One small snippet in the Webflow **footer** (`snippets/loader.html`) loads it. This is the same setup as Cocos Organic.
 
-**Status (24 Nov 2026):** being moved over. The loader is in Site settings > Footer on `v2.5.1` (staging only so far) and carries the site-wide globals. Page code and embeds still hold the rest. Copies of the original code are in `snippets/`. The migration plan is below.
+**Status (24 Nov 2026):** being moved over. The loader is in Site settings > Footer on `v2.5.2` (staging only so far) and carries the site-wide globals. Page code and embeds still hold the rest. Copies of the original code are in `snippets/`. The migration plan is below.
 
 ## Develop
 
@@ -13,6 +13,8 @@ npm run serve   # terminal 2: serve dist/ at http://127.0.0.1:5500
 ```
 
 Then open the site (staging or live) with `?dev` on the end of the URL. That browser loads `http://127.0.0.1:5500/site.js` until you visit with `?dev=off`. Everyone else keeps getting the tagged CDN build. Use Chrome, because Safari blocks localhost scripts on https pages.
+
+**If a page looks empty in your browser** (sections missing, footer year blank, stats stuck at 0), that browser is probably still in dev mode with no local server running. Visit any page with `?dev=off`. The loader has a fail-safe for this and for CDN failures: if the bundle errors or hasn't started within 5 seconds, it adds `.rg-failed` to `<html>`, and the CSS in the `code-v2` embed then shows the `ps="grow"` sections. Other bundle features (stats counters, filters, maps) still need the bundle.
 
 ## Conventions
 
