@@ -2,7 +2,7 @@
 
 Custom JavaScript for the Regenta UK Webflow site (site `68362e432005a0afe1416a06`). Vite builds it into `dist/site.js`, which is committed and served by jsDelivr from a git tag. One small snippet in the Webflow **footer** (`snippets/loader.html`) loads it. This is the same setup as Cocos Organic.
 
-**Status (24 Nov 2026):** being moved over. The loader is in Site settings > Footer on `v2.2.0` (staging only so far) and carries the site-wide globals. Page code and embeds still hold the rest. Copies of the original code are in `snippets/`. The migration plan is below.
+**Status (24 Nov 2026):** being moved over. The loader is in Site settings > Footer on `v2.3.0` (staging only so far) and carries the site-wide globals. Page code and embeds still hold the rest. Copies of the original code are in `snippets/`. The migration plan is below.
 
 ## Develop
 
@@ -42,7 +42,7 @@ Rollback: set `VERSION` back to the previous tag and republish. Never move or re
 
 ## Old files in the repo root (don't move yet)
 
-- `so-calculator.js`, `sd-calculator.js`: loaded by the calculator pages from tags `v1.0.0` (live) and `v1.1.0` (staging). Tagged files stay on jsDelivr, so the root copies can go once the calculators are in the bundle.
+- `so-calculator.js`, `sd-calculator.js`: still loaded by the **live** calculator pages from tag `v1.0.0` until the next live publish. Staging now runs them from the bundle (`src/calculators/`). Tagged files stay on jsDelivr, so the root copies can be deleted once live is published; edit `src/calculators/` from now on.
 - `slider.js`: loaded **unpinned from `@main`** by every development page (testimonials). Moving or changing it on `main` changes the live site. Delete it only after the development template loads the bundle instead.
 
 ## Snippets
@@ -78,7 +78,7 @@ If more developments need this, a CMS switch plus a small module would be better
    - Removed from Webflow: the map/gallery/caption/filter/slider code in the template footer, the brochure, navbar and share embeds (the price list embed keeps only its CSS), the location dropdown embed, and the Property Search, Contact, news, services and success-page code.
    - Still on the Developments template: the forms code (step 5), the hero CSS (step 6), the Finsweet accordion loader, and the noindex script in the head (remove once the CMS "Sitemap indexing" switch is set on unlisted developments).
    - Kept as before: the old embed's "click #default-sort on load" never ran (the gallery code replaced `window.onload`), so it isn't in the bundle either.
-4. Calculators and the Shared Ownership FAQ into the bundle.
+4. ✅ (staging, 24 Nov, `v2.3.0`) Calculators and the Shared Ownership FAQ in the bundle: `src/calculators/` (same code as `v1.1.0`, only the wrapper changed, plus a double-init guard; `window.SharedOwnershipCalculator` / `window.StampDutyCalculator` unchanged) and `src/global/faq.js`. Removed: the calculator loaders from both calculator pages' footers and from the two calculator components, and the script half of the FAQ embed (its CSS stays).
 5. Forms: native Webflow submit plus a signed webhook to a worker (`regenta-private`), forwarding to Make. Contact Us uses Webflow email notifications. Remove the cookie-consent gate. Keep the `formSubmission` dataLayer event until GTM has been checked. Then rotate the old Make and Formspark addresses.
 6. CSS from Site settings into a global `code_css` embed. Optionally move from Finsweet Attributes v1 to v2.
 
