@@ -66,10 +66,11 @@ The scroll reveals are Webflow interactions (Interactions panel), targeted by at
 |---|---|---|
 | `ps="grow"` | `ps=grow` | the element fades in and scales up from 95% (0.6s, ease-out) when its top reaches 85% of the viewport |
 | `ps="grow-children"` | `ps=grow-children` | same effect on each direct child, staggered 0.2s (CMS card rows) |
+| `ps="grow-group"` + `ps="grow-item"` | `ps=grow-group` | same effect on every `grow-item` inside the group, however deeply nested, staggered 0.2s. Used where a script restructures the markup: the Our Services carousel (Slick wraps the cards in its own `slick-list`/`slick-track`, so they stop being direct children). The group attribute sits on `slider_contain`, outside the element Slick rebuilds. |
 
 Both play once and don't animate under `prefers-reduced-motion`. Webflow keeps the elements hidden until its interactions runtime starts, so there's no flash and nothing depends on the bundle. Edit timing or easing in the Interactions panel.
 
-Use `ps="grow-children"` on the Collection List for rows of CMS cards. A Collection Item with its own grid placement gets a Webflow `w-node-…` id that repeats on every card, and a per-item scroll trigger then only animates the last card in the row (that was the case for the featured-developments and news strip cards, which now use `grow-children`).
+Where it's used: `grow-children` on the stats strip, the featured-developments cards, the news strip cards and the Home "strategic partner" banner (text, then image); `grow-group` on the Our Services carousel; `grow` on single elements everywhere else. Use `ps="grow-children"` on the parent for any row that should stagger. A Collection Item with its own grid placement gets a Webflow `w-node-…` id that repeats on every card, and a per-item scroll trigger then only animates the last card in the row (that was the case for the featured-developments and news strip cards, which now use `grow-children`).
 
 ## Custom code in the CMS
 
