@@ -2,7 +2,8 @@
 // v1 wrote links like /property-search?tenure=Shared+Ownership&bedrooms=2&price=,300000;
 // v2 reads ?tenure_equal=…&bedrooms_greater-equal=…&price_less-equal=… (and prefixes the
 // development price list with "plots_" because that page has several lists).
-// Runs before the Finsweet loader, so v2 sees the rewritten URL when it starts.
+// Runs before the Finsweet loader and global/property-filter.js (which reads the same v2 format),
+// so both see the rewritten URL when they start.
 const LEGACY = {
   tenure: ['tenure_equal'],
   region: ['region_equal'],
@@ -12,7 +13,7 @@ const LEGACY = {
 };
 
 export default function legacyFilterLinks() {
-  if (!document.querySelector('[fs-list-element="filters"]')) return;
+  if (!document.querySelector('[data-filter-form], [fs-list-element="filters"]')) return;
   const url = new URL(location.href);
   let changed = false;
 

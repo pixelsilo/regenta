@@ -74,15 +74,26 @@ Where it's used: `grow-children` on the stats strip, the featured-developments c
 
 ## Property Search map view (#57)
 
-Staging only so far (`v2.7.1`). The old pop-up map at the bottom of Property Search is gone. A **List / Map** switch sits beside the filters (`[data-map-view-toggle="list|map"]`, `.is-active` + `aria-pressed`). Map shows `[data-module="map-view"]`: a map that fills the window below the filters, with a compact list of developments alongside. On phones the map sits above the list.
+Staging only so far (`v3.0.0`). The old pop-up map at the bottom of Property Search is gone. A **List / Map** switch sits beside the filters (`[data-map-view-toggle="list|map"]`, `.is-active` + `aria-pressed`). Map shows `[data-module="map-view"]`: a map that fills the window below the filters, with a compact list of developments alongside. On phones the map sits above the list.
 
 - Built in the Designer, all styled with classes there: `view-toggle`, `map-view`, `map-view_sidebar`, `map-view_list`, `map-card` (+ `is-active`), `map-popup`. The sidebar is its own Developments Collection List (Live on Site, same order as the results). Each item carries `data-slug`, `data-lat` and `data-lng` bound to the CMS, a compact card (`[data-map-card]`) and a hidden pin card (`[data-map-popup]` in `map-popup_holder`) that's copied into the Google pop-up when a pin is clicked.
 - Prices: each card has the Price Alternative ("Coming soon") and "From £…"; the script shows the alternative when it's filled in.
-- The map follows the Finsweet filters on the results list (same hook as before). The pin icon on each results card has `data-map-focus` (bound to the slug) and opens the map on that development. Its old `javascript:` link in the embed is stopped in the capture phase; tidy the embed in the Designer when convenient.
+- The map follows the Property Search filters (below) through `lib/filters.js`. The pin icon on each results card has `data-map-focus` (bound to the slug) and opens the map on that development. Its old `javascript:` link and `fs-mirrorclick-element` in the embed are dead and stopped in the capture phase; tidy the embed in the Designer when convenient.
 - `?view=map` opens the map on load, and the switch keeps it in the address.
-- Speed: 0.8s after the page loads, the map is built while hidden (fixed in the window, transparent, behind the page, `inert`), so Map opens on the next frame. Building it off screen didn't work, because Google skips drawing maps outside the window. `v2.7.0` built the map on the first click and took about 1.7s to show tiles and pins. Every Property Search visit now loads the map once (as the old bottom map did), which is what Google bills.
+- Speed (`v3.0.0`): the map is built as soon as the bundle starts, while hidden (fixed in the window, transparent, behind the page, `inert`), so Map opens on the next frame. Google skips drawing maps outside the window, which is why it isn't simply pushed aside. Card and pin clicks don't zoom (a zoom waits for new tiles: the first click used to take 2.4s, now about 5ms). The cards' photos are CMS originals with no responsive versions (26 photos, about 31 MB), so `map-view` parks them until the map is first opened, then loads them at thumbnail size using the `srcset` Webflow made for the same photo on the results cards. Every Property Search visit loads the map once, as the old bottom map did, which is what Google bills.
 - Developments without coordinates (Jigsaw on 25 Nov) get no pin; clicking their card goes to the development page.
 - Classic `google.maps.Marker` is still used. Moving to `AdvancedMarkerElement` needs a Map ID in Regenta's Google Cloud project.
+
+### Property Search filters (no Finsweet)
+
+Since `v3.0.0` Property Search runs no Finsweet scripts (only cookie consent). `global/property-filter.js` does the filtering: 26 developments, filtered instantly in the browser. Same results as Finsweet List v2 for every filter checked, including old v1 links.
+
+- Form `[data-filter-form]`; selects `[data-filter-field="tenure|region|bedrooms"]` (bedrooms means "at least").
+- Price slider: `[data-range]` (`data-range-min` 0, `data-range-max` 1000000, `data-range-step` 5000) with `[data-range-track]`, two `[data-range-handle]`, `[data-range-fill]`, two `[data-range-display]`. Drag, click the track, or use the arrow keys / Page Up / Page Down / Home / End. The ends mean "no limit". Developments with no price (Coming soon) drop out when a price limit is set, as before.
+- `[data-filter-count]` (number of results), `[data-filter-clear]`.
+- Each results item `[data-filter-item]`, with hidden `[data-filter-value="tenure"]` (one per tenure), `"region"`, `"bedrooms"` (Max Bedrooms), `"price"` (Prices From), and the slug on `[data-map-focus]`.
+- The address uses Finsweet's format, so existing links keep working: `?tenure_equal=…&region_equal=…&bedrooms_greater-equal=…&price_greater-equal=…&price_less-equal=…`. `global/legacy-filter-links.js` still turns v1 links into this first.
+- The development price list (plots) still uses Finsweet List v2 for its sort and unit-type filter. Mirror Click is no longer loaded anywhere.
 
 ## Footer (no code)
 

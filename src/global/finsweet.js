@@ -5,11 +5,13 @@
 //
 // Each entry: the element that shows the page needs it → the script to load.
 // v1 scripts are the same files as before; they only load on pages that still use v1 attributes.
+// Property Search uses none of these since #57: its filters are global/property-filter.js.
+// Mirror Click is gone (only the old Property Search map used it); the results cards' pin
+// embeds still carry fs-mirrorclick-element, which nothing reads now.
 const SCRIPTS = [
   { needs: '[fs-cmsfilter-element="list"]', src: 'https://cdn.jsdelivr.net/npm/@finsweet/attributes-cmsfilter@1/cmsfilter.js' },
   { needs: '[fs-cmssort-element="list"]', src: 'https://cdn.jsdelivr.net/npm/@finsweet/attributes-cmssort@1/cmssort.js' },
   { needs: '[fs-rangeslider-element]', v1Only: true, src: 'https://cdn.jsdelivr.net/npm/@finsweet/attributes-rangeslider@1/rangeslider.js' },
-  { needs: '[fs-mirrorclick-element]', v1Only: true, src: 'https://cdn.jsdelivr.net/npm/@finsweet/attributes-mirrorclick@1/mirrorclick.js' },
   { needs: '[fs-richtext-element]', src: 'https://cdn.jsdelivr.net/npm/@finsweet/attributes-richtext@1/richtext.js' },
   { needs: '[fs-numbercount-element]', src: 'https://cdn.jsdelivr.net/npm/@finsweet/attributes-numbercount@1/numbercount.js' },
   { needs: '[fs-accordion-element]', src: 'https://cdn.jsdelivr.net/npm/@finsweet/attributes-accordion@1/accordion.js' },
@@ -22,7 +24,6 @@ const V2_SRC = 'https://cdn.jsdelivr.net/npm/@finsweet/attributes@2/attributes.j
 const V2_SOLUTIONS = [
   { needs: '[fs-list-element]', attr: 'fs-list' },
   { needs: '[fs-rangeslider-element]', attr: 'fs-rangeslider' },
-  { needs: '[fs-mirrorclick-element]', attr: 'fs-mirrorclick' },
 ];
 
 const add = (src, attrs = {}, module = false) => {

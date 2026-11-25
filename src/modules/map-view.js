@@ -18,16 +18,19 @@
 //   [data-list-view]        hidden while the map is open (the normal results list)
 //   [data-map-focus="slug"] on a results card: opens the map on that development
 //
-// The map follows the Finsweet List v2 filters on the results list. ?view=map opens the
-// map on load, and the switch keeps that in the address so the view can be linked to.
-// The map is built, hidden, shortly after the page loads, so opening it is instant.
-import { loadMaps, findList, GREY, LONDON, PIN } from '../lib/maps.js';
+// The map follows the Property Search filters (global/property-filter.js via lib/filters.js).
+// ?view=map opens the map on load, and the switch keeps that in the address.
+//
+// Speed: the map is built straight away, hidden (see stash()), so opening it is instant.
+// The cards' photos are the CMS originals (several MB each, no responsive versions), so
+// they're held back until the map is first opened and then loaded at thumbnail size using
+// the responsive versions Webflow made for the same photo on the results cards.
+import { loadMaps, GREY, LONDON, PIN } from '../lib/maps.js';
+import { onVisible } from '../lib/filters.js';
 
 const DESKTOP = window.matchMedia('(min-width: 768px)');
 const MIN_HEIGHT = 480; // px, desktop map height floor
-const FOCUS_ZOOM = 13; // zoom in at least this far when a development is picked
 const ONE_PIN_ZOOM = 13;
-const WARM_DELAY = 800; // ms after page load before the hidden map is built
 const STASH_GAP = 24; // px between the filters and the map, used while the map is hidden
 
 function number(value) {
@@ -68,6 +71,7 @@ export default function mapView(root) {
   }));
   const bySlug = new Map(items.map((item) => [item.slug, item]));
   pickPrice(root);
+  holdImages();
 
   let view = 'list';
   let visible = new Set(items.map((item) => item.slug));
@@ -86,7 +90,7 @@ export default function mapView(root) {
       root.style.height = '';
       return;
     }
-    const filters = document.querySelector('[fs-list-element="filters"]');
+    const filters = document.querySelector('[data-filter-form]');
     const top = stashed && filters
       ? filters.getBoundingClientRect().bottom + window.scrollY + STASH_GAP
       : root.getBoundingClientRect().top + window.scrollY;
@@ -108,8 +112,7 @@ export default function mapView(root) {
       : { position: '', left: '', top: '', width: '', opacity: '', zIndex: '', pointerEvents: '' });
   }
 
-  // Build the map in the background once the page has settled (or sooner, if someone
-  // heads for the Map button).
+  // Build the map in the background straight away.
   function warm() {
     if (ready) return;
     if (view !== 'map') stash(true);
@@ -176,7 +179,9 @@ export default function mapView(root) {
   }
 
   // Open a development's card on the map. From a pin: highlight its list card.
-  // From the list: pan to the pin (and on phones bring the map into view).
+  // From the list: bring the pin into view if it's off the map (no zooming: a zoom has to
+  // wait for new map tiles, which is what made clicks feel slow), and on phones scroll the
+  // map into view.
   function open(item, { pan = true, scrollList = !pan } = {}) {
     const marker = markers.get(item.slug);
     if (!marker || !gmap) {
@@ -187,11 +192,40 @@ export default function mapView(root) {
     info.setContent(content);
     info.open({ map: gmap, anchor: marker, shouldFocus: false });
     if (pan) {
-      gmap.panTo(marker.getPosition());
-      if (gmap.getZoom() < FOCUS_ZOOM) gmap.setZoom(FOCUS_ZOOM);
+      if (!gmap.getBounds()?.contains(marker.getPosition())) gmap.panTo(marker.getPosition());
       if (!DESKTOP.matches) canvas.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
     setActive(item, { scroll: scrollList });
+  }
+
+  // --- photos -------------------------------------------------------------------
+
+  // Park every photo in the map items (no src, so nothing downloads while hidden).
+  function holdImages() {
+    root.querySelectorAll('[data-map-item] img[src]').forEach((img) => {
+      img.setAttribute('data-hold-src', img.getAttribute('src'));
+      img.removeAttribute('src');
+      img.removeAttribute('srcset');
+    });
+  }
+
+  // Put them back, borrowing the results cards' responsive versions of the same photo.
+  let imagesShown = false;
+  function showImages() {
+    if (imagesShown) return;
+    imagesShown = true;
+    const srcsets = new Map();
+    document.querySelectorAll('img[srcset]').forEach((img) => srcsets.set(img.getAttribute('src'), img.getAttribute('srcset')));
+    root.querySelectorAll('img[data-hold-src]').forEach((img) => {
+      const src = img.getAttribute('data-hold-src');
+      const srcset = srcsets.get(src);
+      if (srcset) {
+        img.sizes = img.closest('[data-map-popup]') ? '256px' : '96px';
+        img.srcset = srcset;
+      }
+      img.src = src;
+      img.removeAttribute('data-hold-src');
+    });
   }
 
   // --- filters ----------------------------------------------------------------
@@ -216,18 +250,8 @@ export default function mapView(root) {
     fit();
   }
 
-  // The results list carries [data-map-focus="slug"] on each card.
-  findList('[data-map-focus]').then((list) => {
-    if (!list) return;
-    const slugsOf = (listItems) => new Set(listItems
-      .map((i) => i.element.querySelector('[data-map-focus]')?.getAttribute('data-map-focus'))
-      .filter(Boolean));
-    list.addHook('afterRender', (listItems) => {
-      visible = slugsOf(listItems);
-      applyFilter();
-      return listItems;
-    });
-    visible = slugsOf(list.items.value.filter((i) => i.element.isConnected));
+  onVisible((slugs) => {
+    visible = slugs;
     applyFilter();
   });
 
@@ -237,6 +261,7 @@ export default function mapView(root) {
     view = next === 'map' ? 'map' : 'list';
     const isMap = view === 'map';
     if (isMap) {
+      showImages();
       stash(false);
       root.style.display = '';
     } else if (ready) {
@@ -270,10 +295,6 @@ export default function mapView(root) {
       event.preventDefault();
       setView(button.getAttribute('data-map-view-toggle'));
     });
-    if (button.getAttribute('data-map-view-toggle') === 'map') {
-      button.addEventListener('pointerenter', warm, { once: true });
-      button.addEventListener('focus', warm, { once: true });
-    }
   });
 
   items.forEach((item) => {
@@ -287,7 +308,7 @@ export default function mapView(root) {
   });
 
   // The pin icon on a results card opens the map on that development. Capture phase, so the
-  // old embed's javascript: link and Finsweet mirror-click never run.
+  // old embed's javascript: link never runs.
   document.addEventListener('click', (event) => {
     const trigger = event.target.closest?.('[data-map-focus]');
     if (!trigger || root.contains(trigger)) return;
@@ -318,7 +339,5 @@ export default function mapView(root) {
 
   setView(new URLSearchParams(window.location.search).get('view') === 'map' ? 'map' : 'list', { remember: false });
 
-  const later = () => setTimeout(warm, WARM_DELAY);
-  if (document.readyState === 'complete') later();
-  else window.addEventListener('load', later, { once: true });
+  setTimeout(warm, 0);
 }
