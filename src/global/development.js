@@ -6,7 +6,12 @@ function captions() {
   document.querySelectorAll('[ps-item="caption"]').forEach((caption) => {
     const img = caption.parentElement?.querySelector('img');
     if (img && img.alt) {
-      caption.textContent = img.alt;
+      // Text sits in a .button-text div so it gets the same Area font correction as buttons
+      caption.textContent = '';
+      const text = document.createElement('div');
+      text.className = 'button-text';
+      text.textContent = img.alt;
+      caption.appendChild(text);
       caption.style.display = 'block';
     } else {
       caption.style.display = 'none';
