@@ -31,6 +31,29 @@ export default function serviceHero(root) {
 
   const fill = (i) => tabs[i].querySelector('.ps-hero_tab-fill');
 
+  // The "Professional services" label sits above .ps-hero_copy. Give the copy the current
+  // service's height so the label meets each title; Webflow eases the height (transition on
+  // .ps-hero_copy) and align-content: end keeps every panel pinned to the bottom.
+  const copy = root.querySelector('.ps-hero_copy');
+  let fitted = false;
+  function fitCopy() {
+    if (!copy) return;
+    const height = `${texts[index].offsetHeight}px`;
+    if (!fitted) {
+      copy.style.transition = 'none';
+      copy.style.height = height;
+      void copy.offsetHeight;
+      copy.style.transition = '';
+      fitted = true;
+      return;
+    }
+    copy.style.height = height;
+  }
+  if (copy && 'ResizeObserver' in window) {
+    const watch = new ResizeObserver(() => { if (fitted) { copy.style.transition = 'none'; copy.style.height = `${texts[index].offsetHeight}px`; void copy.offsetHeight; copy.style.transition = ''; } });
+    texts.forEach((t) => watch.observe(t));
+  }
+
   function runBar(i, ms, from = 0) {
     const bar = fill(i);
     if (!bar) return;
@@ -62,6 +85,7 @@ export default function serviceHero(root) {
       tabs[i].setAttribute('aria-pressed', String(on));
       if (!on) { const bar = fill(i); if (bar) { bar.style.transition = 'none'; bar.style.width = '0%'; } }
     }
+    fitCopy();
     if (paused) {
       // Picked while hovered: hold here, and start the full timer once the pointer leaves.
       remaining = delay;
