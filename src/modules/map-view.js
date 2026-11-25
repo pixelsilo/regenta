@@ -20,13 +20,14 @@
 //
 // The map follows the Finsweet List v2 filters on the results list. ?view=map opens the
 // map on load, and the switch keeps that in the address so the view can be linked to.
-// Google Maps only loads the first time the map is opened.
+// The map is built off screen once the page has loaded, so opening it is instant.
 import { loadMaps, findList, GREY, LONDON, PIN } from '../lib/maps.js';
 
 const DESKTOP = window.matchMedia('(min-width: 768px)');
 const MIN_HEIGHT = 480; // px, desktop map height floor
 const FOCUS_ZOOM = 13; // zoom in at least this far when a development is picked
 const ONE_PIN_ZOOM = 13;
+const STASH_GAP = 24; // px between the filters and the map, used while measuring off screen
 
 function number(value) {
   const n = parseFloat(value);
@@ -78,13 +79,36 @@ export default function mapView(root) {
   // --- layout ---------------------------------------------------------------
 
   // Desktop: the map fills the window below the filters. Phones: CSS stacks map over list.
+  // While it's stashed off screen, measure from the bottom of the filters instead.
   function size() {
     if (!DESKTOP.matches) {
       root.style.height = '';
       return;
     }
-    const top = root.getBoundingClientRect().top + window.scrollY;
+    const filters = document.querySelector('[fs-list-element="filters"]');
+    const top = stashed && filters
+      ? filters.getBoundingClientRect().bottom + window.scrollY + STASH_GAP
+      : root.getBoundingClientRect().top + window.scrollY;
     root.style.height = `${Math.max(MIN_HEIGHT, Math.round(window.innerHeight - top))}px`;
+  }
+
+  // Keep the map laid out but off screen and invisible, so Google can draw it (tiles, pins,
+  // bounds) before anyone asks for it. Opening the map is then just un-stashing it.
+  let stashed = false;
+  function stash(on) {
+    stashed = on;
+    Object.assign(root.style, on
+      ? { display: '', position: 'absolute', left: '-10000px', top: '0px', width: `${root.parentElement.clientWidth}px`, visibility: 'hidden', pointerEvents: 'none' }
+      : { position: '', left: '', top: '', width: '', visibility: '', pointerEvents: '' });
+  }
+
+  // Build the map in the background once the page has settled (or sooner, if someone
+  // heads for the Map button).
+  function warm() {
+    if (ready) return;
+    if (view !== 'map') stash(true);
+    size();
+    init();
   }
 
   // --- map ------------------------------------------------------------------
@@ -183,7 +207,7 @@ export default function mapView(root) {
         ? `Showing all ${shown} ${noun(shown)}`
         : `Showing ${shown} of ${items.length} ${noun(items.length)}`;
     }
-    if (view === 'map') fit();
+    fit();
   }
 
   // The results list carries [data-map-focus="slug"] on each card.
@@ -206,7 +230,14 @@ export default function mapView(root) {
   function setView(next, { remember = true } = {}) {
     view = next === 'map' ? 'map' : 'list';
     const isMap = view === 'map';
-    root.style.display = isMap ? '' : 'none';
+    if (isMap) {
+      stash(false);
+      root.style.display = '';
+    } else if (ready) {
+      stash(true); // keep it drawn for next time
+    } else {
+      root.style.display = 'none';
+    }
     listViews.forEach((el) => { el.style.display = isMap ? 'none' : ''; });
     toggles.forEach((button) => {
       const on = button.getAttribute('data-map-view-toggle') === view;
@@ -233,6 +264,10 @@ export default function mapView(root) {
       event.preventDefault();
       setView(button.getAttribute('data-map-view-toggle'));
     });
+    if (button.getAttribute('data-map-view-toggle') === 'map') {
+      button.addEventListener('pointerenter', warm, { once: true });
+      button.addEventListener('focus', warm, { once: true });
+    }
   });
 
   items.forEach((item) => {
@@ -268,11 +303,17 @@ export default function mapView(root) {
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
-      if (view !== 'map') return;
+      if (!ready) return;
+      if (stashed) root.style.width = `${root.parentElement.clientWidth}px`;
       size();
       gmap?.setOptions({ gestureHandling: DESKTOP.matches ? 'greedy' : 'cooperative' });
     }, 150);
   });
 
   setView(new URLSearchParams(window.location.search).get('view') === 'map' ? 'map' : 'list', { remember: false });
+
+  const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 1500));
+  const later = () => idle(warm, { timeout: 3000 });
+  if (document.readyState === 'complete') later();
+  else window.addEventListener('load', later, { once: true });
 }
