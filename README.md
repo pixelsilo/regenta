@@ -105,8 +105,9 @@ Area (Adobe Fonts, kit ptn3etu) has two sets of line metrics: OS/2 typo 0.75/0.2
 
 The fix is one block in the site CSS embed (component `code-v2` > `css`, copy in `snippets/embeds/global-fluid-font-size-css.html`):
 - Text that sits inside a box (buttons, tabs, pills, nav links, form options, sort headers, the cookie banner buttons) goes in a `.button-text` element. Boxes keep even top/bottom padding.
-- Where the browser supports `text-box` (Chrome 133+, Safari 18.2+), `.button-text` is trimmed to cap height and baseline and the space is added back with `margin-block: calc((1lh - 1cap) / 2)`, so capitals are centred exactly and heights don't change.
-- Elsewhere (Firefox, older Safari) it shifts by `--area-optical-shift`: 0.14em, or -0.09em where `font: -apple-system-body` is supported. Firefox on Mac can't be detected in CSS and stays ~0.2em low.
+- Where the browser supports `text-box` (Chrome 133+, Safari 18.2+, current Firefox), `.button-text` is trimmed to cap height and baseline and the space is added back with `margin-block: calc((1lh - 1cap) / 2)`, so capitals are centred exactly and heights don't change.
+- Elsewhere (older browsers, e.g. Safari 17 / iOS 18.0) it shifts by `--area-optical-shift`: 0.14em, or -0.09em where `font: -apple-system-body` is supported.
+- Checked 25 Nov 2026 on LambdaTest: Safari 17.6 and 18.5 (macOS), iOS 18.0 simulator, Firefox 160 (Mac, Windows), Chrome (Mac, Windows): boxed text within 0.02em of centre (iOS calculator button 0.045em). Real iPhones aren't on our LambdaTest plan.
 - Special cases in the same block: `.heading-pill-1rem` (an h1 with bare text), the alert strip's rich text, and the FAQ page's nav pills.
 
 Don't add padding or `top`/`transform` nudges to centre Area text; wrap the text in `.button-text` instead. Removed in Nov 2026: em padding on `.button`/`-2`/`-3`, `.register-interest`, `.wf_button`, `.mini-navbar_button`, `.navbar_link-search`, `.navbar_mini-link`, `.text-button`; the `button-text_shift-down` combo's padding; uneven padding on `.dg_tab`, `.dropdown-link`, `.map-info-window_link`, `.fs_accordion-2_header`, `.fs-checkbox_field`, `.fs-sort_button-2`, `.caption`, `.alert-strip`, `.heading-pill-1rem`, `Div Block 156`; the iOS-only `.button-text { top: -1em }` rule; the FAQ pills' 0.2em nudge and its Safari override; and `src/global/safari-shift.js` (bundle v3.0.2).

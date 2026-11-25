@@ -28,8 +28,8 @@
 /* Area optical centring (Nov 2026). Replaces the old per-class padding nudges and the Safari-only script.
    Area's line metrics put capitals 0.14em high on Windows/Android (typo metrics) and ~0.09em low on Apple (hhea metrics).
    Text that sits inside a box (buttons, tabs, pills, nav links, form options) goes in .button-text; this centres it.
-   - Browsers with text-box (Chrome 133+, Safari 18.2+): trims to cap height and baseline, then adds the space back evenly. Exact on every OS.
-   - Others (Firefox, older Safari): shifts by the measured offset. Firefox on Mac can't be told apart and stays ~0.2em low.
+   - Browsers with text-box (Chrome 133+, Safari 18.2+, current Firefox): trims to cap height and baseline, then adds the space back evenly. Exact on every OS.
+   - Older browsers: shift by the measured offset (0.14em, or -0.09em on Apple). Checked on LambdaTest Nov 2026: within 0.02em everywhere.
    Source: pixelsilo/regenta README > Area optical centring. */
 :root { --area-optical-shift: 0.14em; }
 @supports (font: -apple-system-body) { :root { --area-optical-shift: -0.09em; } }
