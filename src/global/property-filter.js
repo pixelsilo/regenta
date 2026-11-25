@@ -191,10 +191,30 @@ export default function propertyFilter() {
       d.el.style.display = on ? '' : 'none';
       if (on) shown.add(d.slug);
     });
-    counts.forEach((c) => { (c.querySelector('strong') || c).textContent = String(shown.size); });
+    counts.forEach((c) => {
+      (c.querySelector('strong') || c).textContent = String(shown.size);
+      // "Showing 1 development" / "Showing 8 developments" (the word after the number)
+      const noun = c.nextSibling;
+      if (noun?.nodeType === 3 && /development/.test(noun.textContent)) {
+        noun.textContent = shown.size === 1 ? ' development' : ' developments';
+      }
+    });
     publishVisible(shown);
     if (remember) writeQuery();
   }
+  // After a filter change made further down the page, bring the top of the results (the count)
+  // back into view just under the pinned filters (global/sticky-filters.js), so you see the new
+  // list from its start rather than somewhere in the middle of a shorter one.
+  function backToResults() {
+    const anchor = counts[0];
+    const list = items[0]?.closest('[data-list-view]');
+    if (!anchor || (list && !list.offsetParent)) return; // map view: nothing to scroll to
+    const band = document.querySelector('[data-sticky-filters]');
+    const pinnedBottom = band && getComputedStyle(band).position === 'sticky' ? band.getBoundingClientRect().bottom : 0;
+    const top = anchor.getBoundingClientRect().top;
+    if (top < pinnedBottom) window.scrollTo({ top: window.scrollY + top - pinnedBottom - 24 });
+  }
+
   // Slider drags fire often: filter at most once a frame.
   function applySoon() {
     if (queued) return;
@@ -207,6 +227,7 @@ export default function propertyFilter() {
     select?.addEventListener('change', () => {
       state[key] = key === 'bedrooms' ? num(select.value) : select.value;
       apply();
+      backToResults();
     });
   });
 
@@ -233,6 +254,7 @@ export default function propertyFilter() {
       });
       range?.setRange(null, null);
       apply();
+      backToResults();
     });
   });
 

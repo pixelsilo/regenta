@@ -17,6 +17,8 @@
 //                           [data-map-price-from] ("From £…"); only one shows
 // Elsewhere on the page:
 //   [data-map-view-toggle="list|map"]  the switch buttons (.is-active + aria-pressed)
+//   [data-map-view-indicator]  the green pill behind them; slides and resizes to the
+//                           active button (its transition is set in Webflow)
 //   [data-list-view]        hidden while the map is open (the normal results list)
 //   [data-map-focus="slug"] on a results card: opens the map on that development
 //
@@ -108,6 +110,7 @@ export default function mapView(root) {
   const count = root.querySelector('[data-map-count]');
   const listViews = [...document.querySelectorAll('[data-list-view]')];
   const toggles = [...document.querySelectorAll('[data-map-view-toggle]')];
+  const indicators = [...document.querySelectorAll('[data-map-view-indicator]')];
 
   const items = [...root.querySelectorAll('[data-map-item]')].map((el) => ({
     el,
@@ -134,16 +137,18 @@ export default function mapView(root) {
   // --- layout ---------------------------------------------------------------
 
   // Desktop: the map fills the window below the filters. Phones: CSS stacks map over list.
-  // While it's hidden, measure from the bottom of the filters instead.
+  // While it's hidden, measure from where it will open: the top of the results list (which
+  // it replaces), or failing that the bottom of the filters.
   function size() {
     if (!DESKTOP.matches) {
       root.style.height = '';
       return;
     }
+    const list = listViews.find((el) => el.offsetParent);
     const filters = document.querySelector('[data-filter-form]');
-    const top = stashed && filters
-      ? filters.getBoundingClientRect().bottom + window.scrollY + STASH_GAP
-      : root.getBoundingClientRect().top + window.scrollY;
+    let top = root.getBoundingClientRect().top + window.scrollY;
+    if (stashed && list) top = list.getBoundingClientRect().top + window.scrollY;
+    else if (stashed && filters) top = filters.getBoundingClientRect().bottom + window.scrollY + STASH_GAP;
     root.style.height = `${Math.max(MIN_HEIGHT, Math.round(window.innerHeight - top))}px`;
   }
 
@@ -340,6 +345,7 @@ export default function mapView(root) {
       button.classList.toggle('is-active', on);
       button.setAttribute('aria-pressed', String(on));
     });
+    moveIndicator();
     if (remember) {
       const url = new URL(window.location.href);
       if (isMap) url.searchParams.set('view', 'map');
@@ -352,6 +358,22 @@ export default function mapView(root) {
     }
     size();
     return init().then(fit);
+  }
+
+  // Slide the switch's pill under the active button, at that button's size.
+  function moveIndicator({ animate = true } = {}) {
+    indicators.forEach((pill) => {
+      const button = [...pill.parentElement.querySelectorAll('[data-map-view-toggle]')]
+        .find((b) => b.getAttribute('data-map-view-toggle') === view);
+      if (!button || !button.offsetWidth) return;
+      if (!animate) pill.style.transition = 'none';
+      pill.style.left = `${button.offsetLeft}px`;
+      pill.style.width = `${button.offsetWidth}px`;
+      if (!animate) {
+        pill.getBoundingClientRect(); // apply before turning the transition back on
+        pill.style.transition = '';
+      }
+    });
   }
 
   toggles.forEach((button) => {
@@ -391,6 +413,7 @@ export default function mapView(root) {
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
+      moveIndicator({ animate: false });
       if (!ready) return;
       if (stashed) root.style.width = `${root.parentElement.clientWidth}px`;
       size();
@@ -399,6 +422,8 @@ export default function mapView(root) {
   });
 
   setView(new URLSearchParams(window.location.search).get('view') === 'map' ? 'map' : 'list', { remember: false });
+  moveIndicator({ animate: false });
+  document.fonts?.ready.then(() => moveIndicator({ animate: false })); // button widths change with the font
 
   setTimeout(warm, 0);
 }
