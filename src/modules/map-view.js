@@ -102,6 +102,18 @@ function pickPrice(scope) {
   });
 }
 
+// A development's page address: the [data-map-link] href if it points at an item page, else
+// the link on the results card with the same slug.
+function pageLink(slug, el) {
+  const own = el.querySelector('[data-map-link]')?.getAttribute('href') || '';
+  if (slug && own.endsWith(`/${slug}`)) return own;
+  const focus = slug && document.querySelector(`[data-filter-item] [data-map-focus="${CSS.escape(slug)}"]`);
+  const result = focus?.closest('[data-filter-item]');
+  const href = [...(result?.querySelectorAll('a[href]') || [])].map((a) => a.getAttribute('href'))
+    .find((h) => h && slug && h.endsWith(`/${slug}`));
+  return href || own.replace(/^#$/, '');
+}
+
 export default function mapView(root) {
   const key = root.getAttribute('data-maps-key');
   const canvas = root.querySelector('[data-map]');
@@ -122,8 +134,14 @@ export default function mapView(root) {
     name: el.querySelector('[data-map-card] h3')?.textContent.trim() || '',
     card: el.querySelector('[data-map-card]'),
     popup: el.querySelector('[data-map-popup]'),
-    link: el.querySelector('[data-map-link]')?.href || '',
+    link: pageLink(el.getAttribute('data-slug'), el),
   }));
+  // The pop-up's "View development" link should point at the item's own page. If it's been
+  // set to anything else in Webflow ('#' or the bare /development template), point it at the
+  // page the matching results card links to.
+  items.forEach((item) => {
+    item.el.querySelectorAll('[data-map-link]').forEach((a) => { if (item.link) a.href = item.link; });
+  });
   const bySlug = new Map(items.map((item) => [item.slug, item]));
   pickPrice(root);
   holdImages();
