@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mock v2: Professional services | Regenta (#57)</title>
+<link rel="stylesheet" href="https://cdn.prod.website-files.com/68362e432005a0afe1416a06/css/regenta-uk.webflow.shared.80a6cc7ad.min.css">
+<script src="https://use.typekit.net/ptn3etu.js"></script>
+<script>try{Typekit.load();}catch(e){}</script>
+<style>
+  /* Mock only. Built in Webflow afterwards with Designer classes. */
+  :root { --green:#0b2b26; --green-2:#173833; --sand:#e3e5db; --sand-2:#e3e5db80; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--sand); color:var(--green); font-family: area-normal, area, "Area Normal", system-ui, sans-serif; }
+  .g { font-family: Griffiths, serif; font-weight:400; font-style:normal; }
+  a { color:inherit; text-decoration:none; }
+  .wrap { width:100%; max-width:1440px; margin:0 auto; padding:0 1.75rem; }
+
+  /* nav (static copy of the professional set) */
+  .nav { position:fixed; inset:0 0 auto 0; z-index:10; height:112px; display:flex; align-items:center; }
+  .nav .wrap { display:flex; align-items:center; justify-content:space-between; }
+  .logo { color:#fff; font-size:1.9rem; letter-spacing:.06em; font-weight:500; }
+  .links { display:flex; gap:1.75rem; align-items:center; color:#fff; font-size:.7rem; letter-spacing:.2em; font-weight:600; }
+  .pill { background:var(--sand); color:var(--green); border-radius:99px; padding:.8rem 1.4rem; letter-spacing:0; font-size:1rem; font-weight:500; }
+
+  /* 1. hero scroller */
+  .ps-hero { position:relative; height:100svh; min-height:640px; color:#fff; overflow:hidden; background:var(--green); }
+  .ps-slide { position:absolute; inset:0; opacity:0; transition:opacity .9s ease; }
+  .ps-slide.is-active { opacity:1; }
+  .ps-slide img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transform:scale(1.06); transition:transform 7s linear; }
+  .ps-slide.is-active img { transform:scale(1); }
+  .ps-slide::after { content:""; position:absolute; inset:0; background:linear-gradient(90deg, rgba(11,43,38,.92) 0%, rgba(11,43,38,.7) 45%, rgba(11,43,38,.15) 100%), linear-gradient(0deg, rgba(11,43,38,.85) 0%, rgba(11,43,38,0) 40%); }
+  .ps-content { position:absolute; inset:0; display:flex; flex-direction:column; justify-content:flex-end; padding-bottom:11.5rem; }
+  .ps-eyebrow { font-size:.75rem; letter-spacing:.22em; text-transform:uppercase; font-weight:600; opacity:.8; margin-bottom:1.25rem; }
+  .ps-copy { position:relative; min-height:19rem; max-width:44rem; }
+  .ps-text { position:absolute; inset:auto 0 0 0; opacity:0; transform:translateY(1.25rem); transition:opacity .6s ease, transform .6s ease; pointer-events:none; }
+  .ps-text.is-active { opacity:1; transform:none; pointer-events:auto; transition-delay:.25s; }
+  .ps-title { font-size:clamp(3rem, 6vw, 5.5rem); line-height:.95; font-weight:700; margin:0 0 1.25rem; letter-spacing:-.01em; }
+  .ps-title .g { font-size:1.08em; }
+  .ps-desc { font-size:1.15rem; line-height:1.5; margin:0 0 2rem; max-width:36rem; opacity:.92; }
+  .ps-btn { display:inline-flex; align-items:center; gap:1.25rem; border:1px solid #fff; border-radius:99px; padding:1.05rem 2.1rem; font-size:1rem; }
+  .ps-btn:hover { background:#fff; color:var(--green); }
+
+  .ps-tabs { position:absolute; left:0; right:0; bottom:0; border-top:1px solid rgba(255,255,255,.2); }
+  .ps-tabs .wrap { display:grid; grid-template-columns:repeat(4, 1fr) auto; align-items:stretch; }
+  .ps-tab { position:relative; text-align:left; background:none; border:0; color:#fff; padding:1.6rem 1.5rem 1.9rem 0; cursor:pointer; font:inherit; opacity:.55; transition:opacity .3s; }
+  .ps-tab:hover, .ps-tab.is-active { opacity:1; }
+  .ps-tab .n { display:block; font-size:.72rem; letter-spacing:.2em; margin-bottom:.5rem; }
+  .ps-tab .t { font-size:1.15rem; font-weight:600; }
+  .ps-tab .bar { position:absolute; left:0; right:1.5rem; top:-1px; height:2px; background:rgba(255,255,255,0); overflow:hidden; }
+  .ps-tab .bar i { display:block; height:100%; width:0; background:#fff; }
+  .ps-tab.is-active .bar i { animation:fill var(--dur,7s) linear forwards; }
+  .ps-hero.is-paused .ps-tab.is-active .bar i { animation-play-state:paused; }
+  @keyframes fill { to { width:100%; } }
+  .ps-arrows { display:flex; gap:.6rem; align-items:center; padding-left:1rem; }
+  .ps-arrow { width:3.25rem; height:3.25rem; border-radius:50%; border:1px solid rgba(255,255,255,.6); background:none; color:#fff; font-size:1.2rem; cursor:pointer; }
+  .ps-arrow:hover { background:#fff; color:var(--green); }
+
+  /* 2. intro + stats */
+  .intro { padding:7rem 0 5rem; }
+  .intro .wrap { display:grid; grid-template-columns:1.1fr 1fr; gap:4rem; align-items:end; }
+  .h2 { font-size:clamp(2.2rem, 3.6vw, 3.4rem); line-height:1.05; font-weight:700; margin:0; }
+  .intro p { font-size:1.15rem; line-height:1.55; margin:0 0 1.5rem; }
+  .stats { grid-column:1 / -1; display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-top:4.5rem; border-top:1px solid rgba(11,43,38,.2); padding-top:2rem; }
+  .stat b { display:block; font-size:clamp(2.6rem, 4.5vw, 4rem); line-height:1; font-weight:700; }
+  .stat span { display:block; margin-top:.75rem; max-width:20rem; line-height:1.45; }
+
+  /* 3. service index (all services at a glance, links to each page) */
+  .index { padding:2rem 0 7rem; }
+  .row { display:grid; grid-template-columns:5rem 1.2fr 1.5fr 8rem; gap:2rem; align-items:center; padding:2.25rem 0; border-top:1px solid rgba(11,43,38,.2); transition:padding .3s; }
+  .row:last-child { border-bottom:1px solid rgba(11,43,38,.2); }
+  .row .num { font-size:.8rem; letter-spacing:.2em; }
+  .row .name { font-size:clamp(1.8rem, 2.8vw, 2.6rem); font-weight:700; line-height:1.05; }
+  .row .sum { line-height:1.5; opacity:.85; }
+  .row .thumb { width:8rem; height:5.5rem; border-radius:.5rem; overflow:hidden; }
+  .row .thumb img { width:100%; height:100%; object-fit:cover; transition:transform .5s; }
+  .row:hover .thumb img { transform:scale(1.08); }
+  .row:hover .name { font-family:Griffiths, serif; font-weight:400; }
+
+  /* 4. reused components (placeholders) */
+  .reuse { margin:0 1.75rem 1.5rem; border:2px dashed rgba(11,43,38,.35); border-radius:1rem; padding:2.5rem; text-align:center; font-size:.95rem; }
+  .reuse b { display:block; font-size:1.2rem; margin-bottom:.35rem; }
+
+  /* 5. CTA */
+  .cta { background:var(--green); color:#fff; border-radius:1.5rem; margin:4rem 1.75rem 2rem; padding:5rem 3rem; display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; }
+  .cta .h2 { max-width:40rem; }
+  .cta a { background:var(--sand); color:var(--green); border-radius:99px; padding:1.05rem 2.1rem; white-space:nowrap; }
+
+  .note { position:fixed; right:1rem; bottom:1rem; z-index:20; background:#fff; color:#0b2b26; border-radius:.75rem; padding:.8rem 1rem; font:13px/1.4 system-ui, sans-serif; max-width:20rem; box-shadow:0 8px 30px rgba(0,0,0,.2); }
+
+  @media (max-width: 767px) {
+    .nav { height:76px; } .links a:not(.pill) { display:none; } .logo { font-size:1.4rem; }
+    .ps-content { padding-bottom:9.5rem; } .ps-copy { min-height:22rem; }
+    .ps-desc { font-size:1rem; }
+    .ps-tabs .wrap { grid-template-columns:repeat(4, 1fr); }
+    .ps-arrows { display:none; }
+    .ps-tab { padding:1.1rem .5rem 1.3rem 0; } .ps-tab .t { font-size:.78rem; } .ps-tab .bar { right:.5rem; }
+    .intro { padding:4.5rem 0 3rem; } .intro .wrap { grid-template-columns:1fr; gap:1.5rem; }
+    .stats { grid-template-columns:1fr; margin-top:2.5rem; }
+    .row { grid-template-columns:2.5rem 1fr; gap:.5rem 1rem; padding:1.5rem 0; } .row .sum { grid-column:2; } .row .thumb { display:none; }
+    .cta { flex-direction:column; align-items:flex-start; padding:3rem 1.75rem; margin:3rem 1rem 1rem; }
+    .note { left:1rem; right:1rem; max-width:none; }
+  }
+  @media (prefers-reduced-motion: reduce) { .ps-slide, .ps-slide img, .ps-text { transition:none; } .ps-tab.is-active .bar i { animation:none; width:100%; } }
+  /* v2: tabs clear the cookie shield */
+  .ps-tabs { padding-bottom:2.5rem; } .ps-content { padding-bottom:14rem; }
+
+  /* 2. intro, expanded */
+  .about { padding:7.5rem 0 6rem; }
+  .about .wrap { display:grid; grid-template-columns:1fr 1fr; gap:5rem; align-items:start; }
+  .eyebrow { font-size:.75rem; letter-spacing:.22em; text-transform:uppercase; font-weight:600; opacity:.7; margin-bottom:1.25rem; }
+  .about p { font-size:1.1rem; line-height:1.6; margin:0 0 1.25rem; }
+  .about .lead { font-size:1.35rem; line-height:1.45; }
+  .who { display:grid; grid-template-columns:1fr 1fr; margin:2.25rem 0 2.5rem; border-top:1px solid rgba(11,43,38,.2); }
+  .who div { padding:1.1rem 0; border-bottom:1px solid rgba(11,43,38,.2); font-weight:600; display:flex; gap:.75rem; align-items:center; }
+  .who div:nth-child(odd) { padding-right:1rem; }
+  .who span { font-size:.7rem; letter-spacing:.2em; opacity:.6; font-weight:500; }
+  .btn-dark { display:inline-flex; align-items:center; gap:1rem; background:var(--green); color:var(--sand); border-radius:99px; padding:1.25rem 2.25rem; }
+  .stats-band { background:var(--green); color:var(--sand); padding:5rem 0; }
+  .stats-band .wrap { display:grid; grid-template-columns:repeat(4,1fr); gap:2rem; }
+  .stats-band b { display:block; font-size:2.2rem; margin-bottom:.75rem; }
+  .stats-band span { font-size:.9rem; line-height:1.5; opacity:.85; }
+
+  /* 3. case studies */
+  .work { padding:8rem 0 9rem; }
+  .work-head { display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; margin-bottom:3rem; }
+  .work-head p { max-width:28rem; margin:.75rem 0 0; line-height:1.55; opacity:.85; }
+  .link-arrow { white-space:nowrap; border-bottom:1px solid currentColor; padding-bottom:.2rem; }
+  .cs { position:relative; display:block; overflow:hidden; border-radius:1.25rem; background:var(--green); color:#fff; }
+  .cs img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform 1.2s cubic-bezier(.2,.7,.2,1); }
+  .cs:hover img { transform:scale(1.04); }
+  .cs::after { content:""; position:absolute; inset:0; background:linear-gradient(0deg, rgba(11,43,38,.88) 0%, rgba(11,43,38,.25) 45%, rgba(11,43,38,0) 70%); }
+  .cs-body { position:absolute; left:0; right:0; bottom:0; z-index:1; padding:2rem; }
+  .cs-meta { display:flex; flex-wrap:wrap; gap:.5rem; margin-bottom:1rem; }
+  .chip { font-size:.75rem; letter-spacing:.04em; border:1px solid rgba(255,255,255,.45); border-radius:99px; padding:.4rem .8rem; backdrop-filter:blur(6px); }
+  .cs h3 { margin:0; font-size:1.9rem; line-height:1.1; font-weight:700; }
+  .cs p { margin:.75rem 0 0; max-width:34rem; line-height:1.5; opacity:.9; }
+  .cs .more { display:inline-block; margin-top:1.25rem; font-size:.95rem; border-bottom:1px solid rgba(255,255,255,.6); }
+
+  .cs-feature { height:min(78vh, 46rem); margin-bottom:1.5rem; }
+  .cs-feature .cs-body { padding:3rem; display:grid; grid-template-columns:1.2fr 1fr; gap:3rem; align-items:end; }
+  .cs-feature h3 { font-size:clamp(2.6rem, 4.5vw, 4.2rem); }
+  .cs-feature blockquote { margin:0; font-size:1.15rem; line-height:1.5; border-left:2px solid rgba(255,255,255,.6); padding-left:1.25rem; }
+  .cs-feature cite { display:block; margin-top:.75rem; font-style:normal; font-size:.85rem; opacity:.75; }
+
+  .cs-grid { display:grid; grid-template-columns:1.25fr 1fr; grid-template-rows:22rem 22rem; gap:1.5rem; margin-bottom:1.5rem; }
+  .cs-grid .cs:first-child { grid-row:1 / 3; }
+  .cs-row { display:grid; grid-template-columns:1fr 1.6fr; gap:1.5rem; }
+  .cs-quote { border-radius:1.25rem; border:1px solid rgba(11,43,38,.2); padding:2.5rem; display:flex; flex-direction:column; justify-content:space-between; min-height:26rem; }
+  .cs-quote .mark { font-family:Griffiths, serif; font-size:6rem; line-height:.6; height:2.5rem; }
+  .cs-quote q { font-size:1.35rem; line-height:1.45; quotes:none; }
+  .cs-quote .who2 { margin-top:2rem; display:flex; justify-content:space-between; align-items:flex-end; gap:1rem; font-size:.9rem; }
+  .cs-quote .who2 b { display:block; font-size:1.05rem; }
+  .cs-wide { min-height:26rem; }
+
+  @media (max-width: 991px) {
+    .about .wrap { grid-template-columns:1fr; gap:2rem; }
+    .stats-band .wrap { grid-template-columns:1fr 1fr; }
+    .cs-feature .cs-body { grid-template-columns:1fr; gap:1.5rem; padding:2rem; }
+    .cs-grid { grid-template-columns:1fr 1fr; grid-template-rows:auto; }
+    .cs-grid .cs { min-height:22rem; } .cs-grid .cs:first-child { grid-row:auto; grid-column:1 / 3; min-height:28rem; }
+    .cs-row { grid-template-columns:1fr; }
+  }
+  @media (max-width: 767px) {
+    .ps-tabs { padding-bottom:2.75rem; } .ps-content { padding-bottom:11.75rem; }
+    .about { padding:4.5rem 0 3.5rem; } .who { grid-template-columns:1fr; } .who div:nth-child(odd) { padding-right:0; }
+    .stats-band .wrap { grid-template-columns:1fr; }
+    .work { padding:4.5rem 0 5rem; } .work-head { flex-direction:column; align-items:flex-start; }
+    .cs-feature { height:32rem; } .cs-feature blockquote { display:none; }
+    .cs-grid { grid-template-columns:1fr; } .cs-grid .cs:first-child { grid-column:auto; }
+    .cs h3 { font-size:1.6rem; } .cs-body { padding:1.5rem; }
+  }
+
+</style>
+</head>
+<body>
+
+<header class="nav"><div class="wrap">
+  <a class="logo" href="#">⁘ REGENTA</a>
+  <nav class="links"><a href="#">OUR SERVICES ↓</a><a href="#">ABOUT US</a><a href="#">BUILT BY REGENTA</a><a href="#">CASE STUDIES</a><a href="#">NEWS</a><a href="#">CONTACT US</a><a class="pill" href="#">Properties ⌕</a></nav>
+</div></header>
+
+<!-- 1. HERO SCROLLER: the services themselves are the hero -->
+<section class="ps-hero" data-ps-hero>
+  <div class="ps-slide is-active"><img src="https://cdn.prod.website-files.com/63e575590da52be2a3c31dcf/66e835ded598ee599e7e39b0_198_HiRes_BuyersJourney_Corporate_SiteSales_4K8A8998_1_30.jpg" alt=""></div>
+  <div class="ps-slide"><img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/68362e432005a0afe141711c_marketing.jpg" alt=""></div>
+  <div class="ps-slide"><img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/68362e432005a0afe141711d_market-intelligence.jpg" alt=""></div>
+  <div class="ps-slide"><img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/68362e432005a0afe141711e_development-consultancy.jpg" alt=""></div>
+
+  <div class="ps-content"><div class="wrap">
+    <div class="ps-eyebrow">Professional services</div>
+    <div class="ps-copy">
+      <div class="ps-text is-active">
+        <h1 class="ps-title">New homes <span class="g">sales</span></h1>
+        <p class="ps-desc">Three decades of selling new homes for developers, housing associations and local authorities, across private sale, Shared Ownership and affordable tenures.</p>
+        <a class="ps-btn" href="#">Explore Sales <span>→</span></a>
+      </div>
+      <div class="ps-text">
+        <h2 class="ps-title">Marketing that <span class="g">sells</span></h2>
+        <p class="ps-desc">Brand, websites, show homes and campaigns, made with London's best creative partners and built to bring in qualified buyers.</p>
+        <a class="ps-btn" href="#">Explore Marketing <span>→</span></a>
+      </div>
+      <div class="ps-text">
+        <h2 class="ps-title">Market <span class="g">intelligence</span></h2>
+        <p class="ps-desc">Research, pricing and valuations from our in-house team, shaping decisions from acquisition to the final reservation.</p>
+        <a class="ps-btn" href="#">Explore Market Intelligence <span>→</span></a>
+      </div>
+      <div class="ps-text">
+        <h2 class="ps-title">Development <span class="g">consultancy</span></h2>
+        <p class="ps-desc">Land, planning, scheme design, tenure mix and specification, so every scheme is set up to sell well and hold its value.</p>
+        <a class="ps-btn" href="#">Explore Development Consultancy <span>→</span></a>
+      </div>
+    </div>
+  </div></div>
+
+  <div class="ps-tabs"><div class="wrap">
+    <button class="ps-tab is-active"><span class="bar"><i></i></span><span class="n">01</span><span class="t">Sales</span></button>
+    <button class="ps-tab"><span class="bar"><i></i></span><span class="n">02</span><span class="t">Marketing</span></button>
+    <button class="ps-tab"><span class="bar"><i></i></span><span class="n">03</span><span class="t">Market Intelligence</span></button>
+    <button class="ps-tab"><span class="bar"><i></i></span><span class="n">04</span><span class="t">Development Consultancy</span></button>
+    <div class="ps-arrows"><button class="ps-arrow" data-prev aria-label="Previous service">←</button><button class="ps-arrow" data-next aria-label="Next service">→</button></div>
+  </div></div>
+</section>
+
+
+<!-- 2. WHO WE ARE (expanded, heading top-aligned with the copy) -->
+<section class="about"><div class="wrap">
+  <div>
+    <div class="eyebrow">About Regenta</div>
+    <h2 class="h2">Your strategic partner in <span class="g">property development</span> success</h2>
+  </div>
+  <div>
+    <p class="lead">We started in 1988 selling new homes. Today we're a development partner for schemes across London, the South East and beyond.</p>
+    <p>We're award-winning developers in our own right, through Built by Regenta, so we know what makes a scheme succeed. That shows in everything from land valuation and site optimisation to contractor management and the sales and marketing strategy.</p>
+    <p>We've worked on everything from boutique 10-home schemes to 1,000-home communities. Our mantra: minimise risk while optimising return.</p>
+    <div class="who">
+      <div><span>01</span>Developers and housebuilders</div>
+      <div><span>02</span>Housing associations</div>
+      <div><span>03</span>Local authorities</div>
+      <div><span>04</span>Registered charities</div>
+    </div>
+    <a class="btn-dark" href="#">Talk to our team <span>→</span></a>
+  </div>
+</div></section>
+
+<!-- existing stats component, unchanged (part 6 replaces the 12-month stat) -->
+<section class="stats-band"><div class="wrap">
+  <div><b>35+ years</b><span>Founded by Murray Smith in 1988.</span></div>
+  <div><b>60 staff</b><span>A team of around 60.</span></div>
+  <div><b>1,000 units</b><span>Up to 1,000 units a year.</span></div>
+  <div><b>12 months</b><span>(this stat is replaced in part 6)</span></div>
+</div></section>
+
+<!-- 3. CASE STUDIES: one feature, then varied sizes -->
+<section class="work"><div class="wrap">
+  <div class="work-head">
+    <div>
+      <div class="eyebrow">Case studies</div>
+      <h2 class="h2">Recent <span class="g">work</span></h2>
+      <p>Schemes we've sold and marketed for councils, housing associations and developers.</p>
+    </div>
+    <a class="link-arrow" href="#">All case studies →</a>
+  </div>
+
+  <a class="cs cs-feature" href="#">
+    <img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/68362e432005a0afe14172c4_001_LowRes_Externals_FilmSquare_SiteSales_4K2A0909.jpg" alt="">
+    <div class="cs-body">
+      <div>
+        <div class="cs-meta"><span class="chip">2025</span><span class="chip">47 homes</span><span class="chip">Shared Ownership</span><span class="chip">Waltham Forest Council</span></div>
+        <h3>Film Square, <span class="g">Waltham Forest</span></h3>
+        <span class="more">Read the case study →</span>
+      </div>
+      <blockquote>"The experience so far has been nothing short of exceptional. From the beginning, the framework procurement process was seamless and efficient."<cite>Waltham Forest Council</cite></blockquote>
+    </div>
+  </a>
+
+  <div class="cs-grid">
+    <a class="cs" href="#">
+      <img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/68362e432005a0afe1416ede_649311b0df7bd2fa0f1354f5_005_Skyline_Plot54_View_MidRes_Photography_Sitesales_DSC_0218-HDR_final.jpg" alt="">
+      <div class="cs-body">
+        <div class="cs-meta"><span class="chip">2023</span><span class="chip">Shared Ownership + private sale</span></div>
+        <h3>Skyline, E17</h3>
+        <p>A landmark 15-storey scheme for Waltham Forest Council, selling an average of 8 homes a month, most of them off plan.</p>
+      </div>
+    </a>
+    <a class="cs" href="#">
+      <img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/68362e432005a0afe1416e96_LowRes_054_MakersYard_LaunchPhotography_SiteSales.webp" alt="">
+      <div class="cs-body">
+        <div class="cs-meta"><span class="chip">2022</span><span class="chip">245 homes</span></div>
+        <h3>Makers Yard, E16</h3>
+      </div>
+    </a>
+    <a class="cs" href="#">
+      <img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/68362e432005a0afe1416e64_005_LowRes_TelferHouse-Externals_SiteSales_9.webp" alt="">
+      <div class="cs-body">
+        <div class="cs-meta"><span class="chip">2022</span><span class="chip">30 homes</span><span class="chip">Private sale</span></div>
+        <h3>Kings Grove, EC1V</h3>
+      </div>
+    </a>
+  </div>
+
+  <div class="cs-row">
+    <div class="cs-quote">
+      <div class="mark">“</div>
+      <q>Their experienced sales team reserved 50% of the flats off plan. The rest were reserved within 8 months of completion, and every flat completed within 11 months, exceeding expectations.</q>
+      <div class="who2"><div><b>No.1 Wood Street</b>Shared Ownership</div><a class="link-arrow" href="#">Read →</a></div>
+    </div>
+    <a class="cs cs-wide" href="#">
+      <img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/68362e432005a0afe1416dda_036_LowRes_External-CommunualPhotography_TrentPark_4K8A0531.jpg" alt="">
+      <div class="cs-body">
+        <div class="cs-meta"><span class="chip">2021</span><span class="chip">33 homes</span><span class="chip">Shared Ownership</span></div>
+        <h3>Trent Park</h3>
+        <p>One and two-bedroom apartments in a 56-acre country park estate in North London.</p>
+      </div>
+    </a>
+  </div>
+</div></section>
+
+<div class="note"><b>Mock v2 for Luke.</b> The hero only pauses while the mouse is over the tab row or arrows. Below it: a longer intro, the existing stats strip, then case studies (one feature, a mixed grid, then a quote beside a wide card). The services list, the How we make a difference strip and the Let's talk panel are gone.</div>
+
+<script>
+  const hero = document.querySelector('[data-ps-hero]');
+  const slides = [...hero.querySelectorAll('.ps-slide')];
+  const texts = [...hero.querySelectorAll('.ps-text')];
+  const tabs = [...hero.querySelectorAll('.ps-tab')];
+  const controls = hero.querySelector('.ps-tabs');
+  let i = 0, timer; const DUR = 7000;
+  hero.style.setProperty('--dur', DUR + 'ms');
+  function go(n) {
+    i = (n + slides.length) % slides.length;
+    [slides, texts, tabs].forEach((set) => set.forEach((el, k) => el.classList.toggle('is-active', k === i)));
+    const bar = tabs[i].querySelector('i'); bar.style.animation = 'none'; bar.offsetWidth; bar.style.animation = '';
+    clearTimeout(timer);
+    if (!hero.classList.contains('is-paused')) timer = setTimeout(() => go(i + 1), DUR);
+  }
+  tabs.forEach((t, k) => t.addEventListener('click', () => go(k)));
+  hero.querySelector('[data-prev]').onclick = () => go(i - 1);
+  hero.querySelector('[data-next]').onclick = () => go(i + 1);
+  controls.addEventListener('mouseenter', () => { hero.classList.add('is-paused'); clearTimeout(timer); });
+  controls.addEventListener('mouseleave', () => { hero.classList.remove('is-paused'); go(i); });
+  go(0);
+</script>
+</body>
+</html>

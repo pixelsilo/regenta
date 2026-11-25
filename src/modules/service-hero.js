@@ -11,7 +11,7 @@
 // Optional on the root: data-service-hero-delay="7000" (ms per service).
 //
 // .is-active goes on the current slide, image, text and tab; the root gets .is-paused while
-// hovered or focused. The fill bar's width is the only thing set inline (it times the slide).
+// the tab row (.ps-hero_tabs) is hovered or focused. The fill bar's width is the only thing set inline (it times the slide).
 
 const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -109,11 +109,13 @@ export default function serviceHero(root) {
   if (prev) press(prev, () => go(index - 1));
   if (next) press(next, () => go(index + 1));
 
-  // Hover or keyboard focus holds the current service; touch never pauses.
-  root.addEventListener('pointerenter', (event) => { if (event.pointerType === 'mouse') pause(); });
-  root.addEventListener('pointerleave', (event) => { if (event.pointerType === 'mouse') resume(); });
-  root.addEventListener('focusin', pause);
-  root.addEventListener('focusout', (event) => { if (!root.contains(event.relatedTarget)) resume(); });
+  // Only the controls (the tab row and arrows) hold the current service, on mouse hover or
+  // keyboard focus. The rest of the hero, its buttons included, never pauses it; nor does touch.
+  const controls = root.querySelector('.ps-hero_tabs') || root;
+  controls.addEventListener('pointerenter', (event) => { if (event.pointerType === 'mouse') pause(); });
+  controls.addEventListener('pointerleave', (event) => { if (event.pointerType === 'mouse') resume(); });
+  controls.addEventListener('focusin', pause);
+  controls.addEventListener('focusout', (event) => { if (!controls.contains(event.relatedTarget)) resume(); });
   // Don't advance in a background tab.
   document.addEventListener('visibilitychange', () => (document.hidden ? pause() : resume()));
 
