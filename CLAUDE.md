@@ -22,4 +22,7 @@ Anything drafted for Luke to send (client messages, questions, approval messages
 
 Notes from Luke's corrections, added as we go. Read before starting a job.
 
-- (none yet)
+- Nav variants (buyer vs professional) live inside the one Navbar component as separate link sets, shown or hidden with component properties. Don't build a second nav component or toggle links with JS. (#57, 25 Nov 2026)
+- Keep the FAQ ↔ calculator cross-links. Dan asked to remove them, but Elle agreed on the call to keep them.
+- Two contact pages: a buyer one (phone only, no form) and the professional Contact Us with its form.
+- New page designs (e.g. the Professional services landing page) get mocked up locally for Luke first, then built in Webflow and pushed to staging.
