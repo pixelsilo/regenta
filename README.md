@@ -72,6 +72,17 @@ Both play once and don't animate under `prefers-reduced-motion`. Webflow keeps t
 
 Where it's used: `grow-children` on the stats strip, the featured-developments cards, the news strip cards and the Home "strategic partner" banner (text, then image); `grow-group` on the Our Services carousel; `grow` on single elements everywhere else. Use `ps="grow-children"` on the parent for any row that should stagger. A Collection Item with its own grid placement gets a Webflow `w-node-…` id that repeats on every card, and a per-item scroll trigger then only animates the last card in the row (that was the case for the featured-developments and news strip cards, which now use `grow-children`).
 
+## Property Search map view (#57)
+
+Staging only so far (`v2.7.0`). The old pop-up map at the bottom of Property Search is gone. A **List / Map** switch sits beside the filters (`[data-map-view-toggle="list|map"]`, `.is-active` + `aria-pressed`). Map shows `[data-module="map-view"]`: a map that fills the window below the filters, with a compact list of developments alongside. On phones the map sits above the list.
+
+- Built in the Designer, all styled with classes there: `view-toggle`, `map-view`, `map-view_sidebar`, `map-view_list`, `map-card` (+ `is-active`), `map-popup`. The sidebar is its own Developments Collection List (Live on Site, same order as the results). Each item carries `data-slug`, `data-lat` and `data-lng` bound to the CMS, a compact card (`[data-map-card]`) and a hidden pin card (`[data-map-popup]` in `map-popup_holder`) that's copied into the Google pop-up when a pin is clicked.
+- Prices: each card has the Price Alternative ("Coming soon") and "From £…"; the script shows the alternative when it's filled in.
+- The map follows the Finsweet filters on the results list (same hook as before). The pin icon on each results card has `data-map-focus` (bound to the slug) and opens the map on that development. Its old `javascript:` link in the embed is stopped in the capture phase; tidy the embed in the Designer when convenient.
+- `?view=map` opens the map on load, and the switch keeps it in the address. Google Maps only loads the first time the map is opened.
+- Developments without coordinates (Jigsaw on 25 Nov) get no pin; clicking their card goes to the development page.
+- Classic `google.maps.Marker` is still used. Moving to `AdvancedMarkerElement` needs a Map ID in Regenta's Google Cloud project.
+
 ## Footer (no code)
 
 The footer is the `footer` component in Webflow (on every page). Redesigned 24 Nov 2026, staging only so far. Five columns in `footer_main`: logo and the homepage hero line ("London's leading new homes sales and marketing specialist", script accents via `griffiths-font` spans); Buy a home (property search, Shared Ownership, FAQs, both calculators); Our services (Services collection list); Company; Get in touch (phone, email, address, socials). Three columns on tablet, two on small screens, one on phones. Legal strip: Privacy Policy on the left; ©, company number and VAT number in one line on the right (stacked under Privacy Policy on mobile). The section's bottom padding (5rem) keeps the bar clear of the fixed cookie settings button. The `.footer-date` span is filled by the `copyright-year` global. The old version is kept as the unused component "footer (old, backup 24 Nov 2026)"; delete it once the new one is live and approved.
