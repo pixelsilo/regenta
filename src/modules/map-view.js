@@ -27,6 +27,7 @@ const DESKTOP = window.matchMedia('(min-width: 768px)');
 const MIN_HEIGHT = 480; // px, desktop map height floor
 const FOCUS_ZOOM = 13; // zoom in at least this far when a development is picked
 const ONE_PIN_ZOOM = 13;
+const WARM_DELAY = 800; // ms after page load before the map is built off screen
 const STASH_GAP = 24; // px between the filters and the map, used while measuring off screen
 
 function number(value) {
@@ -312,8 +313,7 @@ export default function mapView(root) {
 
   setView(new URLSearchParams(window.location.search).get('view') === 'map' ? 'map' : 'list', { remember: false });
 
-  const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 1500));
-  const later = () => idle(warm, { timeout: 3000 });
+  const later = () => setTimeout(warm, WARM_DELAY);
   if (document.readyState === 'complete') later();
   else window.addEventListener('load', later, { once: true });
 }
