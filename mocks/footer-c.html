@@ -119,6 +119,14 @@ ul { list-style:none; margin:0; padding:0; }
 .fc2 .fc-link { gap:.85rem; }
 .fc2 .fc-link::after { transform:translateX(-.6rem); }
 .fc2 .fc-link:hover::after { opacity:1; transform:translateX(0); }
+/* C v2: contact + social hovers */
+.fc2 .fc-phone, .fc2 .fc-mail { display:inline-block; background-image:linear-gradient(currentColor, currentColor); background-repeat:no-repeat; background-position:0 100%; background-size:0% 1px; padding-bottom:.1rem; transition:background-size .45s cubic-bezier(.23,1,.32,1); }
+.fc2 .fc-phone:hover, .fc2 .fc-mail:hover { background-size:100% 1px; }
+.fc2 .fc-phone, .fc2 .fc-mail { margin-right:100%; white-space:nowrap; }
+.fc2 .soc-dark { gap:.6rem; }
+.fc2 .soc-dark a { width:2.6rem; height:2.6rem; padding:.7rem; border:1px solid rgba(11,43,38,.2); border-radius:50%; opacity:1; display:flex; align-items:center; justify-content:center; transition:background-color .3s cubic-bezier(.23,1,.32,1), color .3s, border-color .3s, transform .3s cubic-bezier(.23,1,.32,1); }
+.fc2 .soc-dark a svg { width:100%; height:100%; }
+.fc2 .soc-dark a:hover { background-color:var(--green); border-color:var(--green); color:var(--sand); transform:translateY(-3px); }
 </style></head><body>
 <header class="intro"><div class="wrap"><h1>Footer: option C, round 2</h1><p>Full width, smaller links, phone and email the same size, and the panel sized to its content.</p></div></header>
 
