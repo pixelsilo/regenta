@@ -87,6 +87,19 @@ ul { list-style:none; margin:0; padding:0; }
   .fa-grid, .fb-grid, .fd-grid, .fc-cols { grid-template-columns:1fr; gap:2.5rem; }
   .legal { flex-direction:column; }
 }
+
+/* C v2 (footer-c.html) */
+.fc2 .wrap { max-width:none; padding:0 2rem; }
+.fc2 .fc-grid { grid-template-columns:minmax(22rem, 1fr) 2.4fr; gap:5rem; align-items:start; }
+.fc2 .fc-panel { min-height:0; gap:2rem; padding:2.25rem 2.5rem; }
+.fc2 .fc-phone, .fc2 .fc-mail { font-size:1.35rem; line-height:1.3; margin-bottom:.35rem; }
+.fc2 .fc-phone { font-weight:600; }
+.fc2 .fc-addr { margin-top:.75rem; }
+.fc2 .soc { margin-top:0; }
+.fc2 .fc-cols { gap:3rem; padding-top:.5rem; }
+.fc2 .fc-link { font-size:1.05rem; padding:.4rem 0; }
+@media (max-width: 991px) { .fc2 .fc-grid { grid-template-columns:1fr; gap:3rem; } }
+@media (max-width: 600px) { .fc2 .wrap { padding:0 1rem; } }
 </style></head><body>
 <header class="intro"><div class="wrap"><h1>Footer options</h1><p>Same content in all four, with different layouts and type. Current footer for comparison: regenta-uk.webflow.io (any page).</p></div></header>
 <div class="opt-label"><b>Option A: Four columns, contact under the logo</b><span>Logo, hero line and contact details share the first column. Titles are sentence case and larger; links go up to 1.15rem.</span></div>

@@ -1,0 +1,154 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mock: footer options | Regenta (#57)</title>
+<link rel="stylesheet" href="https://cdn.prod.website-files.com/68362e432005a0afe1416a06/css/regenta-uk.webflow.shared.80a6cc7ad.min.css">
+<script src="https://use.typekit.net/ptn3etu.js"></script><script>try{Typekit.load();}catch(e){}</script>
+<style>:root { --green:#0b2b26; --green-2:#173833; --sand:#e3e5db; }
+* { box-sizing:border-box; }
+body { margin:0; background:#f2f3ee; color:var(--green); font-family: area-normal, area, system-ui, sans-serif; }
+a { color:inherit; text-decoration:none; }
+ul { list-style:none; margin:0; padding:0; }
+.g { font-family:Griffiths, serif; font-weight:400; }
+.wrap { max-width:1440px; margin:0 auto; padding:0 2rem; }
+.intro { padding:3rem 0 2rem; } .intro h1 { margin:0 0 .5rem; font-size:2rem; } .intro p { margin:0; opacity:.7; }
+.opt-label { max-width:1440px; margin:3rem auto 1rem; padding:0 2rem; display:flex; gap:1rem; align-items:baseline; flex-wrap:wrap; }
+.opt-label b { font-size:1.1rem; } .opt-label span { opacity:.7; font-size:.95rem; }
+.logo { display:block; width:12.5rem; color:var(--sand); }
+.logo svg { width:100%; height:auto; }
+.logo-dark { color:var(--green); }
+.soc { display:flex; gap:1rem; margin-top:1.5rem; color:var(--sand); }
+.soc a { width:1.35rem; height:1.35rem; display:block; opacity:.85; transition:opacity .2s; }
+.soc a:hover { opacity:1; }
+.soc-dark { color:var(--green); }
+.legal { display:flex; justify-content:space-between; gap:1rem 2rem; flex-wrap:wrap; padding:1.75rem 0 5rem; margin-top:4rem; border-top:1px solid rgba(227,229,219,.18); font-size:.85rem; opacity:.75; }
+.legal a:hover { text-decoration:underline; }
+
+/* A */
+.fa { background:var(--green); color:var(--sand); padding-top:5.5rem; }
+.fa-grid { display:grid; grid-template-columns:1.35fr 1fr 1fr 1fr; gap:3rem; }
+.fa-line { font-size:1.35rem; line-height:1.3; margin:1.75rem 0 2rem; max-width:22rem; }
+.fa-phone { display:block; font-size:1.6rem; font-weight:600; margin-bottom:.5rem; }
+.fa-mail { display:block; font-size:1.1rem; margin-bottom:1rem; }
+.fa-addr { margin:0; opacity:.75; line-height:1.5; }
+.fa-h { font-size:1.35rem; font-weight:600; margin:0 0 1.5rem; }
+.fa .fl { display:inline-block; font-size:1.15rem; padding:.35rem 0; opacity:.85; transition:opacity .2s; }
+.fa .fl:hover { opacity:1; }
+
+/* B */
+.fb { background:var(--green); color:var(--sand); padding-top:6rem; }
+.fb-top { display:flex; justify-content:space-between; align-items:flex-end; gap:3rem; padding-bottom:4rem; border-bottom:1px solid rgba(227,229,219,.18); }
+.fb-line { margin:0; font-size:clamp(2.4rem, 4.8vw, 4.6rem); line-height:1.02; max-width:60rem; font-weight:600; letter-spacing:-.01em; }
+.fb-logo { width:10rem; flex:none; opacity:.9; }
+.fb-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:3rem; padding-top:3.5rem; }
+.fb-h { font-family:Griffiths, serif; font-weight:400; font-size:1.9rem; margin:0 0 1.25rem; }
+.fb-link { display:block; font-size:1.05rem; font-weight:300; padding:.3rem 0; opacity:.85; }
+.fb-link:hover { opacity:1; }
+.fb-big { display:block; font-size:1.45rem; margin-bottom:.4rem; }
+.fb-addr { opacity:.75; line-height:1.5; font-weight:300; }
+
+/* C */
+.fc { background:var(--green); color:var(--sand); padding-top:3rem; }
+.fc-grid { display:grid; grid-template-columns:1fr 1.7fr; gap:4rem; align-items:stretch; }
+.fc-panel { background:var(--sand); color:var(--green); border-radius:1.5rem; padding:2.5rem; display:flex; flex-direction:column; justify-content:space-between; gap:3rem; min-height:28rem; }
+.fc-k { font-size:.75rem; letter-spacing:.22em; text-transform:uppercase; font-weight:600; opacity:.6; margin-bottom:.75rem; }
+.fc-phone { display:block; font-size:clamp(1.8rem, 2.6vw, 2.5rem); font-weight:700; line-height:1.1; margin-bottom:.75rem; }
+.fc-mail { display:block; font-size:1.15rem; margin-bottom:.75rem; }
+.fc-addr { margin:0; opacity:.7; }
+.fc-cols { display:grid; grid-template-columns:repeat(3,1fr); gap:2.5rem; padding-top:2.5rem; }
+.fc-h { font-size:1.1rem; font-weight:600; margin:0 0 1.5rem; padding-bottom:1rem; border-bottom:1px solid rgba(227,229,219,.2); }
+.fc-link { display:flex; justify-content:space-between; align-items:center; font-size:1.2rem; padding:.45rem 0; opacity:.85; transition:opacity .2s, transform .3s cubic-bezier(.23,1,.32,1); }
+.fc-link::after { content:'\2192'; opacity:0; transform:translateX(-.5rem); transition:all .3s cubic-bezier(.23,1,.32,1); }
+.fc-link:hover { opacity:1; }
+.fc-link:hover::after { opacity:1; transform:none; }
+
+/* D */
+.fd { position:relative; overflow:hidden; background:var(--green); color:var(--sand); padding-top:5rem; }
+.fd-emblem { position:absolute; right:-14rem; bottom:-14rem; width:38rem; height:38rem; color:var(--green-2); pointer-events:none; }
+.fd .wrap { position:relative; }
+.fd-top { display:flex; align-items:center; gap:2.5rem; padding-bottom:3.5rem; }
+.fd-line { margin:0; font-size:1.15rem; opacity:.8; max-width:30rem; }
+.fd-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:3rem; }
+.fd-h { font-size:1.25rem; font-weight:500; margin:0 0 1.5rem; }
+.fd-h::after { content:''; display:block; width:2rem; height:2px; background:currentColor; opacity:.4; margin-top:.9rem; }
+.fd-link { display:block; font-size:1.1rem; padding:.35rem 0; opacity:.85; transition:transform .3s cubic-bezier(.23,1,.32,1), opacity .2s; }
+.fd-link:hover { opacity:1; transform:translateX(.35rem); }
+.fd-strong { font-size:1.35rem; font-weight:600; }
+.fd-addr { opacity:.7; line-height:1.5; }
+.fd-legal { border-top-color:rgba(227,229,219,.12); }
+
+@media (max-width: 991px) {
+  .fa-grid, .fb-grid, .fd-grid { grid-template-columns:1fr 1fr; }
+  .fa-brand { grid-column:1 / -1; }
+  .fb-top { flex-direction:column; align-items:flex-start; }
+  .fc-grid { grid-template-columns:1fr; } .fc-panel { min-height:0; }
+  .fd-top { flex-direction:column; align-items:flex-start; gap:1rem; }
+}
+@media (max-width: 600px) {
+  .wrap, .opt-label { padding:0 1rem; }
+  .fa-grid, .fb-grid, .fd-grid, .fc-cols { grid-template-columns:1fr; gap:2.5rem; }
+  .legal { flex-direction:column; }
+}
+
+/* C v2 (footer-c.html) */
+.fc2 .wrap { max-width:none; padding:0 2rem; }
+.fc2 .fc-grid { grid-template-columns:minmax(22rem, 1fr) 2.4fr; gap:5rem; align-items:start; }
+.fc2 .fc-panel { min-height:0; gap:2rem; padding:2.25rem 2.5rem; }
+.fc2 .fc-phone, .fc2 .fc-mail { font-size:1.35rem; line-height:1.3; margin-bottom:.35rem; }
+.fc2 .fc-phone, .fc2 .fc-mail { font-weight:500; }
+.fc2 .fc-addr { margin-top:.75rem; }
+.fc2 .soc { margin-top:0; }
+.fc2 .fc-cols { gap:3rem; padding-top:.5rem; }
+.fc2 .fc-link { font-size:1.05rem; padding:.4rem 0; }
+@media (max-width: 991px) { .fc2 .fc-grid { grid-template-columns:1fr; gap:3rem; } }
+@media (max-width: 600px) { .fc2 .wrap { padding:0 1rem; } }
+</style></head><body>
+<header class="intro"><div class="wrap"><h1>Footer: option C, round 2</h1><p>Full width, smaller links, phone and email the same size, and the panel sized to its content.</p></div></header>
+
+<footer class="fc fc2"><div class="wrap">
+  <div class="fc-grid">
+    <div class="fc-panel">
+      <a class="logo logo-dark" href="#"><svg display="block" height="100%" viewBox="0 0 200 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_1_69)">
+<path d="M15.6624 7.066C17.3929 7.066 18.7957 5.65779 18.7957 3.92067C18.7957 2.18355 17.3929 0.775341 15.6624 0.775341C13.9319 0.775341 12.5291 2.18355 12.5291 3.92067C12.5291 5.65779 13.9319 7.066 15.6624 7.066Z" fill="currentcolor"></path>
+<path d="M21.9289 13.3547C23.6588 13.3547 25.0622 11.9459 25.0622 10.2093C25.0622 8.47281 23.6588 7.06401 21.9289 7.06401C20.1991 7.06401 18.7957 8.47281 18.7957 10.2093C18.7957 11.9459 20.1991 13.3547 21.9289 13.3547Z" fill="currentcolor"></path>
+<path d="M28.1935 13.3547C26.4636 13.3547 25.0602 14.7635 25.0602 16.5C25.0602 18.2365 26.4636 19.6453 28.1935 19.6453C29.9234 19.6453 31.3268 18.2365 31.3268 16.5C31.3268 14.7635 29.9234 13.3547 28.1935 13.3547Z" fill="currentcolor"></path>
+<path d="M3.13328 19.6453C4.86374 19.6453 6.26655 18.2371 6.26655 16.5C6.26655 14.7629 4.86374 13.3547 3.13328 13.3547C1.40282 13.3547 0 14.7629 0 16.5C0 18.2371 1.40282 19.6453 3.13328 19.6453Z" fill="currentcolor"></path>
+<path d="M9.39784 13.3547C11.1277 13.3547 12.5311 11.9459 12.5311 10.2093C12.5311 8.47281 11.1277 7.06401 9.39784 7.06401C7.66797 7.06401 6.26456 8.47281 6.26456 10.2093C6.26456 11.9459 7.66797 13.3547 9.39784 13.3547Z" fill="currentcolor"></path>
+<path d="M15.6624 32.2247C17.3929 32.2247 18.7957 30.8164 18.7957 29.0793C18.7957 27.3422 17.3929 25.934 15.6624 25.934C13.9319 25.934 12.5291 27.3422 12.5291 29.0793C12.5291 30.8164 13.9319 32.2247 15.6624 32.2247Z" fill="currentcolor"></path>
+<path d="M9.39784 19.6453C7.66797 19.6453 6.26456 21.0541 6.26456 22.7907C6.26456 24.5272 7.66797 25.936 9.39784 25.936C11.1277 25.936 12.5311 24.5272 12.5311 22.7907C12.5311 21.0541 11.1277 19.6453 9.39784 19.6453Z" fill="currentcolor"></path>
+<path d="M21.9289 19.6453C20.1991 19.6453 18.7957 21.0541 18.7957 22.7907C18.7957 24.5272 20.1991 25.936 21.9289 25.936C23.6588 25.936 25.0622 24.5272 25.0622 22.7907C25.0622 21.0541 23.6588 19.6453 21.9289 19.6453Z" fill="currentcolor"></path>
+<path d="M15.6624 19.6453C17.3929 19.6453 18.7957 18.2371 18.7957 16.5C18.7957 14.7629 17.3929 13.3547 15.6624 13.3547C13.9319 13.3547 12.5291 14.7629 12.5291 16.5C12.5291 18.2371 13.9319 19.6453 15.6624 19.6453Z" fill="currentcolor"></path>
+<path d="M42.4545 26.2357V6.25069H53.4886C54.7786 6.25069 55.9292 6.51847 56.9444 7.05002C57.9576 7.58356 58.7639 8.32493 59.3611 9.27613C59.9582 10.2273 60.2568 11.3024 60.2568 12.5014C60.2568 13.7004 59.9344 14.7954 59.2894 15.7846C58.6444 16.7738 57.7904 17.5591 56.7294 18.1406C55.6664 18.7221 54.482 19.0119 53.1741 19.0119H46.0655V26.2337H42.4545V26.2357ZM46.0655 15.7866H52.8915C53.5364 15.7866 54.1237 15.6447 54.6552 15.359C55.1867 15.0732 55.6127 14.6875 55.9351 14.2019C56.2576 13.7164 56.4189 13.1788 56.4189 12.5893C56.4189 11.9998 56.2537 11.5102 55.9212 11.0626C55.5888 10.615 55.1429 10.2593 54.5855 9.99152C54.0261 9.72575 53.405 9.59186 52.7222 9.59186H46.0675V15.7866H46.0655ZM56.8727 26.2357L50.4449 17.2154L54.3406 16.502L61.3358 26.2657L56.8708 26.2377L56.8727 26.2357Z" fill="currentcolor"></path>
+<path d="M65.333 26.2357V6.25069H81.5428V9.61984H68.9719V22.8666H81.6563V26.2357H65.333ZM67.2679 17.671V14.3598H80.0936V17.671H67.2679Z" fill="currentcolor"></path>
+<path d="M96.3851 26.5215C94.7925 26.5215 93.2936 26.2937 91.8922 25.8361C90.4888 25.3785 89.2566 24.719 88.1955 23.8518C87.1325 22.9865 86.3005 21.9094 85.6933 20.6265C85.0862 19.3416 84.7836 17.8708 84.7836 16.2162C84.7836 14.7695 85.0921 13.4226 85.7072 12.1757C86.3223 10.9287 87.1763 9.84365 88.2672 8.92043C89.3581 7.99722 90.6361 7.27982 92.1072 6.76426C93.5763 6.2507 95.1548 5.99292 96.8429 5.99292C98.2085 5.99292 99.4885 6.15078 100.683 6.46452C101.877 6.77825 102.924 7.1919 103.826 7.70546C104.726 8.21903 105.452 8.77256 106.002 9.36206L103.671 11.9599C103.046 11.4643 102.377 11.0326 101.666 10.661C100.956 10.2893 100.197 9.99552 99.3909 9.77571C98.5847 9.55789 97.7267 9.44798 96.817 9.44798C95.6804 9.44798 94.6134 9.61984 93.6181 9.96155C92.6227 10.3033 91.7608 10.7809 91.0302 11.3883C90.2997 11.9978 89.7263 12.7112 89.3103 13.5285C88.8923 14.3478 88.6852 15.2411 88.6852 16.2122C88.6852 17.3733 88.9022 18.3824 89.3402 19.2377C89.7761 20.095 90.3693 20.8083 91.1178 21.3779C91.8663 21.9494 92.7302 22.373 93.7057 22.6488C94.6831 22.9246 95.6824 23.0624 96.7055 23.0624C97.7287 23.0624 98.7101 22.9585 99.592 22.7487C100.474 22.5389 101.246 22.2451 101.909 21.8635C102.572 21.4838 103.09 21.0362 103.46 20.5226C103.83 20.009 103.995 19.4375 103.957 18.81L103.93 18.3524L104.469 19.1238H96.6478V15.8685H107.71C107.748 16.1343 107.776 16.3881 107.795 16.6259C107.813 16.8637 107.823 17.0635 107.823 17.2254V17.6111C107.823 19.0778 107.549 20.3667 106.999 21.4798C106.45 22.5928 105.663 23.522 104.638 24.2634C103.615 25.0048 102.407 25.5663 101.013 25.948C99.6199 26.3277 98.0791 26.5195 96.391 26.5195L96.3851 26.5215Z" fill="currentcolor"></path>
+<path d="M112.44 26.2357V6.25069H128.649V9.61984H116.078V22.8666H128.763V26.2357H112.44ZM114.373 17.671V14.3598H127.198V17.671H114.373Z" fill="currentcolor"></path>
+<path d="M134.074 26.2357V6.25069H137.629L152.36 21.8674L151.962 21.9813C151.866 21.3719 151.791 20.7484 151.735 20.1109C151.677 19.4735 151.625 18.826 151.578 18.1706C151.53 17.5131 151.492 16.8537 151.464 16.1863C151.436 15.5208 151.416 14.8594 151.406 14.2019C151.397 13.5445 151.393 12.8931 151.393 12.2456V6.25069H155.061V26.2337H151.45L136.662 10.8468L137.173 10.647C137.231 11.1226 137.277 11.6121 137.315 12.1177C137.353 12.6213 137.4 13.1309 137.458 13.6444C137.516 14.158 137.568 14.6815 137.613 15.2151C137.661 15.7486 137.693 16.2962 137.713 16.8577C137.731 17.4192 137.741 17.9668 137.741 18.4983V26.2357H134.072H134.074Z" fill="currentcolor"></path>
+<path d="M166.713 26.2357V9.67779H159.433V6.25269H177.86V9.67779H170.409V26.2357H166.713Z" fill="currentcolor"></path>
+<path d="M176.54 26.2357L185.896 6.25269H189.736L199.065 26.2357H195.139L189.167 13.5025C188.996 13.1408 188.825 12.7692 188.655 12.3895C188.484 12.0098 188.319 11.6241 188.158 11.2325C187.997 10.8428 187.845 10.4471 187.702 10.0475C187.561 9.64781 187.421 9.25814 187.29 8.87647L188.2 8.84849C188.066 9.26813 187.925 9.68178 187.774 10.0894C187.622 10.4991 187.455 10.9027 187.276 11.3024C187.095 11.7021 186.92 12.0877 186.75 12.4594C186.579 12.8311 186.418 13.2068 186.267 13.5865L180.323 26.2337H176.54V26.2357ZM180.721 21.8954L182.056 18.6702H193.347L194.058 21.8954H180.721Z" fill="currentcolor"></path>
+</g>
+<defs>
+<clipPath id="clip0_1_69">
+<rect width="199.065" height="33" fill="currentcolor"></rect>
+</clipPath>
+</defs>
+</svg></a>
+      <div>
+        <div class="fc-k">Talk to us</div>
+        <a class="fc-phone" href="#">+44 (0)20 8502 5758</a>
+        <a class="fc-mail" href="#">info@regenta.co.uk</a>
+        <p class="fc-addr">14 Devonshire Square<br>London EC2M 4YT</p>
+      </div>
+      <div class="soc soc-dark"><a href="#" aria-label="Facebook"><svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 13.73 25.095">
+  <path id="facebook" d="M9.966,27.594h5.283V17.015h4.76l.523-5.257H15.249V9.1A1.321,1.321,0,0,1,16.57,7.783h3.962V2.5H16.57a6.6,6.6,0,0,0-6.6,6.6v2.654H7.325L6.8,17.015H9.966Z" transform="translate(-6.802 -2.5)" fill="currentColor"></path>
+</svg></a><a href="#" aria-label="LinkedIn"><svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 26.262 25.095">
+  <path id="linkedin" d="M26.262,15.412v9.709H20.633V16.062c0-2.276-.814-3.829-2.851-3.829a3.08,3.08,0,0,0-2.888,2.059,3.847,3.847,0,0,0-.187,1.372v9.457H9.075s.076-15.342,0-16.933h5.632v2.4l-.037.055h.037v-.055a5.589,5.589,0,0,1,5.074-2.8C23.485,7.791,26.262,10.212,26.262,15.412ZM3.186.026a2.934,2.934,0,1,0-.074,5.851h.037A2.935,2.935,0,1,0,3.187.026ZM.334,25.121H5.963V8.188H.334Z" transform="translate(0 -0.026)" fill="currentColor"></path>
+</svg></a><a href="#" aria-label="Instagram"><svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 25.094 25.097">
+  <path id="instagram" d="M3933.624,12339.629a7.488,7.488,0,0,1-7.476-7.477v-10.142a7.485,7.485,0,0,1,7.476-7.479h10.142a7.484,7.484,0,0,1,7.476,7.476v10.145a7.485,7.485,0,0,1-7.473,7.477Zm-4.952-17.621v10.145a4.952,4.952,0,0,0,4.952,4.952h10.142a4.952,4.952,0,0,0,4.952-4.952v-10.142a4.948,4.948,0,0,0-4.949-4.952h-10.145A4.95,4.95,0,0,0,3928.672,12322.008Zm3.534,5.072a6.491,6.491,0,1,1,6.491,6.491A6.5,6.5,0,0,1,3932.206,12327.08Zm2.524,0a3.965,3.965,0,1,0,3.967-3.964A3.965,3.965,0,0,0,3934.729,12327.08Zm8.913-6.441a1.556,1.556,0,1,1,1.558,1.555A1.557,1.557,0,0,1,3943.642,12320.639Z" transform="translate(-3926.148 -12314.532)" fill="currentColor"></path>
+</svg></a></div>
+    </div>
+    <div class="fc-cols">
+      <div><h4 class="fc-h">Buy a Home</h4><ul><li><a class="fc-link" href="#">Property search</a></li><li><a class="fc-link" href="#">What is Shared Ownership?</a></li><li><a class="fc-link" href="#">Shared Ownership FAQs</a></li><li><a class="fc-link" href="#">Shared Ownership calculator</a></li><li><a class="fc-link" href="#">Stamp Duty calculator</a></li></ul></div><div><h4 class="fc-h">Our Services</h4><ul><li><a class="fc-link" href="#">Sales</a></li><li><a class="fc-link" href="#">Marketing</a></li><li><a class="fc-link" href="#">Market Intelligence</a></li><li><a class="fc-link" href="#">Development Consultancy</a></li><li><a class="fc-link" href="#">Scheme Optimisation</a></li><li><a class="fc-link" href="#">Customer Care</a></li></ul></div><div><h4 class="fc-h">Company</h4><ul><li><a class="fc-link" href="#">About us</a></li><li><a class="fc-link" href="#">Built by Regenta</a></li><li><a class="fc-link" href="#">Case studies</a></li><li><a class="fc-link" href="#">News</a></li><li><a class="fc-link" href="#">Careers</a></li><li><a class="fc-link" href="#">Contact us</a></li></ul></div>
+    </div>
+  </div>
+  <div class="legal"><a href="#">Privacy Policy</a><span>&copy; 2026 Regenta &nbsp;&middot;&nbsp; Registered in England, Company No. 2406015 &nbsp;&middot;&nbsp; VAT No. 739 9631 80</span></div>
+</div></footer>
+</body></html>
