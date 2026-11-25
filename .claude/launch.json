@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "mocks",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "5601", "--bind", "127.0.0.1", "--directory", "mocks"],
+      "port": 5601
+    }
+  ]
+}
