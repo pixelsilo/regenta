@@ -5,7 +5,8 @@
 // Root: [data-module="map-view"] with data-maps-key. Inside it:
 //   [data-map]              the map canvas
 //   [data-map-sidebar]      the scrolling list column
-//   [data-map-count]        "Showing 12 of 26 developments"
+//   [data-map-count]        optional "Showing 12 of 26 developments" (removed in v3.4.0: the
+//                           band's count says it)
 //   [data-map-item]         one per development (Collection List item), with data-slug,
 //                           data-lat, data-lng bound to the CMS
 //     [data-map-card]       the compact card (role="button")
@@ -104,6 +105,7 @@ function pickPrice(scope) {
 export default function mapView(root) {
   const key = root.getAttribute('data-maps-key');
   const canvas = root.querySelector('[data-map]');
+  const band = document.querySelector('[data-sticky-filters]'); // the pinned green search band
   if (!key || !canvas) throw new Error('map-view: missing data-maps-key or [data-map]');
 
   const sidebar = root.querySelector('[data-map-sidebar]');
@@ -209,7 +211,6 @@ export default function mapView(root) {
   // The map is pulled up under the green band's rounded bottom (a negative top margin in
   // Webflow), and the band stays pinned over it as you scroll: keep pins and the open card
   // clear of whatever the band covers.
-  const band = document.querySelector('[data-sticky-filters]');
   function tuck() {
     if (!band || stashed) return 0;
     return Math.max(0, Math.round(band.getBoundingClientRect().bottom - canvas.getBoundingClientRect().top));
@@ -244,10 +245,9 @@ export default function mapView(root) {
     }
   }
 
-  // Open a development's card on the map. From a pin: highlight its list card.
-  // From the list: bring the pin into view if it's off the map (no zooming: a zoom has to
-  // wait for new map tiles, which is what made clicks feel slow), and on phones scroll the
-  // map into view.
+  // Open a development's card on the map, from a pin or from the list, and glide the map so
+  // the card and its pin sit centred in the part of the map you can see (below the green
+  // band). On phones, a click in the list first scrolls the map up under the pinned band.
   function open(item, { pan = true, scrollList = !pan } = {}) {
     const marker = markers.get(item.slug);
     if (!marker || !gmap) {
@@ -257,9 +257,9 @@ export default function mapView(root) {
     const content = item.popup ? item.popup.cloneNode(true) : document.createTextNode(item.name);
     content.querySelectorAll('[id]').forEach((el) => el.removeAttribute('id'));
     card.show(gmap, marker.getPosition(), content, item.name);
-    if (pan && !gmap.getBounds()?.contains(marker.getPosition())) gmap.panTo(marker.getPosition());
-    if (pan && !DESKTOP.matches) canvas.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    requestAnimationFrame(() => requestAnimationFrame(keepCardInView));
+    const phoneScroll = pan && !DESKTOP.matches ? scrollMapIntoView() : null;
+    // Wait two frames so the card has been drawn and can be measured.
+    requestAnimationFrame(() => requestAnimationFrame(() => centreCard(marker, phoneScroll)));
     setActive(item, { scroll: scrollList });
   }
 
@@ -268,18 +268,44 @@ export default function mapView(root) {
     setActive(null);
   }
 
-  // Nudge the map so an open card isn't cut off by the map's edges (a small pan, no zoom).
-  function keepCardInView() {
+  // Phones: scroll so the map sits just under the pinned band (at least far enough for the band
+  // to pin, so the heading is gone). Returns the part of the map that will be visible once
+  // there, in map pixels (the scroll is smooth, so it can't be measured yet).
+  function scrollMapIntoView() {
+    const sticky = band && getComputedStyle(band).position === 'sticky';
+    const stuckTop = sticky ? parseFloat(band.style.top) || 0 : 0;
+    const pinnedBottom = sticky ? stuckTop + band.offsetHeight : 0;
+    // (the band's own position reads as its pinned one while stuck; its section's doesn't)
+    const bandDocTop = band ? band.parentElement.getBoundingClientRect().top + window.scrollY : 0;
+    const canvasDocTop = canvas.getBoundingClientRect().top + window.scrollY;
+    let target = canvasDocTop - pinnedBottom;
+    if (sticky) target = Math.max(target, bandDocTop - stuckTop); // where the band pins
+    window.scrollTo({ top: target, behavior: 'smooth' });
+    const canvasTop = canvasDocTop - target; // in the window, once scrolled
+    return {
+      visibleTop: Math.max(0, pinnedBottom - canvasTop),
+      visibleBottom: Math.min(canvas.clientHeight, window.innerHeight - canvasTop),
+    };
+  }
+
+  // Pan so the card plus its pin are centred in the visible part of the map. panBy animates
+  // whenever the move is smaller than the map, which it is for anything already on screen.
+  function centreCard(marker, view) {
     if (!card?.isOpen()) return;
-    const box = card.el.getBoundingClientRect();
-    const map = canvas.getBoundingClientRect();
-    if (!box.width) return;
-    let dx = 0;
-    let dy = 0;
-    if (box.top < map.top + tuck() + CARD_MARGIN) dy = box.top - map.top - tuck() - CARD_MARGIN;
-    if (box.left < map.left + CARD_MARGIN) dx = box.left - map.left - CARD_MARGIN;
-    else if (box.right > map.right - CARD_MARGIN) dx = box.right - map.right + CARD_MARGIN;
-    if (dx || dy) gmap.panBy(Math.round(dx), Math.round(dy));
+    const point = card.getProjection()?.fromLatLngToContainerPixel(marker.getPosition());
+    const height = card.el.offsetHeight;
+    if (!point || !height) return;
+    const rect = canvas.getBoundingClientRect();
+    const visibleTop = view ? view.visibleTop : tuck();
+    const visibleBottom = view ? view.visibleBottom : Math.min(canvas.clientHeight, window.innerHeight - rect.top);
+    const space = visibleBottom - visibleTop;
+    const group = height + PIN_HEIGHT; // card top to the pin's point
+    const targetY = group + CARD_MARGIN > space
+      ? visibleTop + CARD_MARGIN + group // too tall to centre: keep the card's top in view
+      : visibleTop + (space - group) / 2 + group;
+    const dx = Math.round(point.x - canvas.clientWidth / 2);
+    const dy = Math.round(point.y - targetY);
+    if (Math.abs(dx) > 1 || Math.abs(dy) > 1) gmap.panBy(dx, dy);
   }
 
   // --- photos -------------------------------------------------------------------

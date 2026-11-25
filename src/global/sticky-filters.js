@@ -14,17 +14,25 @@ export default function stickyFilters() {
   const form = band?.querySelector('[data-filter-form]');
   if (!band || !form) return;
   const nav = document.querySelector('.navbar');
+  // The heading's script lettering hangs below its line, so a sliver would peek out under the
+  // nav while pinned: fade it out whenever the band is stuck.
+  const heading = band.querySelector('h1, h2');
+  if (heading) heading.style.transition = 'opacity 150ms ease';
 
   let queued = false;
   function place() {
     queued = false;
     if (getComputedStyle(band).position !== 'sticky') {
       band.style.top = '';
+      if (heading) heading.style.opacity = '';
       return;
     }
     const navBottom = nav ? Math.max(0, nav.getBoundingClientRect().bottom) : 0;
     const formTop = form.getBoundingClientRect().top - band.getBoundingClientRect().top;
-    band.style.top = `${Math.round(navBottom + GAP - formTop)}px`;
+    const top = Math.round(navBottom + GAP - formTop);
+    band.style.top = `${top}px`;
+    const stuck = band.getBoundingClientRect().top <= top + 1;
+    if (heading) heading.style.opacity = stuck ? '0' : '';
   }
   const soon = () => {
     if (queued) return;
