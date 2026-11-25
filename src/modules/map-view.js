@@ -9,7 +9,9 @@
 //   [data-map-item]         one per development (Collection List item), with data-slug,
 //                           data-lat, data-lng bound to the CMS
 //     [data-map-card]       the compact card (role="button")
-//     [data-map-popup]      the pin card, kept in a hidden holder and copied into the pop-up
+//     [data-map-popup]      the pin card, kept in a hidden holder and copied onto the map
+//                           above the pin (our own card, not Google's InfoWindow), with
+//                           [data-map-popup-close] inside it
 //     [data-map-link]       link to the development page (inside the pop-up)
 //     [data-map-price]      holds [data-map-price-alt] ("Coming soon") and
 //                           [data-map-price-from] ("From £…"); only one shows
@@ -32,6 +34,54 @@ const DESKTOP = window.matchMedia('(min-width: 768px)');
 const MIN_HEIGHT = 480; // px, desktop map height floor
 const ONE_PIN_ZOOM = 13;
 const STASH_GAP = 24; // px between the filters and the map, used while the map is hidden
+const PIN_HEIGHT = 62; // px: the pin image is 51px tall; the card's pointer tip ends just above it
+const CARD_MARGIN = 16; // px kept between an open card and the map's edges
+
+// The pin card drawn on the map: an OverlayView holding a copy of [data-map-popup]. All of
+// its look comes from the Webflow classes; this only places it above the pin.
+function makeCard(OverlayView, onClose) {
+  class Card extends OverlayView {
+    constructor() {
+      super();
+      this.el = document.createElement('div');
+      this.el.setAttribute('role', 'dialog');
+      Object.assign(this.el.style, { position: 'absolute', zIndex: '10', cursor: 'auto' });
+      OverlayView.preventMapHitsAndGesturesFrom(this.el); // clicks and scrolls stay on the card
+      this.el.addEventListener('click', (event) => {
+        if (event.target.closest('[data-map-popup-close]')) onClose();
+      });
+      this.position = null;
+    }
+
+    show(map, position, content, label) {
+      this.position = position;
+      this.el.replaceChildren(content);
+      this.el.setAttribute('aria-label', label);
+      if (this.getMap() === map) this.draw();
+      else this.setMap(map);
+    }
+
+    hide() {
+      this.position = null;
+      this.setMap(null);
+    }
+
+    isOpen() { return !!this.position && !!this.getMap(); }
+
+    onAdd() { this.getPanes().floatPane.appendChild(this.el); }
+
+    onRemove() { this.el.remove(); }
+
+    draw() {
+      const point = this.position && this.getProjection()?.fromLatLngToDivPixel(this.position);
+      if (!point) return;
+      this.el.style.left = `${point.x}px`;
+      this.el.style.top = `${point.y}px`;
+      this.el.style.transform = `translate(-50%, calc(-100% - ${PIN_HEIGHT}px))`;
+    }
+  }
+  return new Card();
+}
 
 function number(value) {
   const n = parseFloat(value);
@@ -76,7 +126,7 @@ export default function mapView(root) {
   let view = 'list';
   let visible = new Set(items.map((item) => item.slug));
   let gmap = null;
-  let info = null;
+  let card = null; // the pin card on the map (makeCard)
   let ready = null;
   let active = null;
   const markers = new Map();
@@ -124,7 +174,7 @@ export default function mapView(root) {
 
   function init() {
     if (ready) return ready;
-    ready = loadMaps(key).then(({ Map: GMap, InfoWindow, Marker }) => {
+    ready = loadMaps(key).then(({ Map: GMap, OverlayView, Marker }) => {
       gmap = new GMap(canvas, {
         center: LONDON,
         zoom: 10,
@@ -135,8 +185,8 @@ export default function mapView(root) {
         clickableIcons: false,
         gestureHandling: DESKTOP.matches ? 'greedy' : 'cooperative',
       });
-      info = new InfoWindow({ maxWidth: 320 });
-      info.addListener('closeclick', () => setActive(null));
+      card = makeCard(OverlayView, closeCard);
+      gmap.addListener('click', closeCard); // a click on the map itself closes the card
 
       items.forEach((item) => {
         if (item.lat === null || item.lng === null) return; // no coordinates in the CMS
@@ -189,13 +239,31 @@ export default function mapView(root) {
       return;
     }
     const content = item.popup ? item.popup.cloneNode(true) : document.createTextNode(item.name);
-    info.setContent(content);
-    info.open({ map: gmap, anchor: marker, shouldFocus: false });
-    if (pan) {
-      if (!gmap.getBounds()?.contains(marker.getPosition())) gmap.panTo(marker.getPosition());
-      if (!DESKTOP.matches) canvas.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
+    content.querySelectorAll('[id]').forEach((el) => el.removeAttribute('id'));
+    card.show(gmap, marker.getPosition(), content, item.name);
+    if (pan && !gmap.getBounds()?.contains(marker.getPosition())) gmap.panTo(marker.getPosition());
+    if (pan && !DESKTOP.matches) canvas.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    requestAnimationFrame(() => requestAnimationFrame(keepCardInView));
     setActive(item, { scroll: scrollList });
+  }
+
+  function closeCard() {
+    card?.hide();
+    setActive(null);
+  }
+
+  // Nudge the map so an open card isn't cut off by the map's edges (a small pan, no zoom).
+  function keepCardInView() {
+    if (!card?.isOpen()) return;
+    const box = card.el.getBoundingClientRect();
+    const map = canvas.getBoundingClientRect();
+    if (!box.width) return;
+    let dx = 0;
+    let dy = 0;
+    if (box.top < map.top + CARD_MARGIN) dy = box.top - map.top - CARD_MARGIN;
+    if (box.left < map.left + CARD_MARGIN) dx = box.left - map.left - CARD_MARGIN;
+    else if (box.right > map.right - CARD_MARGIN) dx = box.right - map.right + CARD_MARGIN;
+    if (dx || dy) gmap.panBy(Math.round(dx), Math.round(dy));
   }
 
   // --- photos -------------------------------------------------------------------
@@ -236,10 +304,7 @@ export default function mapView(root) {
       item.el.style.display = on ? '' : 'none';
       markers.get(item.slug)?.setMap(on && gmap ? gmap : null);
     });
-    if (active && !visible.has(active.slug)) {
-      info?.close();
-      setActive(null);
-    }
+    if (active && !visible.has(active.slug)) closeCard();
     if (count) {
       const shown = items.filter((item) => visible.has(item.slug)).length;
       const noun = (n) => (n === 1 ? 'development' : 'developments');
@@ -282,8 +347,7 @@ export default function mapView(root) {
       history.replaceState(history.state, '', url);
     }
     if (!isMap) {
-      info?.close();
-      setActive(null);
+      closeCard();
       return Promise.resolve();
     }
     size();
@@ -320,10 +384,7 @@ export default function mapView(root) {
   }, true);
 
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && view === 'map' && active) {
-      info?.close();
-      setActive(null);
-    }
+    if (event.key === 'Escape' && view === 'map' && active) closeCard();
   });
 
   let resizeTimer;

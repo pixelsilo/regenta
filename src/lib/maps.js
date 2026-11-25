@@ -40,12 +40,12 @@ export function loadMaps(key) {
       s.onerror = () => reject(new Error('Google Maps failed to load'));
       document.head.appendChild(s);
     }).then(async () => {
-      const [{ Map, InfoWindow }, { Marker }, { LatLngBounds }] = await Promise.all([
+      const [{ Map, InfoWindow, OverlayView }, { Marker }, { LatLngBounds }] = await Promise.all([
         google.maps.importLibrary('maps'),
         google.maps.importLibrary('marker'),
         google.maps.importLibrary('core'),
       ]);
-      return { Map, InfoWindow, Marker, LatLngBounds, LatLng: google.maps.LatLng };
+      return { Map, InfoWindow, OverlayView, Marker, LatLngBounds, LatLng: google.maps.LatLng };
     });
   }
   return loading;

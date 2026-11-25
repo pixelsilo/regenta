@@ -61,7 +61,8 @@ function rangeSlider(root, onChange) {
       fill.style.left = `${pct(values[0])}%`;
       fill.style.width = `${pct(values[1]) - pct(values[0])}%`;
     }
-    displays.forEach((d, i) => { if (i < 2) d.textContent = money(values[i]); });
+    // The top end means "no limit": £1,000,000+.
+    displays.forEach((d, i) => { if (i < 2) d.textContent = money(values[i]) + (i === 1 && values[1] >= max ? '+' : ''); });
   }
 
   function set(i, value, notify = true) {
@@ -225,7 +226,11 @@ export default function propertyFilter() {
     link.addEventListener('click', (event) => {
       event.preventDefault();
       Object.assign(state, { tenure: '', region: '', bedrooms: null, priceFrom: null, priceTo: null });
-      Object.values(selects).forEach((s) => { if (s) s.value = ''; });
+      Object.values(selects).forEach((s) => {
+        if (!s) return;
+        s.value = '';
+        s.dispatchEvent(new Event('filter:sync')); // global/filter-select.js redraws its button
+      });
       range?.setRange(null, null);
       apply();
     });
