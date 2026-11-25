@@ -15,6 +15,7 @@ import legacyFilterLinks from './global/legacy-filter-links.js';
 import propertyFilter from './global/property-filter.js';
 import filterSelect from './global/filter-select.js';
 import stickyFilters from './global/sticky-filters.js';
+import caseStudyLinks from './global/case-study-links.js';
 import sharedOwnershipCalculator from './calculators/shared-ownership.js';
 import stampDutyCalculator from './calculators/stamp-duty.js';
 import map from './modules/map.js';
@@ -24,7 +25,7 @@ import serviceHero from './modules/service-hero.js';
 
 // Site-wide behaviour that runs on every page.
 // Order matters: page fixes that change the DOM (prices, location options) run before finsweet loads the filters.
-const GLOBALS = [copyrightYear, formatPrice, hideOnTouch, nav, testimonialSlider, development, pageExtras, faq, sharedOwnershipCalculator, stampDutyCalculator, legacyFilterLinks, propertyFilter, filterSelect, stickyFilters, finsweet];
+const GLOBALS = [copyrightYear, formatPrice, hideOnTouch, nav, testimonialSlider, development, pageExtras, faq, sharedOwnershipCalculator, stampDutyCalculator, legacyFilterLinks, propertyFilter, filterSelect, stickyFilters, caseStudyLinks, finsweet];
 
 // Opt-in modules, mounted on [data-module="<name>"] roots
 const MODULES = { map, 'map-view': mapView, 'auto-scroll': autoScroll, 'service-hero': serviceHero };
