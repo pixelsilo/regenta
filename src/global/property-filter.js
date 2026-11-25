@@ -202,16 +202,15 @@ export default function propertyFilter() {
     publishVisible(shown);
     if (remember) writeQuery();
   }
-  // After a filter change made further down the page, bring the top of the results (the count)
-  // back into view just under the pinned filters (global/sticky-filters.js), so you see the new
+  // After a filter change made further down the page, bring the top of the results list back
+  // into view just under the pinned filters (global/sticky-filters.js), so you see the new
   // list from its start rather than somewhere in the middle of a shorter one.
   function backToResults() {
-    const anchor = counts[0];
     const list = items[0]?.closest('[data-list-view]');
-    if (!anchor || (list && !list.offsetParent)) return; // map view: nothing to scroll to
+    if (!list || !list.offsetParent) return; // map view: nothing to scroll to
     const band = document.querySelector('[data-sticky-filters]');
     const pinnedBottom = band && getComputedStyle(band).position === 'sticky' ? band.getBoundingClientRect().bottom : 0;
-    const top = anchor.getBoundingClientRect().top;
+    const top = list.getBoundingClientRect().top;
     if (top < pinnedBottom) window.scrollTo({ top: window.scrollY + top - pinnedBottom - 24 });
   }
 

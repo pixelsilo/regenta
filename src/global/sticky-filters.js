@@ -1,8 +1,8 @@
 // Property Search (#57): the filter row stays pinned under the nav while you scroll; the
 // "Start your search" heading above it scrolls away.
 //
-// Webflow: the green band [data-sticky-filters] (.search-band) is position: sticky from tablet
-// up (relative on phones, where the filters would take a third of the screen). Its top has to
+// Webflow: the green band [data-sticky-filters] (.search-band) is position: sticky (it holds
+// the filters, the List / Map switch and the results count). Its top has to
 // be negative, so that only the filter row is left showing, and has to follow the nav, which
 // shrinks from 112px to 70px as you scroll down and grows back on the way up. That offset is
 // the only thing set here.

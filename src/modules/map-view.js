@@ -147,7 +147,8 @@ export default function mapView(root) {
     const list = listViews.find((el) => el.offsetParent);
     const filters = document.querySelector('[data-filter-form]');
     let top = root.getBoundingClientRect().top + window.scrollY;
-    if (stashed && list) top = list.getBoundingClientRect().top + window.scrollY;
+    // (plus the map's own top margin: it's pulled up under the green band's rounded corners)
+    if (stashed && list) top = list.getBoundingClientRect().top + window.scrollY + (parseFloat(getComputedStyle(root).marginTop) || 0);
     else if (stashed && filters) top = filters.getBoundingClientRect().bottom + window.scrollY + STASH_GAP;
     root.style.height = `${Math.max(MIN_HEIGHT, Math.round(window.innerHeight - top))}px`;
   }
@@ -205,6 +206,15 @@ export default function mapView(root) {
     return ready;
   }
 
+  // The map is pulled up under the green band's rounded bottom (a negative top margin in
+  // Webflow), and the band stays pinned over it as you scroll: keep pins and the open card
+  // clear of whatever the band covers.
+  const band = document.querySelector('[data-sticky-filters]');
+  function tuck() {
+    if (!band || stashed) return 0;
+    return Math.max(0, Math.round(band.getBoundingClientRect().bottom - canvas.getBoundingClientRect().top));
+  }
+
   function fit() {
     if (!gmap) return;
     const shown = items.filter((item) => visible.has(item.slug) && markers.has(item.slug));
@@ -220,7 +230,8 @@ export default function mapView(root) {
     }
     const bounds = new google.maps.LatLngBounds();
     shown.forEach((item) => bounds.extend({ lat: item.lat, lng: item.lng }));
-    gmap.fitBounds(bounds, 48);
+    const pad = 48;
+    gmap.fitBounds(bounds, { top: tuck() + 64, right: pad, bottom: pad, left: pad }); // top: room for the 51px pin above its point
   }
 
   function setActive(item, { scroll = false } = {}) {
@@ -265,7 +276,7 @@ export default function mapView(root) {
     if (!box.width) return;
     let dx = 0;
     let dy = 0;
-    if (box.top < map.top + CARD_MARGIN) dy = box.top - map.top - CARD_MARGIN;
+    if (box.top < map.top + tuck() + CARD_MARGIN) dy = box.top - map.top - tuck() - CARD_MARGIN;
     if (box.left < map.left + CARD_MARGIN) dx = box.left - map.left - CARD_MARGIN;
     else if (box.right > map.right - CARD_MARGIN) dx = box.right - map.right + CARD_MARGIN;
     if (dx || dy) gmap.panBy(Math.round(dx), Math.round(dy));
