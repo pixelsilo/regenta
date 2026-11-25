@@ -24,8 +24,8 @@
 //   [data-map-focus="slug"] on a results card: opens the map on that development
 //
 // The map follows the Property Search filters (global/property-filter.js via lib/filters.js).
-// ?view=map opens the map on load, and the switch keeps that in the address. Opening the map
-// scrolls the page to where the filters pin, so the map fills the window under them.
+// ?view=map opens the map on load, and the switch keeps that in the address. Map mode is a
+// layout switch (see setMode): the heading folds away and the map fills the window.
 //
 // Speed: the map is built straight away, hidden (see stash()), so opening it is instant.
 // The cards' photos are the CMS originals (several MB each, no responsive versions), so
@@ -37,7 +37,6 @@ import { onVisible } from '../lib/filters.js';
 const DESKTOP = window.matchMedia('(min-width: 768px)');
 const MIN_HEIGHT = 480; // px, desktop map height floor
 const ONE_PIN_ZOOM = 13;
-const STASH_GAP = 24; // px between the filters and the map, used while the map is hidden
 const PIN_HEIGHT = 62; // px: the pin image is 51px tall; the card's pointer tip ends just above it
 const CARD_MARGIN = 16; // px kept between an open card and the map's edges
 
@@ -139,63 +138,42 @@ export default function mapView(root) {
 
   // --- layout ---------------------------------------------------------------
 
-  // Desktop: the map fills the window below the filters. Phones: CSS stacks map over list.
-  // While it's hidden, measure from where it will open: the top of the results list (which
-  // it replaces), or failing that the bottom of the filters.
-  function size(pin) {
-    if (!DESKTOP.matches) {
+  // Map mode is a layout, not a scroll position. The section (this root's parent) gets .is-map:
+  // in Webflow that's a window-high flex column from tablet up, so the map simply fills what's
+  // left under the filter bar. The "Start your search" block folds away (.is-collapsed, an
+  // animated grid-row collapse in Webflow). Phones stack map over list and scroll as normal.
+  const section = root.parentElement;
+  const hero = document.querySelector('[data-search-hero]');
+  const FOLD_MS = 380; // a little over the fold transition set in Webflow (350ms)
+
+  function setMode(isMap, { animate = true } = {}) {
+    if (hero && !animate) hero.style.transition = 'none';
+    section.classList.toggle('is-map', isMap);
+    hero?.classList.toggle('is-collapsed', isMap);
+    if (hero && !animate) {
+      hero.getBoundingClientRect(); // apply before turning the transition back on
+      hero.style.transition = '';
+    }
+  }
+
+  // Desktop/tablet: in map mode the flex layout sizes the map, so no height is set here. While
+  // the map is hidden (stashed) it gets the size it will have in map mode: the window less the
+  // heading block's top padding (the heading itself is folded away), the filter bar and its
+  // margin, plus the strip that tucks under the bar. Phones: CSS stacks map over list.
+  function size() {
+    if (!DESKTOP.matches || (!stashed && getComputedStyle(section).display === 'flex')) {
       root.style.height = '';
       return;
     }
-    const list = listViews.find((el) => el.offsetParent);
-    const filters = document.querySelector('[data-filter-form]');
-    let top = root.getBoundingClientRect().top + window.scrollY;
-    // (plus the map's own top margin: it's pulled up under the green band's rounded corners)
-    if (stashed && list) top = list.getBoundingClientRect().top + window.scrollY + (parseFloat(getComputedStyle(root).marginTop) || 0);
-    else if (stashed && filters) top = filters.getBoundingClientRect().bottom + window.scrollY + STASH_GAP;
-    // The map is seen with the page at the point where the filters pin (see revealMap), so it
-    // fills the window from there down, whatever the page is scrolled to now.
-    root.style.height = `${Math.max(MIN_HEIGHT, Math.round(window.innerHeight - (top - (pin ?? pinScroll()))))}px`;
+    const px = (el, prop) => (el ? parseFloat(getComputedStyle(el)[prop]) || 0 : 0);
+    const top = px(hero, 'paddingTop') + (band ? band.offsetHeight : 0) + px(band, 'marginBottom') + px(root, 'marginTop');
+    root.style.height = `${Math.max(MIN_HEIGHT, Math.round(window.innerHeight - top))}px`;
   }
 
-  // How far down the page the green band pins under the nav ("Start your search" is gone by
-  // then). 0 if there's no pinned band.
-  function pinScroll() {
-    if (!band || getComputedStyle(band).position !== 'sticky') return 0;
-    // (the band's own position reads as its pinned one while stuck; its section's doesn't)
-    const sectionTop = band.parentElement.getBoundingClientRect().top + window.scrollY;
-    return Math.max(0, Math.round(sectionTop - (parseFloat(band.style.top) || 0)));
-  }
-
-  function isPinned() {
-    return !!band && band.getBoundingClientRect().top <= (parseFloat(band.style.top) || 0) + 1;
-  }
-
-  // Opening the map: jump to where the filters pin, wherever the list was scrolled to, so the
-  // map sits right under them and fills the window. The nav changes height as the page
-  // scrolls (which moves the pin point), so check again once it has settled.
   // The nav is at full height at the top of the page and grows back to it whenever you scroll
-  // up, so a jump up the page will end with it at full height: allow for that straight away.
+  // up; the pinned filter bar follows it down (global/sticky-filters.js).
   const navbar = document.querySelector('.navbar');
   const navFull = navbar && window.scrollY < 10 ? navbar.getBoundingClientRect().bottom : null;
-  function revealMap() {
-    const go = () => {
-      let target = pinScroll();
-      if (navFull && target < window.scrollY) {
-        target = Math.max(0, target - Math.max(0, navFull - navbar.getBoundingClientRect().bottom));
-      }
-      window.scrollTo({ top: target, behavior: 'instant' });
-      size(target);
-    };
-    go();
-    setTimeout(() => {
-      if (view !== 'map') return;
-      if (!isPinned() || Math.abs(window.scrollY - pinScroll()) > 2) {
-        go();
-        if (gmap) google.maps.event.trigger(gmap, 'resize');
-      }
-    }, 450);
-  }
 
   // Keep the map laid out in the window but fully transparent and behind the page, so Google
   // draws it (tiles, pins, bounds) before anyone asks for it. Google skips drawing maps that
@@ -310,20 +288,16 @@ export default function mapView(root) {
     setActive(null);
   }
 
-  // Phones: scroll so the map sits just under the pinned band (at least far enough for the band
-  // to pin, so the heading is gone). Returns the part of the map that will be visible once
-  // there, in map pixels (the scroll is smooth, so it can't be measured yet).
+  // Phones: scroll so the map sits just under the pinned filter bar. Returns the part of the
+  // map that will be visible once there, in map pixels (the scroll is smooth, so it can't be
+  // measured yet).
   function scrollMapIntoView() {
     const sticky = band && getComputedStyle(band).position === 'sticky';
-    const stuckTop = sticky ? parseFloat(band.style.top) || 0 : 0;
-    let pinnedBottom = sticky ? stuckTop + band.offsetHeight : 0;
-    // (the band's own position reads as its pinned one while stuck; its section's doesn't)
-    const bandDocTop = band ? band.parentElement.getBoundingClientRect().top + window.scrollY : 0;
+    let pinnedBottom = sticky ? (parseFloat(band.style.top) || 0) + band.offsetHeight : 0;
     const canvasDocTop = canvas.getBoundingClientRect().top + window.scrollY;
-    let target = canvasDocTop - pinnedBottom;
-    if (sticky) target = Math.max(target, bandDocTop - stuckTop); // where the band pins
-    // Scrolling up grows the nav back to full height, which pins the band that much lower.
-    const growth = navFull && target < window.scrollY ? Math.max(0, navFull - navbar.getBoundingClientRect().bottom) : 0;
+    let target = Math.max(0, canvasDocTop - pinnedBottom);
+    // Scrolling up grows the nav back to full height, and the bar moves down with it.
+    const growth = sticky && navFull && target < window.scrollY ? Math.max(0, navFull - navbar.getBoundingClientRect().bottom) : 0;
     if (growth) {
       target = Math.max(0, target - growth);
       pinnedBottom += growth;
@@ -415,16 +389,19 @@ export default function mapView(root) {
   function setView(next, { remember = true } = {}) {
     view = next === 'map' ? 'map' : 'list';
     const isMap = view === 'map';
+    listViews.forEach((el) => { el.style.display = isMap ? 'none' : ''; });
+    setMode(isMap, { animate: remember });
     if (isMap) {
       showImages();
       stash(false);
       root.style.display = '';
+      // Map mode starts at the top of the page, wherever the list was scrolled to.
+      if (window.scrollY > 0) window.scrollTo({ top: 0, behavior: 'instant' });
     } else if (ready) {
       stash(true); // keep it drawn for next time
     } else {
       root.style.display = 'none';
     }
-    listViews.forEach((el) => { el.style.display = isMap ? 'none' : ''; });
     toggles.forEach((button) => {
       const on = button.getAttribute('data-map-view-toggle') === view;
       button.classList.toggle('is-active', on);
@@ -441,8 +418,10 @@ export default function mapView(root) {
       closeCard();
       return Promise.resolve();
     }
-    revealMap();
-    return init().then(fit);
+    size();
+    // Fit the pins once the heading has finished folding away (the map grows as it folds).
+    const folded = remember ? new Promise((resolve) => setTimeout(resolve, FOLD_MS)) : Promise.resolve();
+    return Promise.all([init(), folded]).then(fit);
   }
 
   // Slide the switch's pill under the active button, at that button's size.
