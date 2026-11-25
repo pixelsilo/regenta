@@ -74,7 +74,7 @@ Where it's used: `grow-children` on the stats strip, the featured-developments c
 
 ## Property Search map view (#57)
 
-Staging only so far (`v3.6.1`). The old pop-up map at the bottom of Property Search is gone. A **List / Map** switch sits beside the filters (`[data-map-view-toggle="list|map"]`, `.is-active` + `aria-pressed`). Map shows `[data-module="map-view"]`: a map that fills the window below the filters, with a compact list of developments alongside. On phones the map sits above the list.
+Staging only so far (`v3.7.0`). The old pop-up map at the bottom of Property Search is gone. A **List / Map** switch sits beside the filters (`[data-map-view-toggle="list|map"]`, `.is-active` + `aria-pressed`). Map shows `[data-module="map-view"]`: a map that fills the window below the filters, with a compact list of developments alongside. On phones the map sits above the list.
 
 - Built in the Designer, all styled with classes there: `view-toggle`, `map-view`, `map-view_sidebar`, `map-view_list`, `map-card` (+ `is-active`), `map-popup`. The sidebar is its own Developments Collection List (Live on Site, same order as the results). Each item carries `data-slug`, `data-lat` and `data-lng` bound to the CMS, a compact card (`[data-map-card]`) and a hidden pin card (`[data-map-popup]` in `map-popup_holder`) that's copied onto the map above the pin when a pin or card is clicked. Since `v3.1.0` that card is our own (a Google `OverlayView`), not Google's InfoWindow, so it has no Google frame or close bar: `.map-popup` is the white card, the photo runs full width (`.map-popup_image-wrap`), the text sits in `.map-popup_body`, the close button `[data-map-popup-close]` (`.map-popup_close`, two `.map-popup_close-line`) sits on the photo, and `.map-popup_arrow` points at the pin. Clicking the map, Escape, or the close button closes it; the map pans a little if the card would be cut off.
 - Pin card position (`v3.4.0`): every time a card opens, from a pin or from the list, the map glides (`panBy`, animated) so the card and its pin sit centred in the visible part of the map: below whatever the band covers, and on desktop within the window. On phones a list click first scrolls the map up under the pinned band, at least far enough for the band to pin.
@@ -109,6 +109,16 @@ Layout (`v3.6.0`, restructured after the scroll-based version proved jumpy): thr
 List / Map switch (`v3.2.0`): a green pill (`.view-toggle_indicator`, `[data-map-view-indicator]`) sits behind the two transparent buttons; `map-view` sets its `left` and `width` to the active button and the Webflow transition (350ms) slides and resizes it.
 
 Price slider (`v3.1.0`): "Price" and the chosen range (`.range_label`, `.range_amount`) sit above a 4px track with white, green-ringed handles; the top end reads "£1,000,000+".
+
+## Buyer / professional split (#57)
+
+Staging only so far. The `navigation` component has two boolean props under "Links": **Professional links** (default on: Our services, About us, Built by Regenta, Case studies, News, Contact us) and **Buyer links** (default off: FAQs, Shared Ownership Calculator, Stamp Duty Calculator, Contact Us to `/contact-buyers`, Professional Services). Each set is shown or hidden by its prop, on desktop (`Div Block 152` and the `[data-nav-set="buyer"]` block) and in the mobile menu (each `nm_link`). Buyer pages switch Professional off and Buyer on: Property Search, both calculators, Shared Ownership FAQs, Contact Buyers. Development pages use their own navbar, not this component. No code involved.
+
+Homepage hero: "Find your home" (Property Search) and "Professional services" (`/professional-services`). `/contact-buyers` is phone only, with no form; `/contact-us` keeps its form for the professional side.
+
+### Professional Services page (`v3.7.0`)
+
+`/professional-services`. The hero (`.ps-hero`) is a full-screen slider of the four services, styled in Webflow with `ps-hero_*` classes. `modules/service-hero.js` moves `.is-active` across the slide, image, text and tab, and times the tab's fill bar (7s; pauses on mouse hover or keyboard focus and in a background tab, never on touch). The text panels sit in one grid cell, so the tallest sets the height. It mounts on the `.ps-hero` class because the Webflow API wouldn't keep an attribute on that element. Below the hero: intro, the `stats` component, a services list (`ps-index_*`), the Built by Regenta and case study strips, and a closing panel (`ps-cta`). The mock is in `mocks/professional-services.html`.
 
 ## Footer (no code)
 

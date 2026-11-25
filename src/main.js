@@ -20,13 +20,14 @@ import stampDutyCalculator from './calculators/stamp-duty.js';
 import map from './modules/map.js';
 import mapView from './modules/map-view.js';
 import autoScroll from './modules/auto-scroll.js';
+import serviceHero from './modules/service-hero.js';
 
 // Site-wide behaviour that runs on every page.
 // Order matters: page fixes that change the DOM (prices, location options) run before finsweet loads the filters.
 const GLOBALS = [copyrightYear, formatPrice, hideOnTouch, nav, testimonialSlider, development, pageExtras, faq, sharedOwnershipCalculator, stampDutyCalculator, legacyFilterLinks, propertyFilter, filterSelect, stickyFilters, finsweet];
 
 // Opt-in modules, mounted on [data-module="<name>"] roots
-const MODULES = { map, 'map-view': mapView, 'auto-scroll': autoScroll };
+const MODULES = { map, 'map-view': mapView, 'auto-scroll': autoScroll, 'service-hero': serviceHero };
 
 function boot() {
   window.__regentaBooted = true; // the loader shows hidden content if this never happens
@@ -37,6 +38,9 @@ function boot() {
       console.error('[regenta] global failed:', err);
     }
   });
+
+  // The Professional Services hero mounts on its class: Webflow won't keep an attribute on that element.
+  document.querySelectorAll('.ps-hero:not([data-module])').forEach((root) => root.setAttribute('data-module', 'service-hero'));
 
   document.querySelectorAll('[data-module]').forEach((root) => {
     if (root.hasAttribute('data-ready')) return; // guard double init
