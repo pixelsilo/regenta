@@ -16,6 +16,7 @@ import legacyFilterLinks from './global/legacy-filter-links.js';
 import sharedOwnershipCalculator from './calculators/shared-ownership.js';
 import stampDutyCalculator from './calculators/stamp-duty.js';
 import map from './modules/map.js';
+import mapView from './modules/map-view.js';
 import autoScroll from './modules/auto-scroll.js';
 
 // Site-wide behaviour that runs on every page.
@@ -23,7 +24,7 @@ import autoScroll from './modules/auto-scroll.js';
 const GLOBALS = [copyrightYear, formatPrice, hideOnTouch, safariShift, nav, testimonialSlider, development, pageExtras, faq, sharedOwnershipCalculator, stampDutyCalculator, legacyFilterLinks, finsweet];
 
 // Opt-in modules, mounted on [data-module="<name>"] roots
-const MODULES = { map, 'auto-scroll': autoScroll };
+const MODULES = { map, 'map-view': mapView, 'auto-scroll': autoScroll };
 
 function boot() {
   window.__regentaBooted = true; // the loader shows hidden content if this never happens

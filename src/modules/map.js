@@ -6,32 +6,7 @@
 //                at zoom 10 with the grey style and info windows. With Finsweet List v2 on the
 //                page, pins follow the filtered cards.
 // Was: page code on Property Search, Contact Us and the Developments template.
-import { loadMaps } from '../lib/maps.js';
-
-const PIN = 'https://cdn.prod.website-files.com/68362e432005a0afe1416a06/6842c1858ab95beb6b0339ee_regenta-pin.png';
-const LONDON = { lat: 51.5074, lng: -0.1278 };
-
-// https://mapstyle.withgoogle.com "Silver"
-const GREY = [
-  { elementType: 'geometry', stylers: [{ color: '#f5f5f5' }] },
-  { elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
-  { elementType: 'labels.text.fill', stylers: [{ color: '#616161' }] },
-  { elementType: 'labels.text.stroke', stylers: [{ color: '#f5f5f5' }] },
-  { featureType: 'administrative.land_parcel', elementType: 'labels.text.fill', stylers: [{ color: '#bdbdbd' }] },
-  { featureType: 'poi', elementType: 'geometry', stylers: [{ color: '#eeeeee' }] },
-  { featureType: 'poi', elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },
-  { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#e5e5e5' }] },
-  { featureType: 'poi.park', elementType: 'labels.text.fill', stylers: [{ color: '#9e9e9e' }] },
-  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#ffffff' }] },
-  { featureType: 'road.arterial', elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },
-  { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#dadada' }] },
-  { featureType: 'road.highway', elementType: 'labels.text.fill', stylers: [{ color: '#616161' }] },
-  { featureType: 'road.local', elementType: 'labels.text.fill', stylers: [{ color: '#9e9e9e' }] },
-  { featureType: 'transit.line', elementType: 'geometry', stylers: [{ color: '#e5e5e5' }] },
-  { featureType: 'transit.station', elementType: 'geometry', stylers: [{ color: '#eeeeee' }] },
-  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#c9c9c9' }] },
-  { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#9e9e9e' }] },
-];
+import { loadMaps, findList, GREY, LONDON, PIN } from '../lib/maps.js';
 
 // One pin per development card: .data---latitude / .data---longitude / .data---info-window inside it.
 function pinFor(el) {
@@ -39,20 +14,6 @@ function pinFor(el) {
   const lng = Number(el.querySelector('.data---longitude')?.textContent);
   if (!lat || !lng) return null;
   return { el, lat, lng, html: el.querySelector('.data---info-window')?.innerHTML || '' };
-}
-
-// The Finsweet List v2 instance that holds the development cards, if the page uses one.
-function findList(cardSelector) {
-  return new Promise((resolve) => {
-    if (!document.querySelector('[fs-list-element="list"]')) return resolve(null);
-    const timer = setTimeout(() => resolve(null), 8000); // list never started: fall back to all cards
-    window.FinsweetAttributes ||= [];
-    window.FinsweetAttributes.push(['list', (lists) => {
-      clearTimeout(timer);
-      const card = document.querySelector(cardSelector);
-      resolve(lists.find((l) => card && (l.listElement || l.wrapperElement)?.contains(card)) || null);
-    }]);
-  });
 }
 
 export default function map(root) {
