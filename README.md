@@ -74,12 +74,13 @@ Where it's used: `grow-children` on the stats strip, the featured-developments c
 
 ## Property Search map view (#57)
 
-Staging only so far (`v2.7.0`). The old pop-up map at the bottom of Property Search is gone. A **List / Map** switch sits beside the filters (`[data-map-view-toggle="list|map"]`, `.is-active` + `aria-pressed`). Map shows `[data-module="map-view"]`: a map that fills the window below the filters, with a compact list of developments alongside. On phones the map sits above the list.
+Staging only so far (`v2.7.1`). The old pop-up map at the bottom of Property Search is gone. A **List / Map** switch sits beside the filters (`[data-map-view-toggle="list|map"]`, `.is-active` + `aria-pressed`). Map shows `[data-module="map-view"]`: a map that fills the window below the filters, with a compact list of developments alongside. On phones the map sits above the list.
 
 - Built in the Designer, all styled with classes there: `view-toggle`, `map-view`, `map-view_sidebar`, `map-view_list`, `map-card` (+ `is-active`), `map-popup`. The sidebar is its own Developments Collection List (Live on Site, same order as the results). Each item carries `data-slug`, `data-lat` and `data-lng` bound to the CMS, a compact card (`[data-map-card]`) and a hidden pin card (`[data-map-popup]` in `map-popup_holder`) that's copied into the Google pop-up when a pin is clicked.
 - Prices: each card has the Price Alternative ("Coming soon") and "From £…"; the script shows the alternative when it's filled in.
 - The map follows the Finsweet filters on the results list (same hook as before). The pin icon on each results card has `data-map-focus` (bound to the slug) and opens the map on that development. Its old `javascript:` link in the embed is stopped in the capture phase; tidy the embed in the Designer when convenient.
-- `?view=map` opens the map on load, and the switch keeps it in the address. Google Maps only loads the first time the map is opened.
+- `?view=map` opens the map on load, and the switch keeps it in the address.
+- Speed: 0.8s after the page loads, the map is built while hidden (fixed in the window, transparent, behind the page, `inert`), so Map opens on the next frame. Building it off screen didn't work, because Google skips drawing maps outside the window. `v2.7.0` built the map on the first click and took about 1.7s to show tiles and pins. Every Property Search visit now loads the map once (as the old bottom map did), which is what Google bills.
 - Developments without coordinates (Jigsaw on 25 Nov) get no pin; clicking their card goes to the development page.
 - Classic `google.maps.Marker` is still used. Moving to `AdvancedMarkerElement` needs a Map ID in Regenta's Google Cloud project.
 

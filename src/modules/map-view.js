@@ -20,15 +20,15 @@
 //
 // The map follows the Finsweet List v2 filters on the results list. ?view=map opens the
 // map on load, and the switch keeps that in the address so the view can be linked to.
-// The map is built off screen once the page has loaded, so opening it is instant.
+// The map is built, hidden, shortly after the page loads, so opening it is instant.
 import { loadMaps, findList, GREY, LONDON, PIN } from '../lib/maps.js';
 
 const DESKTOP = window.matchMedia('(min-width: 768px)');
 const MIN_HEIGHT = 480; // px, desktop map height floor
 const FOCUS_ZOOM = 13; // zoom in at least this far when a development is picked
 const ONE_PIN_ZOOM = 13;
-const WARM_DELAY = 800; // ms after page load before the map is built off screen
-const STASH_GAP = 24; // px between the filters and the map, used while measuring off screen
+const WARM_DELAY = 800; // ms after page load before the hidden map is built
+const STASH_GAP = 24; // px between the filters and the map, used while the map is hidden
 
 function number(value) {
   const n = parseFloat(value);
@@ -80,7 +80,7 @@ export default function mapView(root) {
   // --- layout ---------------------------------------------------------------
 
   // Desktop: the map fills the window below the filters. Phones: CSS stacks map over list.
-  // While it's stashed off screen, measure from the bottom of the filters instead.
+  // While it's hidden, measure from the bottom of the filters instead.
   function size() {
     if (!DESKTOP.matches) {
       root.style.height = '';
@@ -93,14 +93,19 @@ export default function mapView(root) {
     root.style.height = `${Math.max(MIN_HEIGHT, Math.round(window.innerHeight - top))}px`;
   }
 
-  // Keep the map laid out but off screen and invisible, so Google can draw it (tiles, pins,
-  // bounds) before anyone asks for it. Opening the map is then just un-stashing it.
+  // Keep the map laid out in the window but fully transparent and behind the page, so Google
+  // draws it (tiles, pins, bounds) before anyone asks for it. Google skips drawing maps that
+  // are off screen, hence in the window rather than pushed aside. Opening the map is then
+  // just un-stashing it.
   let stashed = false;
   function stash(on) {
     stashed = on;
+    if (on) root.setAttribute('aria-hidden', 'true');
+    else root.removeAttribute('aria-hidden');
+    root.inert = on;
     Object.assign(root.style, on
-      ? { display: '', position: 'absolute', left: '-10000px', top: '0px', width: `${root.parentElement.clientWidth}px`, visibility: 'hidden', pointerEvents: 'none' }
-      : { position: '', left: '', top: '', width: '', visibility: '', pointerEvents: '' });
+      ? { display: '', position: 'fixed', left: '0px', top: '0px', width: `${root.parentElement.clientWidth}px`, opacity: '0', zIndex: '-1', pointerEvents: 'none' }
+      : { position: '', left: '', top: '', width: '', opacity: '', zIndex: '', pointerEvents: '' });
   }
 
   // Build the map in the background once the page has settled (or sooner, if someone
