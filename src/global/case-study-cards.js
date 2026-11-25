@@ -3,13 +3,14 @@
 // 1. Links each card. The API can't set "link to the current Case Study", so cards carry their
 //    slug in data-cs-slug and get /case-studies/<slug>. A link already set in the Designer
 //    (Collection page > Current Case Studies) is left alone.
-// 2. Hover and keyboard focus: adds .is-hover to the image card's .ps-cs_img (zoom), .ps-cs_tint
-//    (darker overlay) and .ps-cs_arrow (badge pops in), and to the quote card .ps-cs-quote
+// 2. Hover and keyboard focus: adds .is-hover to .ps-cs_img (zoom), .ps-cs_tint
+//    (darker overlay), .ps-cs_dots + .ps-cs_arrow (the emblem quarter slides in from the top right and
+//    the arrow from the bottom left, as on the homepage service cards), and to .ps-cs-quote
 //    (turns white). Webflow can't style children from a parent's hover, so the class is the hook.
 // 3. Hides empty pills (.ps-cs_chip whose bound text is blank), e.g. no tenure in the CMS.
 // 4. Makes the whole quote card open its case study, like the image cards.
 
-const PARTS = '.ps-cs_img, .ps-cs_tint, .ps-cs_arrow';
+const PARTS = '.ps-cs_img, .ps-cs_tint, .ps-cs_dots, .ps-cs_arrow';
 
 function hover(card, on) {
   card.classList.toggle('is-hover', on);
