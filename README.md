@@ -99,6 +99,18 @@ Since `v3.0.0` Property Search runs no Finsweet scripts (only cookie consent). `
 
 The footer is the `footer` component in Webflow (on every page). Redesigned 24 Nov 2026, staging only so far. Five columns in `footer_main`: logo and the homepage hero line ("London's leading new homes sales and marketing specialist", script accents via `griffiths-font` spans); Buy a home (property search, Shared Ownership, FAQs, both calculators); Our services (Services collection list); Company; Get in touch (phone, email, address, socials). Three columns on tablet, two on small screens, one on phones. Legal strip: Privacy Policy on the left; ©, company number and VAT number in one line on the right (stacked under Privacy Policy on mobile). The section's bottom padding (5rem) keeps the bar clear of the fixed cookie settings button. The `.footer-date` span is filled by the `copyright-year` global. The old version is kept as the unused component "footer (old, backup 24 Nov 2026)"; delete it once the new one is live and approved.
 
+## Area optical centring (no JS)
+
+Area (Adobe Fonts, kit ptn3etu) has two sets of line metrics: OS/2 typo 0.75/0.25em (with USE_TYPO_METRICS) and hhea/win 1.30/0.34em, cap height 0.78em. Windows/Android browsers use typo, so capitals sit 0.14em high in any line box; Apple's text engine uses hhea, so they sit ~0.09em low. Measured 25 Nov 2026; same for every weight and for area-normal and area-extended. We can't edit or self-host the font (Adobe terms), so there's no `ascent-override`.
+
+The fix is one block in the site CSS embed (component `code-v2` > `css`, copy in `snippets/embeds/global-fluid-font-size-css.html`):
+- Text that sits inside a box (buttons, tabs, pills, nav links, form options, sort headers, the cookie banner buttons) goes in a `.button-text` element. Boxes keep even top/bottom padding.
+- Where the browser supports `text-box` (Chrome 133+, Safari 18.2+), `.button-text` is trimmed to cap height and baseline and the space is added back with `margin-block: calc((1lh - 1cap) / 2)`, so capitals are centred exactly and heights don't change.
+- Elsewhere (Firefox, older Safari) it shifts by `--area-optical-shift`: 0.14em, or -0.09em where `font: -apple-system-body` is supported. Firefox on Mac can't be detected in CSS and stays ~0.2em low.
+- Special cases in the same block: `.heading-pill-1rem` (an h1 with bare text), the alert strip's rich text, and the FAQ page's nav pills.
+
+Don't add padding or `top`/`transform` nudges to centre Area text; wrap the text in `.button-text` instead. Removed in Nov 2026: em padding on `.button`/`-2`/`-3`, `.register-interest`, `.wf_button`, `.mini-navbar_button`, `.navbar_link-search`, `.navbar_mini-link`, `.text-button`; the `button-text_shift-down` combo's padding; uneven padding on `.dg_tab`, `.dropdown-link`, `.map-info-window_link`, `.fs_accordion-2_header`, `.fs-checkbox_field`, `.fs-sort_button-2`, `.caption`, `.alert-strip`, `.heading-pill-1rem`, `Div Block 156`; the iOS-only `.button-text { top: -1em }` rule; the FAQ pills' 0.2em nudge and its Safari override; and `src/global/safari-shift.js` (bundle v3.0.2).
+
 ## Custom code in the CMS
 
 The Developments collection has a "Custom Code" rich-text field. In use on 24 Nov 2026:

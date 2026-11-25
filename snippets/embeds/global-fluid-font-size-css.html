@@ -25,9 +25,21 @@
 }
 </style>
 <style>
-@supports (-webkit-touch-callout: none) {
-  .button-text {
-    top: -1em; /* Try -0.05em to -0.1em depending on your taste */
-  }
+/* Area optical centring (Nov 2026). Replaces the old per-class padding nudges and the Safari-only script.
+   Area's line metrics put capitals 0.14em high on Windows/Android (typo metrics) and ~0.09em low on Apple (hhea metrics).
+   Text that sits inside a box (buttons, tabs, pills, nav links, form options) goes in .button-text; this centres it.
+   - Browsers with text-box (Chrome 133+, Safari 18.2+): trims to cap height and baseline, then adds the space back evenly. Exact on every OS.
+   - Others (Firefox, older Safari): shifts by the measured offset. Firefox on Mac can't be told apart and stays ~0.2em low.
+   Source: pixelsilo/regenta README > Area optical centring. */
+:root { --area-optical-shift: 0.14em; }
+@supports (font: -apple-system-body) { :root { --area-optical-shift: -0.09em; } }
+.button-text, .faq_nav-link > span, .alert-strip .w-richtext > :only-child { translate: 0 var(--area-optical-shift); }
+.heading-pill-1rem { padding-top: calc(0.7rem + var(--area-optical-shift)); padding-bottom: calc(0.7rem - var(--area-optical-shift)); }
+@supports (text-box: trim-both cap alphabetic) {
+  :root { --area-optical-shift: 0em; }
+  .button-text, .faq_nav-link > span { text-box: trim-both cap alphabetic; margin-block: calc((1lh - 1cap) / 2); }
+  .alert-strip .w-richtext > :only-child { text-box: trim-both cap alphabetic; padding-block: calc((1lh - 1cap) / 2); } /* padding: rich text forces margin-top 0 */
+  .heading-pill-1rem { text-box: trim-both cap alphabetic; padding-block: calc(0.7rem + (1lh - 1cap) / 2); }
 }
 </style>
+<!-- (Before Nov 2026 this embed also had an iOS-only `.button-text { top: -1em }` rule; it had no effect and was removed.) -->
