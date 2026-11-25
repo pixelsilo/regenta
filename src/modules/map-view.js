@@ -24,7 +24,8 @@
 //   [data-map-focus="slug"] on a results card: opens the map on that development
 //
 // The map follows the Property Search filters (global/property-filter.js via lib/filters.js).
-// ?view=map opens the map on load, and the switch keeps that in the address.
+// ?view=map opens the map on load, and the switch keeps that in the address. Opening the map
+// scrolls the page to where the filters pin, so the map fills the window under them.
 //
 // Speed: the map is built straight away, hidden (see stash()), so opening it is instant.
 // The cards' photos are the CMS originals (several MB each, no responsive versions), so
@@ -141,7 +142,7 @@ export default function mapView(root) {
   // Desktop: the map fills the window below the filters. Phones: CSS stacks map over list.
   // While it's hidden, measure from where it will open: the top of the results list (which
   // it replaces), or failing that the bottom of the filters.
-  function size() {
+  function size(pin) {
     if (!DESKTOP.matches) {
       root.style.height = '';
       return;
@@ -152,7 +153,48 @@ export default function mapView(root) {
     // (plus the map's own top margin: it's pulled up under the green band's rounded corners)
     if (stashed && list) top = list.getBoundingClientRect().top + window.scrollY + (parseFloat(getComputedStyle(root).marginTop) || 0);
     else if (stashed && filters) top = filters.getBoundingClientRect().bottom + window.scrollY + STASH_GAP;
-    root.style.height = `${Math.max(MIN_HEIGHT, Math.round(window.innerHeight - top))}px`;
+    // The map is seen with the page at the point where the filters pin (see revealMap), so it
+    // fills the window from there down, whatever the page is scrolled to now.
+    root.style.height = `${Math.max(MIN_HEIGHT, Math.round(window.innerHeight - (top - (pin ?? pinScroll()))))}px`;
+  }
+
+  // How far down the page the green band pins under the nav ("Start your search" is gone by
+  // then). 0 if there's no pinned band.
+  function pinScroll() {
+    if (!band || getComputedStyle(band).position !== 'sticky') return 0;
+    // (the band's own position reads as its pinned one while stuck; its section's doesn't)
+    const sectionTop = band.parentElement.getBoundingClientRect().top + window.scrollY;
+    return Math.max(0, Math.round(sectionTop - (parseFloat(band.style.top) || 0)));
+  }
+
+  function isPinned() {
+    return !!band && band.getBoundingClientRect().top <= (parseFloat(band.style.top) || 0) + 1;
+  }
+
+  // Opening the map: jump to where the filters pin, wherever the list was scrolled to, so the
+  // map sits right under them and fills the window. The nav changes height as the page
+  // scrolls (which moves the pin point), so check again once it has settled.
+  // The nav is at full height at the top of the page and grows back to it whenever you scroll
+  // up, so a jump up the page will end with it at full height: allow for that straight away.
+  const navbar = document.querySelector('.navbar');
+  const navFull = navbar && window.scrollY < 10 ? navbar.getBoundingClientRect().bottom : null;
+  function revealMap() {
+    const go = () => {
+      let target = pinScroll();
+      if (navFull && target < window.scrollY) {
+        target = Math.max(0, target - Math.max(0, navFull - navbar.getBoundingClientRect().bottom));
+      }
+      window.scrollTo({ top: target, behavior: 'instant' });
+      size(target);
+    };
+    go();
+    setTimeout(() => {
+      if (view !== 'map') return;
+      if (!isPinned() || Math.abs(window.scrollY - pinScroll()) > 2) {
+        go();
+        if (gmap) google.maps.event.trigger(gmap, 'resize');
+      }
+    }, 450);
   }
 
   // Keep the map laid out in the window but fully transparent and behind the page, so Google
@@ -274,12 +316,18 @@ export default function mapView(root) {
   function scrollMapIntoView() {
     const sticky = band && getComputedStyle(band).position === 'sticky';
     const stuckTop = sticky ? parseFloat(band.style.top) || 0 : 0;
-    const pinnedBottom = sticky ? stuckTop + band.offsetHeight : 0;
+    let pinnedBottom = sticky ? stuckTop + band.offsetHeight : 0;
     // (the band's own position reads as its pinned one while stuck; its section's doesn't)
     const bandDocTop = band ? band.parentElement.getBoundingClientRect().top + window.scrollY : 0;
     const canvasDocTop = canvas.getBoundingClientRect().top + window.scrollY;
     let target = canvasDocTop - pinnedBottom;
     if (sticky) target = Math.max(target, bandDocTop - stuckTop); // where the band pins
+    // Scrolling up grows the nav back to full height, which pins the band that much lower.
+    const growth = navFull && target < window.scrollY ? Math.max(0, navFull - navbar.getBoundingClientRect().bottom) : 0;
+    if (growth) {
+      target = Math.max(0, target - growth);
+      pinnedBottom += growth;
+    }
     window.scrollTo({ top: target, behavior: 'smooth' });
     const canvasTop = canvasDocTop - target; // in the window, once scrolled
     return {
@@ -393,7 +441,7 @@ export default function mapView(root) {
       closeCard();
       return Promise.resolve();
     }
-    size();
+    revealMap();
     return init().then(fit);
   }
 
@@ -438,7 +486,6 @@ export default function mapView(root) {
     event.preventDefault();
     event.stopPropagation();
     const item = bySlug.get(trigger.getAttribute('data-map-focus'));
-    window.scrollTo({ top: 0 });
     setView('map').then(() => item && open(item, { pan: true, scrollList: true }));
   }, true);
 
