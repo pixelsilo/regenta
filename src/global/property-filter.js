@@ -144,6 +144,17 @@ export default function propertyFilter() {
     price: num(text(el.querySelector('[data-filter-value="price"]'))),
   }));
 
+  // Webflow marks the card photos as full window width (sizes="100vw", because they're
+  // absolutely positioned), so browsers fetch 1600-2000px versions for ~430px cards. For the
+  // ones further down that haven't started loading yet, give the real width.
+  items.forEach((el) => {
+    el.querySelectorAll('img[srcset][loading="lazy"]').forEach((img) => {
+      const r = img.getBoundingClientRect();
+      if (img.complete || !r.width || r.top < window.innerHeight * 1.5) return;
+      img.sizes = `${Math.ceil(r.width)}px`;
+    });
+  });
+
   const selects = {
     tenure: form.querySelector('[data-filter-field="tenure"]'),
     region: form.querySelector('[data-filter-field="region"]'),
