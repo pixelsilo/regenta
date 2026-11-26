@@ -186,12 +186,15 @@ Mock: `mocks/service-template.html` (option C). Built natively on the Services T
 
 Before live: redirect `/services/customer-care` and `/services/scheme-optimisation-and-specification` (Site settings), and replace the 12-month stat (Statistics, Order 2).
 
-## Case study template (layout A, `v3.18.1`)
+## Case study template (layout A, `v3.18.2`)
 
 Hero (eyebrow, title, date and tags), then a photo grid, then a sticky facts card beside the story. Mock: `mocks/case-study.html`.
 
 - **Photo grid** `.cs-gal`: the Main Image tile, then the Gallery collection items (`.cs-gal_item`). The collection wrapper and list are `display: contents`, so every photo is a grid cell; the empty state is hidden. `src/global/case-gallery.js` adds `is-n1` / `is-n2` for one or two photos, places the first three in `is-slot-1..3`, and with more than three crossfades the rest through the slots (side tiles first, pauses on hover, off for reduced motion).
 - **Lightbox**: our own, not Webflow's. `.cs-lb` (image, prev / next / close buttons with inline SVGs, counter) is built and styled in Webflow at the end of the template; the script opens it, swaps photos, and handles arrow keys, Escape and swipes.
+- **Hero**: the section has an `is-case` combo (less top padding and gap than other pages). Date and service tags sit in one row: tags are `.cs-tag` pills, and the date and tag labels use the `.button-text` font fix (the date via a `cs-date button-text` combo, as it's bound) so they line up.
+- **Tiles without a photo** (e.g. no Main Image, as on No.1 Wood Street) are hidden by the script; the rest close up. Hidden photos load straight away and only fade in once loaded. `.cs-gal_count` shows "N photos" over the main photo (hidden for one photo).
+- **Side column** `.cs-side` (sticky) holds the facts card and the Back to Case Studies button. From tablet down it's `display: contents` and `.cs-back` has `order: 1`, so the button drops below the story.
 - **Facts card** `.cs-facts`: the four stat rows keep their conditional visibility (rows with no value drop out), plus Client (Developer name) and the development and client logos in equal `.cs-logo_box` boxes.
 - All `cs-` classes are new; the shared `dg_*` and `news-hero_*` classes are untouched.
 
