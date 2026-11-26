@@ -108,17 +108,17 @@ export default function purchaserStories(root) {
     hide(el.querySelector('[data-review-more]'), !excerpt);
     hide(el.querySelector('[data-review-dev]'), !r.dev);
 
-    // Video cards: poster with a play button, the title as the quote, "Watch the video"
-    hide(el.querySelector('[data-review-video]'), !r.video);
+    // Video cards: a full-bleed poster (4:5) with a play button and the label, title and name
+    // over a gradient, as in the mock. The review layout inside the card is hidden.
+    const poster = el.querySelector('[data-review-video]');
+    hide(poster, !r.video);
     if (r.video) {
       el.classList.add('is-video');
-      hide(el.querySelector('.review-mark'), true);
-      hide(el.querySelector('[data-review-google]'), true);
-      hide(el.querySelector('[data-review-trustpilot]'), true);
-      if (quote) quote.innerHTML = `<p><strong>${esc(r.title || 'Video case study')}</strong></p>`;
-      const more = el.querySelector('[data-review-more]');
-      hide(more, false);
-      if (more) (more.querySelector('.button-text div') || more.querySelector('.button-text') || more).textContent = 'Watch the video →';
+      poster?.classList.add('is-full');
+      ['.review-mark', '[data-review-dev]', '[data-review-quote]', '.review-who', '.review-meta']
+        .forEach((sel) => hide(el.querySelector(`:scope > ${sel}`), true));
+      const caption = poster?.querySelector('.review-video_caption');
+      caption?.querySelectorAll('div').forEach((d) => hide(d, !d.textContent.trim()));
     }
 
     // Every card opens its full review
