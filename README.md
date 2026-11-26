@@ -186,6 +186,15 @@ Mock: `mocks/service-template.html` (option C). Built natively on the Services T
 
 Before live: redirect `/services/customer-care` and `/services/scheme-optimisation-and-specification` (Site settings), and replace the 12-month stat (Statistics, Order 2).
 
+## Case study template (layout A, `v3.18.1`)
+
+Hero (eyebrow, title, date and tags), then a photo grid, then a sticky facts card beside the story. Mock: `mocks/case-study.html`.
+
+- **Photo grid** `.cs-gal`: the Main Image tile, then the Gallery collection items (`.cs-gal_item`). The collection wrapper and list are `display: contents`, so every photo is a grid cell; the empty state is hidden. `src/global/case-gallery.js` adds `is-n1` / `is-n2` for one or two photos, places the first three in `is-slot-1..3`, and with more than three crossfades the rest through the slots (side tiles first, pauses on hover, off for reduced motion).
+- **Lightbox**: our own, not Webflow's. `.cs-lb` (image, prev / next / close buttons with inline SVGs, counter) is built and styled in Webflow at the end of the template; the script opens it, swaps photos, and handles arrow keys, Escape and swipes.
+- **Facts card** `.cs-facts`: the four stat rows keep their conditional visibility (rows with no value drop out), plus Client (Developer name) and the development and client logos in equal `.cs-logo_box` boxes.
+- All `cs-` classes are new; the shared `dg_*` and `news-hero_*` classes are untouched.
+
 ## Footer (one CSS rule)
 
 The footer is the `footer` component in Webflow (on every page). **Option C (26 Nov 2026, #57, staging only):** mocked in `mocks/footer-c.html`. `footer_main` is a two-column grid: the first column is the width of a quarter of the row minus gaps, then a 7rem gutter, then `footer_links` (three equal columns, 3rem gap). The first column is `footer_brand`, a sand panel (radius 1.5rem) sized to its content: logo, "Talk to us" eyebrow, phone and email (`footer_large`, 1.35rem, weight 500, an underline draws in on hover), address, and socials as 2.6rem outlined circles (`footer_social-link`; hover fills green and lifts 3px). Column titles are `footer_col-title` (link size, 45% opacity). Links (`footer_link`; the services list is a collection list with `footer_cms-list`) fade from 85% to full on hover and show an arrow that slides in after the text. The arrow is the only footer CSS outside the Designer (Webflow can't style `::after`): it sits in the `code-v2` css embed. The hero line paragraph is hidden, not deleted. Panel stacks above the three columns on tablet; one column on phones. The pre-option-C structure is the unused component "footer (backup 26 Nov 2026)"; it shares the classes, so it shows the new styling on the old layout.
