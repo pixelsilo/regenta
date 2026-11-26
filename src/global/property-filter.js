@@ -200,7 +200,35 @@ export default function propertyFilter() {
       }
     });
     publishVisible(shown);
+    availability();
     if (remember) writeQuery();
+  }
+
+  // Grey out choices that would show nothing alongside the other filters (and the price range):
+  // e.g. Shared Ownership + 5 bedrooms, or Greater London + Re-Sale Homes. The option is
+  // disabled on the native select (the phone picker greys it) and global/filter-select.js
+  // greys it in our list (.is-disabled). The choice already made is never disabled, so a
+  // shared link that lands on nothing still reads correctly and can be changed.
+  function countWith(key, value) {
+    const saved = state[key];
+    state[key] = value;
+    const n = data.filter(matches).length;
+    state[key] = saved;
+    return n;
+  }
+  function availability() {
+    Object.entries(selects).forEach(([key, select]) => {
+      if (!select) return;
+      let changed = false;
+      [...select.options].forEach((option) => {
+        if (option.value === '') return;
+        const n = countWith(key, key === 'bedrooms' ? num(option.value) : option.value);
+        const off = n === 0 && option.index !== select.selectedIndex;
+        option.setAttribute('data-count', String(n));
+        if (option.disabled !== off) { option.disabled = off; changed = true; }
+      });
+      if (changed) select.dispatchEvent(new Event('filter:sync'));
+    });
   }
   // After a filter change made further down the page, bring the top of the results list back
   // into view just under the pinned filters (global/sticky-filters.js), so you see the new

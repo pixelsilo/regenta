@@ -18,7 +18,7 @@
 // Phones and tablets keep the native picker: the transparent select sits on top of the
 // button, so a tap opens the phone's own list. With a mouse, our list opens instead.
 // Classes toggled (styled in Webflow): button .is-open / .is-filled, icon .is-open,
-// list .is-open, option .is-selected / .is-active. Option text goes in a .button-text too.
+// list .is-open, option .is-selected / .is-active / .is-disabled (no results with the other filters). Option text goes in a .button-text too.
 //
 // On desktop each button is as wide as its longest option, so picking one doesn't shift the
 // bar along. On phones the wrappers share the row instead (Webflow's small breakpoint).
@@ -65,7 +65,7 @@ function setup(wrap) {
       el.replaceChildren(text);
       el.addEventListener('mousedown', (event) => event.preventDefault()); // keep focus in the list
       el.addEventListener('click', () => choose(i));
-      el.addEventListener('mousemove', () => setActive(i, false));
+      el.addEventListener('mousemove', () => { if (usable(i)) setActive(i, false); });
       list.appendChild(el);
       return el;
     });
@@ -96,7 +96,19 @@ function setup(wrap) {
     options.forEach((el, n) => {
       el.classList.toggle('is-selected', n === i);
       el.setAttribute('aria-selected', String(n === i));
+      // Options with no results right now (global/property-filter.js disables them)
+      const off = !!select.options[n]?.disabled;
+      el.classList.toggle('is-disabled', off);
+      el.setAttribute('aria-disabled', String(off));
+      if (off) el.classList.remove('is-active');
     });
+  }
+
+  const usable = (i) => !select.options[i]?.disabled;
+  // Arrow keys step over greyed-out options.
+  function step(from, dir) {
+    for (let i = from + dir; i >= 0 && i < options.length; i += dir) if (usable(i)) return i;
+    return from;
   }
 
   // --- open / close ----------------------------------------------------------------
@@ -137,6 +149,7 @@ function setup(wrap) {
   }
 
   function choose(i) {
+    if (!usable(i)) return;
     const changed = select.selectedIndex !== i;
     select.selectedIndex = i;
     sync();
@@ -183,8 +196,8 @@ function setup(wrap) {
   let typedTimer;
   list.addEventListener('keydown', (event) => {
     const keys = {
-      ArrowDown: () => setActive(activeIndex + 1),
-      ArrowUp: () => setActive(activeIndex - 1),
+      ArrowDown: () => setActive(step(activeIndex, 1)),
+      ArrowUp: () => setActive(step(activeIndex, -1)),
       Home: () => setActive(0),
       End: () => setActive(options.length - 1),
       PageDown: () => setActive(activeIndex + 5),
@@ -204,7 +217,7 @@ function setup(wrap) {
       clearTimeout(typedTimer);
       typed += event.key.toLowerCase();
       typedTimer = setTimeout(() => { typed = ''; }, 600);
-      const hit = options.findIndex((el) => el.textContent.toLowerCase().startsWith(typed));
+      const hit = options.findIndex((el, n) => usable(n) && el.textContent.toLowerCase().startsWith(typed));
       if (hit >= 0) setActive(hit);
     }
   });
