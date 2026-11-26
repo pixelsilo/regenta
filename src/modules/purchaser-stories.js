@@ -78,7 +78,7 @@ function rename(root, toRegenta) {
   });
 }
 // The hover label for .brand-name: one [data-brand-tip] element built in Webflow (.brand-tip, .is-shown),
-// position: fixed so cards and the popup can't clip it. Shown on hover, keyboard focus or tap.
+// position: fixed so cards and the popup can't clip it; .is-light over dark cards. Shown on hover, keyboard focus or tap.
 let tipReady = false;
 function brandTips() {
   const tip = document.querySelector('[data-brand-tip]');
@@ -89,6 +89,7 @@ function brandTips() {
   const show = (el) => {
     current = el;
     label.textContent = el.dataset.tip;
+    tip.classList.toggle('is-light', !!el.closest('.review-card.dark, .review-card.video')); // sand label on dark cards
     const r = el.getBoundingClientRect();
     const w = tip.offsetWidth;
     const h = tip.offsetHeight;
