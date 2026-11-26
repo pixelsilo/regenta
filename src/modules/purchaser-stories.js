@@ -67,7 +67,8 @@ function rename(root, toRegenta) {
       const em = document.createElement('em');
       em.className = 'brand-name';
       em.textContent = toRegenta ? 'Regenta' : match;
-      em.title = toRegenta ? 'Previously Site Sales' : 'Now known as Regenta';
+      em.dataset.tip = toRegenta ? 'Previously Site Sales' : 'Now known as Regenta';
+      em.tabIndex = 0;
       frag.append(em);
       last = at + match.length;
       return match;
@@ -75,6 +76,48 @@ function rename(root, toRegenta) {
     frag.append(node.nodeValue.slice(last));
     node.replaceWith(frag);
   });
+}
+// The hover label for .brand-name: one [data-brand-tip] element built in Webflow (.brand-tip, .is-shown),
+// position: fixed so cards and the popup can't clip it. Shown on hover, keyboard focus or tap.
+let tipReady = false;
+function brandTips() {
+  const tip = document.querySelector('[data-brand-tip]');
+  if (!tip || tipReady) return;
+  tipReady = true;
+  const label = tip.querySelector('.button-text') || tip;
+  let current = null;
+  const show = (el) => {
+    current = el;
+    label.textContent = el.dataset.tip;
+    const r = el.getBoundingClientRect();
+    const w = tip.offsetWidth;
+    const h = tip.offsetHeight;
+    const x = Math.min(Math.max(8, r.left + r.width / 2 - w / 2), window.innerWidth - w - 8);
+    const y = r.top - h - 8 < 8 ? r.bottom + 8 : r.top - h - 8;
+    tip.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px)`;
+    tip.classList.add('is-shown');
+    el.setAttribute('aria-describedby', tip.id || 'brand-tip');
+  };
+  const hideTip = () => {
+    current?.removeAttribute('aria-describedby');
+    current = null;
+    tip.classList.remove('is-shown');
+  };
+  const nameOf = (e) => e.target.closest?.('.brand-name');
+  document.addEventListener('mouseover', (e) => { const el = nameOf(e); if (el) show(el); });
+  document.addEventListener('mouseout', (e) => { if (nameOf(e) && !nameOf(e).contains(e.relatedTarget)) hideTip(); });
+  document.addEventListener('focusin', (e) => { const el = nameOf(e); if (el) show(el); });
+  document.addEventListener('focusout', (e) => { if (nameOf(e)) hideTip(); });
+  // On touch, a tap on the name shows the label instead of opening the card
+  document.addEventListener('click', (e) => {
+    const el = nameOf(e);
+    if (el && matchMedia('(hover: none)').matches) {
+      e.stopPropagation();
+      if (current === el) hideTip(); else show(el);
+    } else if (!el) hideTip();
+  }, true);
+  window.addEventListener('scroll', hideTip, { passive: true, capture: true });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hideTip(); });
 }
 // The words the card quotes, as they appear in the full review (no ellipses)
 const quoted = (excerpt, callout) => [excerpt, callout].filter(Boolean).join(' ').replace(/^…+|…+$/g, '').trim();
@@ -127,6 +170,7 @@ export default function purchaserStories(root) {
 
   // Cards show the current name (after the quote is read, so the popup still finds and highlights it)
   reviews.forEach((r) => rename(r.el, true));
+  brandTips();
 
   // Highest Order first, then no Order, newest first
   const ordered = Number.isFinite;
