@@ -1,0 +1,99 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mock: home stats options | Regenta (#57)</title>
+<link rel="stylesheet" href="https://cdn.prod.website-files.com/68362e432005a0afe1416a06/css/regenta-uk.webflow.shared.c7a11d27c.min.css">
+<script src="https://use.typekit.net/ptn3etu.js"></script><script>try{Typekit.load();}catch(e){}</script>
+<style>:root { --green:#0b2b26; --green-2:#173833; --sand:#e3e5db; --ease:cubic-bezier(.23,1,.32,1); }
+* { box-sizing:border-box; }
+body { margin:0; background:#f2f3ee; color:var(--green); font-family: area-normal, area, system-ui, sans-serif; }
+p { margin:0; }
+.g { font-family:Griffiths, serif; font-weight:400; }
+.wrap { padding:0 2rem; }
+.intro { padding:3rem 0 2rem; } .intro h1 { margin:0 0 .5rem; font-size:2rem; } .intro p { opacity:.7; max-width:46rem; }
+.opt-label { margin:3rem 0 1rem; padding:0 2rem; display:flex; gap:1rem; align-items:baseline; flex-wrap:wrap; }
+.opt-label b { font-size:1.1rem; } .opt-label span { opacity:.7; font-size:.95rem; max-width:60rem; }
+.sec { background:var(--green); color:var(--sand); padding:6rem 0; }
+.ic { width:3rem; height:3rem; border-radius:50%; border:1px solid rgba(227,229,219,.25); display:flex; align-items:center; justify-content:center; flex:none; }
+.ic svg { width:1.4rem; height:1.4rem; }
+.u { font-size:.6em; margin-left:.3em; letter-spacing:0; }
+.sa-n { font-size:3.2rem; font-weight:600; line-height:1; letter-spacing:-.02em; white-space:nowrap; }
+
+/* A */
+.sa { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:1.25rem; }
+.sa-card { border:1px solid rgba(227,229,219,.14); background:rgba(227,229,219,.04); border-radius:1.5rem; padding:2rem 2rem 2.25rem; display:flex; flex-direction:column; gap:1.5rem; transition:transform .4s var(--ease), background-color .4s var(--ease), border-color .4s; }
+.sa-card:hover { transform:translateY(-4px); background:rgba(227,229,219,.08); border-color:rgba(227,229,219,.24); }
+.sa-card p { font-size:.95rem; line-height:1.5; opacity:.75; margin-top:auto; }
+.sa-card .sa-n { margin-top:1.5rem; }
+
+/* B */
+.sb { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); border-top:1px solid rgba(227,229,219,.2); }
+.sb-col { padding:2rem 2rem 0; border-left:1px solid rgba(227,229,219,.2); }
+.sb-col:first-child { border-left:0; padding-left:0; }
+.sb-k { font-size:.75rem; letter-spacing:.2em; text-transform:uppercase; opacity:.55; font-weight:600; }
+.sb-n { font-size:clamp(4rem, 7vw, 7rem); font-weight:600; line-height:.9; letter-spacing:-.04em; margin-top:2.5rem; }
+.sb-u { font-size:1.8rem; margin-top:.4rem; opacity:.85; }
+.sb-col p { font-size:.95rem; line-height:1.5; opacity:.7; margin-top:1.5rem; max-width:18rem; }
+
+/* C */
+.sc { display:grid; grid-template-columns:1.15fr 1fr 1fr; grid-template-rows:auto auto; gap:1.25rem; }
+.sc-feat { grid-row:1 / 3; position:relative; overflow:hidden; background:var(--sand); color:var(--green); border-radius:1.5rem; padding:2.5rem; display:flex; flex-direction:column; justify-content:flex-end; min-height:26rem; }
+.sc-emb { position:absolute; right:-6rem; top:-6rem; width:22rem; height:22rem; color:rgba(11,43,38,.08); }
+.sc-k { font-size:.75rem; letter-spacing:.2em; text-transform:uppercase; font-weight:600; opacity:.6; position:relative; }
+.sc-big { font-size:clamp(5rem, 9vw, 8.5rem); font-weight:600; line-height:.9; letter-spacing:-.04em; margin:1rem 0 1.25rem; position:relative; }
+.sc-feat p { max-width:26rem; line-height:1.5; opacity:.8; position:relative; }
+.sc-card { border-radius:1.5rem; background:var(--green-2); padding:2rem; display:flex; flex-direction:column; justify-content:space-between; gap:2rem; }
+.sc-card p { font-size:.95rem; line-height:1.5; opacity:.72; margin-top:1rem; }
+.sc-2 { grid-column:2 / 4; flex-direction:row; align-items:flex-end; }
+.sc-2 > div:last-child { max-width:30rem; }
+
+/* D */
+.sd-sec { padding-top:0; background:linear-gradient(var(--green) 0 0) bottom / 100% 60% no-repeat, #f2f3ee; }
+.sd-hero { height:22rem; background:linear-gradient(180deg, rgba(11,43,38,.15), rgba(11,43,38,.55)), url('https://cdn.prod.website-files.com/68362e432005a0afe1416a06/68362e432005a0afe1416ab7_SS%20Website%20Header-1.webp') center/cover, #3b5a50; display:flex; align-items:flex-end; padding-bottom:7rem; }
+.sd-hero-h { font-size:2.6rem; font-weight:600; color:#fff; max-width:40rem; line-height:1.05; }
+.sd { position:relative; margin-top:-4.5rem; background:var(--sand); color:var(--green); border-radius:1.5rem; display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); padding:2.5rem 0; box-shadow:0 30px 60px -30px rgba(0,0,0,.35); }
+.sd-item { padding:0 2.25rem; border-left:1px solid rgba(11,43,38,.14); display:flex; flex-direction:column; gap:1.1rem; }
+.sd-item:first-child { border-left:0; }
+.ic-solid { background:var(--green); color:var(--sand); border:0; }
+.sd-item .sa-n { font-size:2.6rem; }
+.sd-item p { font-size:.92rem; line-height:1.5; opacity:.75; }
+
+@media (max-width: 991px) {
+  .sa, .sd { grid-template-columns:repeat(2, minmax(0,1fr)); }
+  .sd { row-gap:2.5rem; }
+  .sd-item:nth-child(3) { border-left:0; }
+  .sb { grid-template-columns:repeat(2, minmax(0,1fr)); }
+  .sb-col:nth-child(3) { border-left:0; padding-left:0; }
+  .sb-col { padding-bottom:2.5rem; }
+  .sc { grid-template-columns:1fr 1fr; }
+  .sc-feat { grid-row:auto; grid-column:1 / 3; min-height:20rem; }
+  .sc-2 { grid-column:1 / 3; }
+}
+@media (max-width: 600px) {
+  .wrap, .opt-label { padding:0 1rem; }
+  .sec { padding:4rem 0; }
+  .sa, .sb, .sc, .sd { grid-template-columns:1fr; }
+  .sb-col { border-left:0; padding:1.75rem 0; border-bottom:1px solid rgba(227,229,219,.2); }
+  .sc-feat, .sc-2 { grid-column:auto; }
+  .sc-2 { flex-direction:column; align-items:stretch; }
+  .sd-item { border-left:0; padding:0 1.75rem; }
+  .sd-hero-h { font-size:1.9rem; }
+}
+/* round 1 fixes */
+.ic { width:3.25rem; height:3.25rem; }
+.ic svg { width:1.6rem; height:1.6rem; min-width:1.6rem; }
+.sa-card p { margin-top:0; }
+.sa-card .sa-n { margin-top:1rem; }
+.sc-emb { right:-3rem; top:-3rem; width:17rem; height:17rem; color:rgba(11,43,38,.07); }
+.sc-2 { flex-direction:column; align-items:stretch; }
+.sc-2 > div:last-child { max-width:none; display:flex; align-items:flex-end; gap:3rem; }
+.sc-2 > div:last-child p { margin:0; max-width:26rem; }
+@media (max-width: 600px) { .sc-2 > div:last-child { flex-direction:column; align-items:flex-start; gap:1rem; } }
+.ic svg { width:1.8rem; height:1.8rem; min-width:1.8rem; }
+.sd-sec { background:var(--green); }
+</style></head><body>
+<header class="intro"><div class="wrap"><h1>Home stats: four options</h1><p>Same four stats (from the CMS) in each. Current version: regenta-uk.webflow.io, under the hero. New icons are one hand-drawn set; option B drops icons.</p></div></header>
+<div class="opt-label"><b>Option A: Framed cards</b><span>Each stat in its own softly outlined card, icon in a circle, a bigger number with the unit in Griffiths. Cards lift on hover.</span></div><section class="sec"><div class="wrap"><div class="sa"><div class="sa-card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M12 17.2s-3-1.8-3-3.8a1.6 1.6 0 0 1 3-.8 1.6 1.6 0 0 1 3 .8c0 2-3 3.8-3 3.8z"/></svg></div><div class="sa-n"><span class="cnt" data-to="12">0</span><span class="g u">months</span></div><p>We can provide a 12-month Customer Care Service with all of our properties.</p></div><div class="sa-card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V8l6-3v15M10 20V10l10 3v7M3 20h18"/><path d="M6.5 10v.01M6.5 13v.01M6.5 16v.01M13.5 15v.01M16.5 15v.01M13.5 18v.01M16.5 18v.01"/></svg></div><div class="sa-n"><span class="cnt" data-to="1000">0</span><span class="g u">units</span></div><p>Regenta has consistently worked on up to 1,000 units per year.</p></div><div class="sa-card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8.5" r="3"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M15.5 5.8a3 3 0 0 1 0 5.4M17.5 14.2A5.5 5.5 0 0 1 20.5 19"/></svg></div><div class="sa-n"><span class="cnt" data-to="60">0</span><span class="g u">staff</span></div><p>Today, our team of around 60 staff keeps Regenta a thriving company with extensive experience and knowledge.</p></div><div class="sa-card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9.5" r="5.5"/><path d="m8.6 13.8-1.6 6.7 5-2.5 5 2.5-1.6-6.7"/><path d="m12 7 .9 1.8 2 .3-1.45 1.4.35 2L12 11.6l-1.8.9.35-2L9.1 9.1l2-.3z"/></svg></div><div class="sa-n"><span class="cnt" data-to="35">0</span>+<span class="g u">years</span></div><p>Founded by Murray Smith in 1988, Regenta began with land sales assistance and sales and marketing services.</p></div></div></div></section><div class="opt-label"><b>Option B: Big numbers, ruled columns</b><span>No boxes. Very large numbers with a small label above, thin rules between columns and along the top. Icons drop out; the numbers do the work.</span></div><section class="sec"><div class="wrap"><div class="sb"><div class="sb-col"><div class="sb-k">Customer Care</div><div class="sb-n"><span class="cnt" data-to="12">0</span></div><div class="sb-u g">months</div><p>We can provide a 12-month Customer Care Service with all of our properties.</p></div><div class="sb-col"><div class="sb-k">A year</div><div class="sb-n"><span class="cnt" data-to="1000">0</span></div><div class="sb-u g">units</div><p>Regenta has consistently worked on up to 1,000 units per year.</p></div><div class="sb-col"><div class="sb-k">Our team</div><div class="sb-n"><span class="cnt" data-to="60">0</span></div><div class="sb-u g">staff</div><p>Today, our team of around 60 staff keeps Regenta a thriving company with extensive experience and knowledge.</p></div><div class="sb-col"><div class="sb-k">Since 1988</div><div class="sb-n"><span class="cnt" data-to="35">0</span>+</div><div class="sb-u g">years</div><p>Founded by Murray Smith in 1988, Regenta began with land sales assistance and sales and marketing services.</p></div></div></div></section><div class="opt-label"><b>Option C: Bento</b><span>35+ years leads as a large sand card with the dot emblem; the other three sit beside it in a tighter grid. Most visual interest, and it says "heritage" first.</span></div><section class="sec"><div class="wrap"><div class="sc"><div class="sc-feat"><div class="sc-emb"><svg width="100%" height="100%" viewBox="0 0 600.014 600.015" aria-hidden="true"><path d="M-392.006,250.007A60.007,60.007,0,0,1-332,190a60.007,60.007,0,0,1,60.006,60.007A60.007,60.007,0,0,1-332,310.015,60.007,60.007,0,0,1-392.006,250.007Zm120-120A60,60,0,0,1-212,70,60,60,0,0,1-152,130.007,60,60,0,0,1-212,190.015,60,60,0,0,1-272.009,130.007Zm-239.994,0A60,60,0,0,1-452,70a60,60,0,0,1,60.006,60.007A60,60,0,0,1-452,190.015,60,60,0,0,1-512,130.007Zm359.991-120A60.006,60.006,0,0,1-92.006-50,60,60,0,0,1-32,10.007,60,60,0,0,1-92.006,70.015,60,60,0,0,1-152.012,10.007Zm-239.994,0A60.007,60.007,0,0,1-332-50a60.007,60.007,0,0,1,60.006,60.008A60.007,60.007,0,0,1-332,70.015,60.007,60.007,0,0,1-392.006,10.007Zm-240.008,0A60.007,60.007,0,0,1-572.008-50,60.007,60.007,0,0,1-512,10.007a60.007,60.007,0,0,1-60.006,60.008A60.007,60.007,0,0,1-632.014,10.007Zm360.005-120.014A60,60,0,0,1-212-170.015,60,60,0,0,1-152-110.007,60,60,0,0,1-212-50,60,60,0,0,1-272.009-110.007Zm-239.994,0A60,60,0,0,1-452-170.015a60,60,0,0,1,60.006,60.008A60,60,0,0,1-452-50,60,60,0,0,1-512-110.007Zm120-119.986A60.006,60.006,0,0,1-332-290a60.006,60.006,0,0,1,60.006,60.007A60.008,60.008,0,0,1-332-169.985,60.008,60.008,0,0,1-392.006-229.993Z" transform="translate(632.014 290)" fill="currentColor"/></svg></div><div class="sc-k">Since 1988</div><div class="sc-big"><span class="cnt" data-to="35">0</span>+<span class="g u">years</span></div><p>Founded by Murray Smith in 1988, Regenta began with land sales assistance and sales and marketing services.</p></div><div class="sc-card sc-0"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M12 17.2s-3-1.8-3-3.8a1.6 1.6 0 0 1 3-.8 1.6 1.6 0 0 1 3 .8c0 2-3 3.8-3 3.8z"/></svg></div><div><div class="sa-n"><span class="cnt" data-to="12">0</span><span class="g u">months</span></div><p>We can provide a 12-month Customer Care Service with all of our properties.</p></div></div><div class="sc-card sc-1"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V8l6-3v15M10 20V10l10 3v7M3 20h18"/><path d="M6.5 10v.01M6.5 13v.01M6.5 16v.01M13.5 15v.01M16.5 15v.01M13.5 18v.01M16.5 18v.01"/></svg></div><div><div class="sa-n"><span class="cnt" data-to="1000">0</span><span class="g u">units</span></div><p>Regenta has consistently worked on up to 1,000 units per year.</p></div></div><div class="sc-card sc-2"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8.5" r="3"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M15.5 5.8a3 3 0 0 1 0 5.4M17.5 14.2A5.5 5.5 0 0 1 20.5 19"/></svg></div><div><div class="sa-n"><span class="cnt" data-to="60">0</span><span class="g u">staff</span></div><p>Today, our team of around 60 staff keeps Regenta a thriving company with extensive experience and knowledge.</p></div></div></div></div></section><div class="opt-label"><b>Option D: Stat bar on the hero</b><span>One sand panel that overlaps the bottom of the hero, four stats split by dividers, icons in green circles. Frames them as one block and ties them to the hero.</span></div><section class="sec sd-sec"><div class="sd-hero"><div class="wrap"><div class="sd-hero-h">London&rsquo;s leading new homes <span class="g">sales and marketing</span> specialist</div></div></div><div class="wrap"><div class="sd"><div class="sd-item"><div class="ic ic-solid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M12 17.2s-3-1.8-3-3.8a1.6 1.6 0 0 1 3-.8 1.6 1.6 0 0 1 3 .8c0 2-3 3.8-3 3.8z"/></svg></div><div class="sa-n"><span class="cnt" data-to="12">0</span><span class="g u">months</span></div><p>We can provide a 12-month Customer Care Service with all of our properties.</p></div><div class="sd-item"><div class="ic ic-solid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V8l6-3v15M10 20V10l10 3v7M3 20h18"/><path d="M6.5 10v.01M6.5 13v.01M6.5 16v.01M13.5 15v.01M16.5 15v.01M13.5 18v.01M16.5 18v.01"/></svg></div><div class="sa-n"><span class="cnt" data-to="1000">0</span><span class="g u">units</span></div><p>Regenta has consistently worked on up to 1,000 units per year.</p></div><div class="sd-item"><div class="ic ic-solid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8.5" r="3"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M15.5 5.8a3 3 0 0 1 0 5.4M17.5 14.2A5.5 5.5 0 0 1 20.5 19"/></svg></div><div class="sa-n"><span class="cnt" data-to="60">0</span><span class="g u">staff</span></div><p>Today, our team of around 60 staff keeps Regenta a thriving company with extensive experience and knowledge.</p></div><div class="sd-item"><div class="ic ic-solid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9.5" r="5.5"/><path d="m8.6 13.8-1.6 6.7 5-2.5 5 2.5-1.6-6.7"/><path d="m12 7 .9 1.8 2 .3-1.45 1.4.35 2L12 11.6l-1.8.9.35-2L9.1 9.1l2-.3z"/></svg></div><div class="sa-n"><span class="cnt" data-to="35">0</span>+<span class="g u">years</span></div><p>Founded by Murray Smith in 1988, Regenta began with land sales assistance and sales and marketing services.</p></div></div></div></section>
+<script>
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;io.unobserve(e.target);const el=e.target,to=+el.dataset.to,t0=performance.now();const f=t=>{const k=Math.min(1,(t-t0)/1600),v=Math.round(to*(1-Math.pow(1-k,3)));el.textContent=v.toLocaleString('en-GB');if(k<1)requestAnimationFrame(f)};requestAnimationFrame(f)}),{threshold:.4});
+document.querySelectorAll('.cnt').forEach(e=>io.observe(e));
+</script>
+</body></html>
