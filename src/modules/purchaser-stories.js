@@ -8,12 +8,15 @@
 //   [data-stories-list]                      the collection list (items are laid out in columns here)
 //     [data-review]                          one per review, with attributes bound to CMS fields:
 //         data-order (Order), data-date (Date posted), data-style (Card style: Normal|Big|Dark),
-//         data-source (Source: Google|Trustpilot), data-first / data-so / data-after (switches)
+//         data-source (Source: Google|Trustpilot)
+//       [data-review-tag="first|so|after"]  (hidden) one per filter, visibility bound to its switch
+//                                          (Webflow can't bind a Switch to an attribute)
 //       [data-review-quote]                  where the card's quote goes (filled by this script)
 //       [data-review-excerpt]  (hidden)      Excerpt
 //       [data-review-callout]  (hidden)      Callout
 //       [data-review-full]     (hidden)      Full review (rich text)
-//       [data-review-name], [data-review-year], [data-review-avatar], [data-review-dev],
+//       [data-review-name], [data-review-year] (filled with the year of Date posted),
+//       [data-review-avatar], [data-review-dev],
 //       [data-review-title] (hidden), [data-review-link] (hidden link, Link to review)
 //       [data-review-more]                   "Read full review" (hidden when there's no excerpt)
 //       [data-review-google] / [data-review-trustpilot]   the two source labels; one is hidden
@@ -24,13 +27,16 @@
 //
 // Order: highest Order first, then reviews with no Order, newest first.
 // Layout: cards go left to right into the shortest column (3 columns, 2 below 992px, 1 below 600px).
-// Classes added (styled in Webflow): card .is-big / .is-dark, modal .is-open, body .is-modal-open,
+// Classes added (styled in Webflow): card .is-big / .is-dark, avatar .is-dark, filter .is-active,
+// modal .is-open, body .is-modal-open,
 // .review-callout on the italic phrase, .review-highlight on the excerpt inside the popup.
 
 const COLS = [[599, 1], [991, 2], [Infinity, 3]];
 const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const text = (el) => (el?.textContent || '').trim();
 const on = (v) => /^(true|1|yes)$/i.test(String(v || '').trim());
+// Webflow keeps conditionally hidden elements in the page with this class
+const shown = (el) => !!el && !el.classList.contains('w-condition-invisible');
 const initials = (n) => n.replace(/[^A-Za-z ]/g, '').split(' ').filter(Boolean).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
 
 function quoteHtml(excerpt, callout) {
@@ -58,16 +64,17 @@ export default function purchaserStories(root) {
     const name = text(el.querySelector('[data-review-name]'));
     const style = (el.getAttribute('data-style') || '').toLowerCase();
     const source = (el.getAttribute('data-source') || 'Google').toLowerCase().includes('trust') ? 'trustpilot' : 'google';
+    const date = Date.parse(el.getAttribute('data-date') || '') || 0;
+    const tag = (t) => shown(el.querySelector(`[data-review-tag="${t}"]`)) || on(el.getAttribute(`data-${t}`));
     const r = {
-      el, excerpt, callout, name, source,
+      el, excerpt, callout, name, source, date,
       order: Number.parseFloat(el.getAttribute('data-order')),
-      date: Date.parse(el.getAttribute('data-date') || '') || 0,
-      tags: { first: on(el.getAttribute('data-first')), so: on(el.getAttribute('data-so')), after: on(el.getAttribute('data-after')) },
+      tags: { first: tag('first'), so: tag('so'), after: tag('after') },
       full: el.querySelector('[data-review-full]'),
       title: text(el.querySelector('[data-review-title]')),
       dev: text(el.querySelector('[data-review-dev]')),
-      year: text(el.querySelector('[data-review-year]')),
-      link: el.querySelector('[data-review-link]')?.getAttribute('href') || '',
+      year: date ? String(new Date(date).getFullYear()) : text(el.querySelector('[data-review-year]')),
+      link: (el.querySelector('[data-review-link]')?.getAttribute('href') || '').replace(/^#$/, ''),
     };
 
     // Card: style, quote, initials, source label, "Read full review"
@@ -79,7 +86,12 @@ export default function purchaserStories(root) {
       else if (r.full) quote.innerHTML = r.full.innerHTML;
     }
     const avatar = el.querySelector('[data-review-avatar]');
-    if (avatar) (avatar.querySelector('.button-text') || avatar).textContent = initials(name);
+    if (avatar) {
+      (avatar.querySelector('.button-text') || avatar).textContent = initials(name);
+      avatar.classList.toggle('is-dark', style === 'dark');
+    }
+    const yearEl = el.querySelector('[data-review-year]');
+    if (yearEl && r.year) yearEl.textContent = r.year;
     el.querySelector('[data-review-google]')?.toggleAttribute('hidden', source !== 'google');
     el.querySelector('[data-review-trustpilot]')?.toggleAttribute('hidden', source !== 'trustpilot');
     el.querySelector('[data-review-more]')?.toggleAttribute('hidden', !excerpt);
@@ -134,11 +146,16 @@ export default function purchaserStories(root) {
   // --- filters ---------------------------------------------------------------------------
   const buttons = [...root.querySelectorAll('[data-stories-filter]')];
   buttons.forEach((button) => {
-    button.setAttribute('aria-pressed', String((button.getAttribute('data-stories-filter') || '') === filter));
+    const pressed = (button.getAttribute('data-stories-filter') || '') === filter;
+    button.setAttribute('aria-pressed', String(pressed));
+    button.classList.toggle('is-active', pressed);
     button.addEventListener('click', (event) => {
       event.preventDefault();
       filter = button.getAttribute('data-stories-filter') || '';
-      buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
+      buttons.forEach((b) => {
+        b.setAttribute('aria-pressed', String(b === button));
+        b.classList.toggle('is-active', b === button);
+      });
       layout(true);
     });
   });
@@ -172,7 +189,7 @@ export default function purchaserStories(root) {
     if (link) {
       link.hidden = !r.link;
       if (r.link) link.setAttribute('href', r.link);
-      const label = link.querySelector('.button-text') || link;
+      const label = link.querySelector('div') || link;
       label.textContent = r.source === 'trustpilot' ? 'See it on Trustpilot' : 'See it on Google';
     }
     modal.classList.add('is-open');
