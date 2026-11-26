@@ -1,0 +1,202 @@
+// Purchaser stories (#57): a mosaic of verbatim Google and Trustpilot reviews from the Reviews
+// collection, with filters and a full-review popup so nothing is read out of context.
+// Mock: mocks/purchaser-stories.html. Styling lives in Webflow; this only orders, lays out,
+// filters and opens reviews.
+//
+// Webflow structure (root has data-module="purchaser-stories"):
+//   [data-stories-filter="first|so|after"]   filter buttons; "" = All stories (aria-pressed toggled)
+//   [data-stories-list]                      the collection list (items are laid out in columns here)
+//     [data-review]                          one per review, with attributes bound to CMS fields:
+//         data-order (Order), data-date (Date posted), data-style (Card style: Normal|Big|Dark),
+//         data-source (Source: Google|Trustpilot), data-first / data-so / data-after (switches)
+//       [data-review-quote]                  where the card's quote goes (filled by this script)
+//       [data-review-excerpt]  (hidden)      Excerpt
+//       [data-review-callout]  (hidden)      Callout
+//       [data-review-full]     (hidden)      Full review (rich text)
+//       [data-review-name], [data-review-year], [data-review-avatar], [data-review-dev],
+//       [data-review-title] (hidden), [data-review-link] (hidden link, Link to review)
+//       [data-review-more]                   "Read full review" (hidden when there's no excerpt)
+//       [data-review-google] / [data-review-trustpilot]   the two source labels; one is hidden
+//   [data-review-modal]                      the popup (hidden until .is-open), with
+//       [data-modal-avatar], [data-modal-name], [data-modal-sub], [data-modal-title],
+//       [data-modal-text], [data-modal-google], [data-modal-trustpilot], [data-modal-link],
+//       [data-modal-close] (one or more), [data-modal-panel]
+//
+// Order: highest Order first, then reviews with no Order, newest first.
+// Layout: cards go left to right into the shortest column (3 columns, 2 below 992px, 1 below 600px).
+// Classes added (styled in Webflow): card .is-big / .is-dark, modal .is-open, body .is-modal-open,
+// .review-callout on the italic phrase, .review-highlight on the excerpt inside the popup.
+
+const COLS = [[599, 1], [991, 2], [Infinity, 3]];
+const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const text = (el) => (el?.textContent || '').trim();
+const on = (v) => /^(true|1|yes)$/i.test(String(v || '').trim());
+const initials = (n) => n.replace(/[^A-Za-z ]/g, '').split(' ').filter(Boolean).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
+
+function quoteHtml(excerpt, callout) {
+  let html = esc(excerpt);
+  if (callout) {
+    const c = esc(callout);
+    const at = html.indexOf(c);
+    if (at >= 0) {
+      let end = at + c.length;
+      if (/[.!?]/.test(html[end] || '')) end += 1; // the full stop goes with the callout
+      html = `${html.slice(0, at)}<span class="review-callout">${html.slice(at, end)}</span>${html.slice(end)}`;
+    }
+  }
+  return `…${html}${/[.!?]$/.test(excerpt) ? '' : '…'}`;
+}
+
+export default function purchaserStories(root) {
+  const list = root.querySelector('[data-stories-list]');
+  const modal = root.querySelector('[data-review-modal]') || document.querySelector('[data-review-modal]');
+  if (!list) return;
+
+  const reviews = [...list.querySelectorAll('[data-review]')].map((el) => {
+    const excerpt = text(el.querySelector('[data-review-excerpt]'));
+    const callout = text(el.querySelector('[data-review-callout]'));
+    const name = text(el.querySelector('[data-review-name]'));
+    const style = (el.getAttribute('data-style') || '').toLowerCase();
+    const source = (el.getAttribute('data-source') || 'Google').toLowerCase().includes('trust') ? 'trustpilot' : 'google';
+    const r = {
+      el, excerpt, callout, name, source,
+      order: Number.parseFloat(el.getAttribute('data-order')),
+      date: Date.parse(el.getAttribute('data-date') || '') || 0,
+      tags: { first: on(el.getAttribute('data-first')), so: on(el.getAttribute('data-so')), after: on(el.getAttribute('data-after')) },
+      full: el.querySelector('[data-review-full]'),
+      title: text(el.querySelector('[data-review-title]')),
+      dev: text(el.querySelector('[data-review-dev]')),
+      year: text(el.querySelector('[data-review-year]')),
+      link: el.querySelector('[data-review-link]')?.getAttribute('href') || '',
+    };
+
+    // Card: style, quote, initials, source label, "Read full review"
+    el.classList.toggle('is-big', style === 'big');
+    el.classList.toggle('is-dark', style === 'dark');
+    const quote = el.querySelector('[data-review-quote]');
+    if (quote) {
+      if (excerpt) quote.innerHTML = `<p>${quoteHtml(excerpt, style === 'big' ? callout : '')}</p>`;
+      else if (r.full) quote.innerHTML = r.full.innerHTML;
+    }
+    const avatar = el.querySelector('[data-review-avatar]');
+    if (avatar) (avatar.querySelector('.button-text') || avatar).textContent = initials(name);
+    el.querySelector('[data-review-google]')?.toggleAttribute('hidden', source !== 'google');
+    el.querySelector('[data-review-trustpilot]')?.toggleAttribute('hidden', source !== 'trustpilot');
+    el.querySelector('[data-review-more]')?.toggleAttribute('hidden', !excerpt);
+    if (!r.dev) el.querySelector('[data-review-dev]')?.setAttribute('hidden', '');
+
+    // Every card opens its full review
+    el.setAttribute('role', 'button');
+    el.tabIndex = 0;
+    el.setAttribute('aria-label', `Read ${name}'s full review`);
+    el.addEventListener('click', (event) => { if (!event.target.closest('a')) open(r); });
+    el.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(r); }
+    });
+    return r;
+  });
+
+  // Highest Order first, then no Order, newest first
+  const ordered = Number.isFinite;
+  reviews.sort((a, b) => {
+    if (ordered(a.order) || ordered(b.order)) return (ordered(b.order) ? b.order : -Infinity) - (ordered(a.order) ? a.order : -Infinity) || b.date - a.date;
+    return b.date - a.date;
+  });
+
+  // --- layout: columns filled left to right -------------------------------------------
+  let filter = '';
+  let colCount = 0;
+  function layout(force) {
+    const n = COLS.find(([w]) => window.innerWidth <= w)[1];
+    if (n === colCount && !force) return;
+    colCount = n;
+    const cols = Array.from({ length: n }, () => {
+      const col = document.createElement('div');
+      col.className = 'stories-col';
+      return col;
+    });
+    list.replaceChildren(...cols);
+    reviews.forEach((r) => {
+      const show = !filter || r.tags[filter];
+      if (!show) return;
+      cols.reduce((a, b) => (b.offsetHeight < a.offsetHeight ? b : a)).appendChild(r.el);
+    });
+  }
+  layout(true);
+  let resizeQueued = false;
+  window.addEventListener('resize', () => {
+    if (resizeQueued) return;
+    resizeQueued = true;
+    requestAnimationFrame(() => { resizeQueued = false; layout(); });
+  });
+  document.fonts?.ready.then(() => layout(true));
+
+  // --- filters ---------------------------------------------------------------------------
+  const buttons = [...root.querySelectorAll('[data-stories-filter]')];
+  buttons.forEach((button) => {
+    button.setAttribute('aria-pressed', String((button.getAttribute('data-stories-filter') || '') === filter));
+    button.addEventListener('click', (event) => {
+      event.preventDefault();
+      filter = button.getAttribute('data-stories-filter') || '';
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
+      layout(true);
+    });
+  });
+
+  // --- popup -----------------------------------------------------------------------------
+  let lastFocus = null;
+  const slot = (name) => modal?.querySelector(`[data-modal-${name}]`);
+
+  function open(r) {
+    if (!modal) return;
+    lastFocus = document.activeElement;
+    const av = slot('avatar');
+    if (av) (av.querySelector('.button-text') || av).textContent = initials(r.name);
+    if (slot('name')) slot('name').textContent = r.name;
+    if (slot('sub')) slot('sub').textContent = [r.dev, r.year].filter(Boolean).join(' · ');
+    if (slot('title')) { slot('title').textContent = r.title; slot('title').hidden = !r.title; }
+    const body = slot('text');
+    if (body && r.full) {
+      body.innerHTML = r.full.innerHTML;
+      // highlight the sentence the card quoted
+      if (r.excerpt) {
+        const ex = esc(r.excerpt);
+        body.querySelectorAll('p').forEach((p) => {
+          if (p.innerHTML.includes(ex)) p.innerHTML = p.innerHTML.replace(ex, `<mark class="review-highlight">${ex}</mark>`);
+        });
+      }
+    }
+    slot('google')?.toggleAttribute('hidden', r.source !== 'google');
+    slot('trustpilot')?.toggleAttribute('hidden', r.source !== 'trustpilot');
+    const link = slot('link');
+    if (link) {
+      link.hidden = !r.link;
+      if (r.link) link.setAttribute('href', r.link);
+      const label = link.querySelector('.button-text') || link;
+      label.textContent = r.source === 'trustpilot' ? 'See it on Trustpilot' : 'See it on Google';
+    }
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('is-modal-open');
+    (slot('panel') || modal).scrollTop = 0;
+    modal.querySelector('[data-modal-close]')?.focus({ preventScroll: true });
+  }
+
+  function close() {
+    if (!modal?.classList.contains('is-open')) return;
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('is-modal-open');
+    lastFocus?.focus?.({ preventScroll: true });
+  }
+
+  if (modal) {
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-hidden', 'true');
+    modal.addEventListener('click', (event) => {
+      if (event.target.closest('[data-modal-close]') || !event.target.closest('[data-modal-panel]')) close();
+    });
+    document.addEventListener('keydown', (event) => { if (event.key === 'Escape') close(); });
+  }
+}
