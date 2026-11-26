@@ -144,7 +144,9 @@ Mock: `mocks/purchaser-stories.html`. Verbatim Google and Trustpilot reviews fro
 
 ## Services refresh (#57 part 6, CMS only so far)
 
-Development Consultancy now includes Scheme Optimisation's copy, word for word under a "Scheme optimisation and specification" subheading. Customer Care and Scheme Optimisation are set to draft. All links to them come from CMS lists, but already-published items stay on the site until they're unpublished, which also removes them from live, so that waits for the live publish. Before live: redirect `/services/customer-care` and `/services/scheme-optimisation-and-specification` (Site settings), and replace the 12-month stat (Statistics, Order 2).
+Development Consultancy now includes Scheme Optimisation's copy, word for word under a "Scheme optimisation and specification" subheading. Customer Care and Scheme Optimisation are set to draft. All links to them come from CMS lists, but already-published items stay on the site until they're unpublished, which also removes them from live, so that waits for the live publish. Service pages (template): a "Recent work" section with three case studies in the Professional Services grid card (`ps-cs-grid`, `ps-cs`, newest `public-date` first; `case-study-cards.js` links and hovers them), and the Built by Regenta strip (`regenta-homes-strip`) after it. The list should show only case studies whose **Related Services** include the current service: the API can only filter on a fixed item, so set that filter in the Designer (Services Template > the list > Filter: Related Services contains Current Service). Until then every service page shows the three newest. The service template throws `$ is not defined` from an inline script (also on live); not from #57.
+
+Before live: redirect `/services/customer-care` and `/services/scheme-optimisation-and-specification` (Site settings), and replace the 12-month stat (Statistics, Order 2).
 
 ## Footer (one CSS rule)
 
