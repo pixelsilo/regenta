@@ -210,6 +210,7 @@ export default function purchaserStories(root) {
     hide(slot('google'), !!r.video || r.source !== 'google');
     hide(slot('trustpilot'), !!r.video || r.source !== 'trustpilot');
     hide(modal.querySelector('.stories-stars'), !!r.video);
+    hide(modal.querySelector('.review-meta'), !!r.video); // nothing to show in it for a video
     const player = slot('video');
     const videoEl = player?.querySelector('video');
     hide(player, !r.video);
