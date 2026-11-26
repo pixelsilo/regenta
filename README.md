@@ -66,7 +66,7 @@ The scroll reveals are Webflow interactions (Interactions panel), targeted by at
 |---|---|---|
 | `ps="grow"` | `ps=grow` | the element fades in and scales up from 95% (0.6s, ease-out) when its top reaches 85% of the viewport |
 | `ps="grow-children"` | `ps=grow-children` | same effect on each direct child, staggered 0.2s (CMS card rows) |
-| `ps="grow-group"` + `ps="grow-item"` | `ps=grow-group` | same effect on every `grow-item` inside the group, however deeply nested, staggered 0.2s. Used where a script restructures the markup: the Our Services carousel (Slick wraps the cards in its own `slick-list`/`slick-track`, so they stop being direct children). The group attribute sits on `slider_contain`, outside the element Slick rebuilds. |
+| `ps="grow-group"` + `ps="grow-item"` | `ps=grow-group` | same effect on every `grow-item` inside the group, however deeply nested, staggered 0.2s. Also used for CMS card rows whose list needs a filter: an attribute on the Collection List element itself breaks filter changes ("component map" conflict), so the group goes on a plain parent div and `grow-item` on each card (Services Template "Recent work"). Used where a script restructures the markup: the Our Services carousel (Slick wraps the cards in its own `slick-list`/`slick-track`, so they stop being direct children). The group attribute sits on `slider_contain`, outside the element Slick rebuilds. |
 
 Both play once and don't animate under `prefers-reduced-motion`. Webflow keeps the elements hidden until its interactions runtime starts, so there's no flash and nothing depends on the bundle. Edit timing or easing in the Interactions panel.
 
