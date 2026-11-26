@@ -164,6 +164,18 @@ The Case Studies field **Case study date** (slug `public-date`) shows under the 
 
 Development Consultancy now includes Scheme Optimisation's copy, word for word under a "Scheme optimisation and specification" subheading. Customer Care and Scheme Optimisation are set to draft. All links to them come from CMS lists, but already-published items stay on the site until they're unpublished, which also removes them from live, so that waits for the live publish. Service pages (template): a "Recent work" section with three case studies in the Professional Services grid card (`ps-cs-grid`, `ps-cs`, newest `public-date` first; `case-study-cards.js` links and hovers them), and the Built by Regenta strip (`regenta-homes-strip`) after it. The list should show only case studies whose **Related Services** include the current service: the API can only filter on a fixed item, so set that filter in the Designer (Services Template > the list > Filter: Related Services contains Current Service). Until then every service page shows the three newest. The service template throws `$ is not defined` from an inline script (also on live); not from #57.
 
+### Service pages (template, option C, 26 Nov 2026)
+
+Mock: `mocks/service-template.html` (option C). Built natively on the Services Template, moving the existing CMS-bound elements so their bindings stayed:
+- **Hero** (`svc-hero`, sand): `ps-eyebrow` "Our services", the Name as a big `svc-title` H1, buttons "Get in touch" (`button is-fit`, to the form anchor) and "Recent work" (`button outline`, to the Recent work section), then Hero Copy in `svc-statement` (its H2 is the statement, the paragraph under it).
+- **Image band** (`svc-img`, rounded, 21:9, 4:3 on phones) with Hero Image.
+- **How we work** (`svc-body`, `svc-body_grid`): Content Part 1, plus the Market Intelligence report sign-up (conditional, unchanged).
+- **Recent work** (unchanged), then **contact** (`svc-contact-section` > `svc-contact`, green panel): lead contact photo, title, "Talk to … today", Email button; the existing service contact form, now always open (the Finsweet accordion was deleted). Its FormSpark action is still set from the Form ID field by the page script.
+- **Our services list** (`svc-index`): a Services collection list sorted by Order, rows reuse `ps-index_row` + `is-svc`, `ps-index_name`, `svc-index_sum`, `ps-index_thumb`. Replaces the services carousel.
+- Nav on this template is set to solid green (navbar-white on, faded off) so it reads over the sand hero.
+- Removed: old photo hero, the sticky contact card, the services slider.
+
+
 Before live: redirect `/services/customer-care` and `/services/scheme-optimisation-and-specification` (Site settings), and replace the 12-month stat (Statistics, Order 2).
 
 ## Footer (one CSS rule)
