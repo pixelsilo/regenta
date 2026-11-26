@@ -11,12 +11,12 @@
 //         data-source (Source: Google|Trustpilot)
 //       [data-review-tag="first|so|after"]  (hidden) one per filter, visibility bound to its switch
 //                                          (Webflow can't bind a Switch to an attribute)
-//       [data-review-quote]                  where the card's quote goes (filled by this script)
-//       [data-review-excerpt]  (hidden)      Excerpt
-//       [data-review-callout]  (hidden)      Callout
-//       [data-review-full]     (hidden)      Full review (rich text)
-//       [data-review-name], [data-review-year] (filled with the year of Date posted),
-//       [data-review-avatar], [data-review-dev],
+//       [data-review-quote]                  the card's quote, bound in Webflow: Excerpt, Callout
+//                                          (Big cards) or the Full review, by conditional visibility
+//       [data-review-excerpt], [data-review-callout]   the bound Excerpt and Callout in the quote
+//       [data-review-full]     (hidden)      Full review (rich text), for the popup
+//       [data-review-name], [data-review-year], [data-review-avatar] (bound to Initials),
+//       [data-review-dev],
 //       [data-review-title] (hidden), [data-review-link] (hidden link, Link to review)
 //       [data-review-more]                   "Read full review" (conditional: Excerpt is set)
 //       [data-review-google] / [data-review-trustpilot]   source labels (conditional: Source is …)
@@ -43,21 +43,8 @@ const on = (v) => /^(true|1|yes)$/i.test(String(v || '').trim());
 const shown = (el) => !!el && !el.classList.contains('w-condition-invisible');
 // Hide or show regardless of the element's display class (a [hidden] attribute loses to display:flex)
 const hide = (el, off) => { if (el) { el.hidden = off; el.style.display = off ? 'none' : ''; } };
-const initials = (n) => n.replace(/[^A-Za-z ]/g, '').split(' ').filter(Boolean).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
-
-function quoteHtml(excerpt, callout) {
-  let html = esc(excerpt);
-  if (callout) {
-    const c = esc(callout);
-    const at = html.indexOf(c);
-    if (at >= 0) {
-      let end = at + c.length;
-      if (/[.!?]/.test(html[end] || '')) end += 1; // the full stop goes with the callout
-      html = `${html.slice(0, at)}<span class="review-callout">${html.slice(at, end)}</span>${html.slice(end)}`;
-    }
-  }
-  return `…${html}${/[.!?]$/.test(excerpt) ? '' : '…'}`;
-}
+// The words the card quotes, as they appear in the full review (no ellipses)
+const quoted = (excerpt, callout) => [excerpt, callout].filter(Boolean).join(' ').replace(/^…+|…+$/g, '').trim();
 
 export default function purchaserStories(root) {
   const list = root.querySelector('[data-stories-list]');
@@ -68,12 +55,13 @@ export default function purchaserStories(root) {
     const excerpt = text(el.querySelector('[data-review-excerpt]'));
     const callout = text(el.querySelector('[data-review-callout]'));
     const name = text(el.querySelector('[data-review-name]'));
+    const avatarText = text(el.querySelector('[data-review-avatar]'));
     const style = (el.getAttribute('data-style') || '').toLowerCase();
     const source = (el.getAttribute('data-source') || 'Google').toLowerCase().includes('trust') ? 'trustpilot' : 'google';
     const date = Date.parse(el.getAttribute('data-date') || '') || 0;
     const tag = (t) => shown(el.querySelector(`[data-review-tag="${t}"]`)) || on(el.getAttribute(`data-${t}`));
     const r = {
-      el, excerpt, callout, name, source, date,
+      el, name, source, date, initials: avatarText, quote: quoted(excerpt, callout),
       order: Number.parseFloat(el.getAttribute('data-order')),
       tags: { first: tag('first'), so: tag('so'), after: tag('after') },
       full: el.querySelector('[data-review-full]'),
@@ -88,21 +76,10 @@ export default function purchaserStories(root) {
     };
     r.tags.video = !!r.video;
 
-    // Card: style, quote, initials, source label, "Read full review"
+    // Card style (Big / Dark): Webflow can't set a class from an option field
     el.classList.toggle('is-big', style === 'big');
     el.classList.toggle('is-dark', style === 'dark');
-    const quote = el.querySelector('[data-review-quote]');
-    if (quote) {
-      if (excerpt) quote.innerHTML = `<p>${quoteHtml(excerpt, style === 'big' ? callout : '')}</p>`;
-      else if (r.full) quote.innerHTML = r.full.innerHTML;
-    }
-    const avatar = el.querySelector('[data-review-avatar]');
-    if (avatar) {
-      (avatar.querySelector('.button-text') || avatar).textContent = initials(name);
-      avatar.classList.toggle('is-dark', style === 'dark');
-    }
-    const yearEl = el.querySelector('[data-review-year]');
-    if (yearEl && r.year) yearEl.textContent = r.year;
+    el.querySelector('[data-review-avatar]')?.classList.toggle('is-dark', style === 'dark');
     // What shows on each card (source label, Read full review, development, the video poster
     // or the review layout) is set with conditional visibility in Webflow, so the parts a
     // review doesn't use are never served. This script hides nothing on the cards.
@@ -185,7 +162,7 @@ export default function purchaserStories(root) {
     if (!modal) return;
     lastFocus = document.activeElement;
     const av = slot('avatar');
-    if (av) (av.querySelector('.button-text') || av).textContent = initials(r.name);
+    if (av) (av.querySelector('.button-text') || av).textContent = r.initials;
     if (slot('name')) slot('name').textContent = r.name;
     if (slot('sub')) slot('sub').textContent = [r.dev, r.year].filter(Boolean).join(' · ');
     if (slot('title')) { slot('title').textContent = r.title; hide(slot('title'), !r.title); }
@@ -193,8 +170,8 @@ export default function purchaserStories(root) {
     if (body && r.full) {
       body.innerHTML = r.full.innerHTML;
       // highlight the sentence the card quoted
-      if (r.excerpt) {
-        const ex = esc(r.excerpt);
+      if (r.quote) {
+        const ex = esc(r.quote);
         body.querySelectorAll('p').forEach((p) => {
           if (p.innerHTML.includes(ex)) p.innerHTML = p.innerHTML.replace(ex, `<mark class="review-highlight">${ex}</mark>`);
         });
