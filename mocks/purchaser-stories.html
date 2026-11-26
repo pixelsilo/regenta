@@ -74,8 +74,9 @@ dialog[open] { animation:pop .45s var(--ease); }
 @keyframes pop { from { opacity:0; transform:translateY(16px) scale(.98); } }
 .dlg { padding:2.5rem 2.75rem 2.25rem; display:flex; flex-direction:column; gap:1.5rem; }
 .dlg-top { display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; }
-.x { font:inherit; border:1px solid rgba(11,43,38,.2); background:#fff; width:2.6rem; height:2.6rem; border-radius:50%; cursor:pointer; font-size:1.2rem; color:var(--green); flex:none; }
-.x:hover { background:var(--green); color:var(--sand); }
+.x { border:1px solid rgba(11,43,38,.2); background:#fff; width:3rem; height:3rem; padding:0; border-radius:50%; cursor:pointer; color:var(--green); flex:none; display:flex; align-items:center; justify-content:center; transition:background-color .3s var(--ease), color .3s, border-color .3s, transform .3s var(--ease); }
+.x svg { width:1.1rem; height:1.1rem; display:block; }
+.x:hover { background:var(--green); border-color:var(--green); color:var(--sand); transform:rotate(90deg); }
 .full p + p { margin-top:1rem; }
 .full p { font-size:1.08rem; line-height:1.6; }
 .full mark { background:rgba(233,196,106,.35); color:inherit; padding:0 .1em; border-radius:.2em; }
@@ -118,7 +119,7 @@ dialog[open] { animation:pop .45s var(--ease); }
   <div class="dlg">
     <div class="dlg-top">
       <div class="who"><div class="avatar" id="dlg-av"></div><div><b id="dlg-name"></b><span id="dlg-sub"></span></div></div>
-      <button class="x" type="button" aria-label="Close" data-close>&times;</button>
+      <button class="x" type="button" aria-label="Close" data-close><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"/></svg></button>
     </div>
     <div class="stars" id="dlg-stars"></div>
     <div class="full" id="dlg-text"></div>
