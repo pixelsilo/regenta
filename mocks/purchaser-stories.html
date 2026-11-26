@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mock: Purchaser stories | Regenta (#57)</title>
+<link rel="stylesheet" href="https://cdn.prod.website-files.com/68362e432005a0afe1416a06/css/regenta-uk.webflow.shared.c7a11d27c.min.css">
+<script src="https://use.typekit.net/ptn3etu.js"></script><script>try{Typekit.load();}catch(e){}</script>
+<style>
+:root { --green:#0b2b26; --green-2:#173833; --sand:#e3e5db; --paper:#f2f3ee; --ease:cubic-bezier(.23,1,.32,1); }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--green); font-family:area-normal, area, system-ui, sans-serif; }
+p { margin:0; }
+.g { font-family:Griffiths, serif; font-weight:400; }
+.wrap { padding:0 2rem; max-width:1440px; margin:0 auto; }
+.note { background:#fff8d6; color:#5a4a00; font-size:.85rem; padding:.75rem 2rem; }
+
+/* hero */
+.st-hero { background:var(--green); color:var(--sand); padding:7rem 0 5rem; }
+.st-hero .wrap { display:grid; grid-template-columns:minmax(0,1.4fr) minmax(0,1fr); gap:3rem; align-items:end; }
+.eyebrow { font-size:.75rem; letter-spacing:.2em; text-transform:uppercase; font-weight:600; opacity:.6; margin-bottom:1.25rem; }
+h1 { margin:0; font-size:clamp(2.6rem,5vw,4.6rem); line-height:1; font-weight:600; letter-spacing:-.02em; }
+h1 .g { font-size:1.12em; }
+.lede { font-size:1.15rem; line-height:1.5; opacity:.8; margin-top:1.5rem; max-width:34rem; }
+.rating { justify-self:end; display:flex; align-items:center; gap:1.25rem; background:rgba(227,229,219,.06); border:1px solid rgba(227,229,219,.16); border-radius:1.5rem; padding:1.5rem 1.75rem; }
+.rating b { font-size:3.4rem; line-height:1; font-weight:600; letter-spacing:-.03em; }
+.stars { display:flex; gap:.2rem; color:#e9c46a; }
+.stars svg { width:1.1rem; height:1.1rem; }
+.rating small { display:block; opacity:.7; margin-top:.4rem; font-size:.9rem; }
+.rating a { color:inherit; text-decoration:underline; text-underline-offset:3px; }
+
+/* filters */
+.chips { display:flex; flex-wrap:wrap; gap:.6rem; padding:2.5rem 0 1.5rem; }
+.chip { font:inherit; font-size:.95rem; border:1px solid rgba(11,43,38,.2); background:#fff; color:var(--green); border-radius:999px; padding:.65rem 1.15rem; cursor:pointer; transition:background-color .3s var(--ease), color .3s, border-color .3s; }
+.chip:hover { border-color:var(--green); }
+.chip[aria-pressed="true"] { background:var(--green); color:var(--sand); border-color:var(--green); }
+
+/* mosaic */
+.mosaic { columns:3; column-gap:1.25rem; padding-bottom:6rem; }
+.card { break-inside:avoid; margin:0 0 1.25rem; border-radius:1.5rem; padding:2rem; background:#fff; display:flex; flex-direction:column; gap:1.25rem; transition:transform .4s var(--ease), box-shadow .4s var(--ease), opacity .3s; }
+.card[hidden] { display:none; }
+.card.is-click { cursor:pointer; }
+.card.is-click:hover { transform:translateY(-4px); box-shadow:0 24px 48px -28px rgba(11,43,38,.35); }
+.mark { width:2.2rem; height:auto; color:currentColor; opacity:.25; }
+.quote { font-size:1.12rem; line-height:1.5; }
+.card.big .quote { font-family:Griffiths, serif; font-size:1.85rem; line-height:1.18; letter-spacing:-.005em; }
+.card.big { background:var(--sand); }
+.card.dark { background:var(--green); color:var(--sand); }
+.who { display:flex; align-items:center; gap:.85rem; margin-top:auto; }
+.avatar { width:2.6rem; height:2.6rem; border-radius:50%; background:var(--green); color:var(--sand); display:flex; align-items:center; justify-content:center; font-weight:600; font-size:.95rem; flex:none; }
+.card.dark .avatar { background:var(--sand); color:var(--green); }
+.who b { display:block; font-weight:600; }
+.who span { font-size:.85rem; opacity:.65; }
+.meta { display:flex; justify-content:space-between; align-items:center; gap:1rem; padding-top:1.1rem; border-top:1px solid rgba(11,43,38,.1); font-size:.85rem; }
+.card.dark .meta { border-top-color:rgba(227,229,219,.16); }
+.gmark { display:inline-flex; align-items:center; gap:.4rem; opacity:.7; }
+.gmark svg { width:.95rem; height:.95rem; }
+.more { font-weight:600; display:inline-flex; align-items:center; gap:.4rem; white-space:nowrap; }
+.more::after { content:"\2192"; transition:transform .3s var(--ease); }
+.card.is-click:hover .more::after { transform:translateX(.25rem); }
+.dev { display:inline-block; font-size:.78rem; letter-spacing:.06em; text-transform:uppercase; font-weight:600; opacity:.55; }
+
+/* video tile */
+.card.video { padding:0; overflow:hidden; background:var(--green-2); color:var(--sand); }
+.video .thumb { aspect-ratio:4/5; background:linear-gradient(180deg, rgba(11,43,38,0) 40%, rgba(11,43,38,.85)), url('https://cdn.prod.website-files.com/68362e432005a0afe1416a06/6836f94b8401ff727ef0bfe6_skyline-p-1600.avif') center/cover; position:relative; display:flex; flex-direction:column; justify-content:flex-end; padding:1.75rem; gap:.5rem; }
+.play { position:absolute; top:50%; left:50%; translate:-50% -50%; width:4.5rem; height:4.5rem; border-radius:50%; background:var(--sand); color:var(--green); display:flex; align-items:center; justify-content:center; }
+.play svg { width:1.4rem; margin-left:.2rem; }
+.video h3 { margin:0; font-size:1.4rem; font-weight:600; }
+
+/* dialog */
+dialog { border:0; padding:0; border-radius:1.75rem; width:min(44rem, calc(100vw - 2rem)); max-height:calc(100vh - 4rem); color:var(--green); background:#fff; box-shadow:0 40px 80px -30px rgba(0,0,0,.5); }
+dialog::backdrop { background:rgba(11,43,38,.55); backdrop-filter:blur(3px); }
+dialog[open] { animation:pop .45s var(--ease); }
+@keyframes pop { from { opacity:0; transform:translateY(16px) scale(.98); } }
+.dlg { padding:2.5rem 2.75rem 2.25rem; display:flex; flex-direction:column; gap:1.5rem; }
+.dlg-top { display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; }
+.x { font:inherit; border:1px solid rgba(11,43,38,.2); background:#fff; width:2.6rem; height:2.6rem; border-radius:50%; cursor:pointer; font-size:1.2rem; color:var(--green); flex:none; }
+.x:hover { background:var(--green); color:var(--sand); }
+.full p + p { margin-top:1rem; }
+.full p { font-size:1.08rem; line-height:1.6; }
+.full mark { background:rgba(233,196,106,.35); color:inherit; padding:0 .1em; border-radius:.2em; }
+.dlg .meta a { text-decoration:underline; text-underline-offset:3px; }
+
+@media (max-width:991px) { .mosaic { columns:2; } .st-hero .wrap { grid-template-columns:1fr; } .rating { justify-self:start; } }
+@media (max-width:600px) { .wrap { padding:0 1rem; } .mosaic { columns:1; } .st-hero { padding:5rem 0 3.5rem; } .dlg { padding:2rem 1.5rem; } .card.big .quote { font-size:1.6rem; } }
+</style>
+</head>
+<body>
+<div class="note">Mock for Luke (#57, Purchaser stories). Quotes are verbatim from Regenta's Google reviews; excerpts are marked with … and every excerpt opens the full review. Video tiles are placeholders until the video case studies arrive.</div>
+
+<header class="st-hero"><div class="wrap">
+  <div>
+    <div class="eyebrow">Purchaser stories</div>
+    <h1>In their <span class="g">own words</span></h1>
+    <p class="lede">What buyers say about finding and buying their homes with us, from first viewing to getting the keys and beyond.</p>
+  </div>
+  <div class="rating">
+    <b>4.5</b>
+    <div>
+      <div class="stars" aria-label="4.5 out of 5 stars"></div>
+      <small>From 90 reviews on <a href="#" target="_blank" rel="noopener">Google</a></small>
+    </div>
+  </div>
+</div></header>
+
+<main class="wrap">
+  <div class="chips" role="group" aria-label="Filter stories">
+    <button class="chip" aria-pressed="true" data-tag="">All stories</button>
+    <button class="chip" aria-pressed="false" data-tag="first">First-time buyers</button>
+    <button class="chip" aria-pressed="false" data-tag="so">Shared Ownership</button>
+    <button class="chip" aria-pressed="false" data-tag="after">After moving in</button>
+    <button class="chip" aria-pressed="false" data-tag="video">Videos</button>
+  </div>
+  <div class="mosaic" id="mosaic"></div>
+</main>
+
+<dialog id="dlg" aria-labelledby="dlg-name">
+  <div class="dlg">
+    <div class="dlg-top">
+      <div class="who"><div class="avatar" id="dlg-av"></div><div><b id="dlg-name"></b><span id="dlg-sub"></span></div></div>
+      <button class="x" type="button" aria-label="Close" data-close>&times;</button>
+    </div>
+    <div class="stars" id="dlg-stars"></div>
+    <div class="full" id="dlg-text"></div>
+    <div class="meta"><span class="gmark" id="dlg-g"></span><a href="#" target="_blank" rel="noopener">See it on Google</a></div>
+  </div>
+</dialog>
+
+<script>
+const STAR = '<svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 1.5l2.6 5.5 6 .7-4.4 4.1 1.2 5.9L10 14.8l-5.4 2.9 1.2-5.9L1.4 7.7l6-.7z"/></svg>';
+const HALF = '<svg viewBox="0 0 20 20" aria-hidden="true"><defs><linearGradient id="h"><stop offset="50%" stop-color="currentColor"/><stop offset="50%" stop-color="currentColor" stop-opacity=".3"/></linearGradient></defs><path fill="url(#h)" d="M10 1.5l2.6 5.5 6 .7-4.4 4.1 1.2 5.9L10 14.8l-5.4 2.9 1.2-5.9L1.4 7.7l6-.7z"/></svg>';
+const G = '<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.6 13.3l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 7l7.4 5.7c4.3-4 6.9-9.9 6.9-17.2z"/><path fill="#FBBC05" d="M10.5 28.6c-.5-1.4-.8-2.9-.8-4.6s.3-3.2.8-4.6l-7.9-6.1C1 16.6 0 20.2 0 24s1 7.4 2.6 10.7l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.4-5.7c-2.1 1.4-4.8 2.3-8.5 2.3-6.3 0-11.6-4.1-13.5-9.9l-7.9 6.1C6.6 42.6 14.6 48 24 48z"/></svg>';
+const MARK = '<svg class="mark" viewBox="0 0 44 32" fill="currentColor" aria-hidden="true"><path d="M0 32V19.6C0 8.4 5.6 1.9 16.8 0l1.9 4.1C12.6 5.8 9.6 9.3 9.3 14.6H18V32H0zm26 0V19.6C26 8.4 31.6 1.9 42.8 0l1.9 4.1c-6.1 1.7-9.1 5.2-9.4 10.5H44V32H26z"/></svg>';
+
+// Verbatim Google reviews (Regenta, 14 Devonshire Square), chosen for detail and variety.
+// excerpt: an exact sentence from the review, shown on the card with "…"; the card opens the full review.
+// size: big (sand, Griffiths), dark, or normal. Names as they appear on Google, shortened to first name + initial.
+const R = [
+ { name:'Chiara M.', year:2026, dev:'Shared Ownership', tags:['so','first'], size:'big',
+   excerpt:'I completed on my home just 28 days after submitting my application - an exceptionally fast turnaround.',
+   text:`I had an excellent experience with Regenta while purchasing my home through the shared ownership scheme. I was supported throughout the entire process by Amy, who was absolutely outstanding from start to finish.
+
+She guided me through every step, was always available, and answered all of my questions promptly and thoroughly. Her email responses were incredibly quick, and she was just as accessible over the phone whenever I needed reassurance or clarification.
+
+Amy also kindly offered to liaise with my solicitors to help speed up the process. In the end, this wasn’t even necessary, as the solicitors she recommended were equally excellent. Thanks to this seamless collaboration, I completed on my home just 28 days after submitting my application - an exceptionally fast turnaround.
+
+This would not have been possible without Amy’s professionalism, efficiency, and genuine kindness. I’m incredibly grateful for her support and would highly recommend both her and Regenta to anyone considering shared ownership.
+
+P.S. A small piece of advice for future buyers: make sure to check every detail of the property carefully during viewings. In my case, I only noticed a few minor issues (such as some scratches on appliances and a small crack in the wall) after completion. As is standard in the process, the property is sold “as seen”, so it was too late to raise any requests at that stage. This is not a complaint - just something I wish I had been more aware of beforehand. It’s a common aspect of buying through any agency, but worth keeping in mind so you can feel fully confident in your purchase, especially if it’s your first time!` },
+ { name:'Gurcan G.', year:2026, dev:'Marleigh Park, Cambridge', tags:[],
+   text:`We had a great experience buying our home at Marleigh Park, Cambridge. From the very first time Georgia introduced us to the development through to completion, she was always friendly, professional and incredibly helpful.
+
+She kept us well informed throughout the process and made everything feel smooth and straightforward. We’re absolutely loving our new home and are very grateful for all of Georgia’s help.` },
+ { kind:'video', title:'Video case study', sub:'Coming soon', tags:['video'] },
+ { name:'Imogen L.', year:2022, dev:'Shared Ownership, Brighton', tags:['so','first'], size:'dark',
+   excerpt:'It\'s clear with Jon and Site Sales that it\'s a human first approach, and I genuinely felt looked after, informed and represented every step of the way.',
+   text:`I have just completed on (and moved into) a shared ownership flat in Brighton with the support of Jon Robinson from Site Sales. From first viewing, through second and desperate third viewings too, Jon was a patient, knowledgable and authentic guide. It's clear with Jon and Site Sales that it's a human first approach, and I genuinely felt looked after, informed and represented every step of the way. It can sometimes be a scary and confusing time buying your first home on your own, but Jon made the entire process so much more approachable. No question was too small, and Jon was always a phone call away to help/measure things/cry to! I felt Jon had a genuine interest in helping me achieve what I wanted, whether that be going through with the sale or not. It was a genuinely heart warming experience getting my keys from Jon at the final tour of the flat. I could not recommend Jon and Site Sales enough. If only I could buy another one! Thank you so much Jon!` },
+ { name:'Janet W.', year:2023, tags:[],
+   text:`A huge thank you to Jon Robinson for making my dreams come true. Jon is so kind and approachable and nothing seemed too much trouble. I was desperate to complete before Christmas as I was potentially homeless and Jon pulled out every stop to make sure this happened. I cannot thank him enough.` },
+ { name:'Stefania K.', year:2026, tags:['first','after'],
+   excerpt:'As a first-time buyer, the process felt quite overwhelming, especially as I had just had a baby at the time. Patrizia was really helpful throughout',
+   text:`As a first-time buyer, the process felt quite overwhelming, especially as I had just had a baby at the time. Patrizia was really helpful throughout — she explained things clearly, kept me updated during delays, and was always easy to reach.
+
+Even after moving in, she remained supportive when I had an issue with the boiler. I really appreciated her professionalism and responsiveness, and she made a real difference. I’d happily recommend her.` },
+ { name:'Abid S.', year:2022, tags:['first','after'], size:'big',
+   excerpt:'I asked her about various things from the name of the colour of the paint in my home, to where to find the electric metre, and she assisted me on every occasion.',
+   text:`I was assisted Georgia from Site Sales during my property purchase. All I can say is that she was terrific, right from the start till the end. She was warm, friendly and answered all my questions, no matter how small. I was a first time buyer and so everything was new to me, and Georgia helped me feel at ease with the process. She was professional yet warm and friendly. For example, after moving in, Georgia said I could email her with any questions, and so I did. I asked her about various things from the name of the colour of the paint in my home, to where to find the electric metre, and she assisted me on every occasion. It was a pleasure to meet her and I'm glad I was guided into my new home by Georgia.` },
+ { name:'Mr Mehmets', year:2026, dev:'East Wick and Sweetwater', tags:['first'],
+   text:`Me and my partner recently purchased our first home through Regenta and we are extremely happy with the support we received throughout the whole home buying process. Zoë has been particularly helpful and has been very responsive and answered any questions we have - we are currently moving our things across and the whole team at EastWick and SweetWater continues to provide us with support and are very proactive in making the move as smooth as possible.` },
+ { name:'Rosie S.', year:2025, tags:['first'],
+   text:`We have just completed on our first property and it wouldn’t have been possible without Georgia from the Site Sales team. She was always so informative, patient and kind to us. My partner was away overseas for the majority of the process, and Georgia supported me throughout. Everything was dealt with professionally but much quicker than we anticipated so we couldn’t have been happier :)` },
+ { name:'Danielle D.', year:2022, tags:[], size:'dark',
+   excerpt:'She actually called me to let me know when a flat that was affordable for me came back up, and let me come back to see and measure the flat as many times as I needed to',
+   text:`My first viewing was with a gentleman named Rob. He was so kind and made the experience really relaxed and pleasant, where I've found some places rush you and it's a bit stressful. I think the patient approach actually adds to the feel of the property. He even joined in helping me get a really nice video of the flat to show my family 🤣 from then on I dealt with Amy who went above and beyond repeatedly despite me being a bit of a pain at times. She actually called me to let me know when a flat that was affordable for me came back up, and let me come back to see and measure the flat as many times as I needed to and fielded my never ending questions. All my dreams are coming true now and the team has really contributed to it in a genuine way.` },
+ { name:'Shane B.', year:2024, tags:[],
+   text:`We had the pleasure of buying our flat through Deborah Thompson and Abby at Vodion. I can honestly say without their help I don't think we'd have gone for it.
+
+They were both super responsive without being pushy, and reassuring in their guidance and knowledge. Clearly two people passionate about their roles.
+
+Can't recommend them highly enough - they deserve a pay rise!` },
+ { kind:'video', title:'Video case study', sub:'Coming soon', tags:['video'] },
+ { name:'Melly B.', year:2021, dev:'Shared Ownership', tags:['so','first'], size:'big',
+   excerpt:'without sam i dont think we wouldve been able to get a property at 20 so a massive thank you to him.',
+   text:`if you are lucky enough to come across sam in your experience with site sales, count your lucky stars, he made buying the property very easy and simple. me and my girlfriend are very young and didnt know anything when coming to buy a property with shared ownership but sams contacts made it very easy for us. we needed a mortgage broker he knew someone. we needed a solicitor he knew someone. without sam i dont think we wouldve been able to get a property at 20 so a massive thank you to him.` },
+ { name:'Stevie H.', year:2019, dev:'Trader’s Quarter, London', tags:['so'],
+   text:`Completed yesterday on a shared ownership scheme at Trader's Quarter in London. Richard Sinclair (the on site sales person) was very professional and honest. Any time my partner and I had a question, he was always quick to respond, and considerate of what a big deal this purchase was for us personally. He made the process alot of fun and exciting!` },
+ { name:'Jadranka B.', year:2021, tags:[],
+   excerpt:'She has been amazing in co-ordinating Help to Buy, solicitor and mortgage broker, really easy to get hold off and so efficient and sympathetic when providing updates on the stage of the purchase.',
+   text:`Many, many thanks to Georgia Goldhawk for all her help during the whole process of purchasing the property, she has made the whole experience less stressful.
+
+She has been amazing in co-ordinating Help to Buy, solicitor and mortgage broker, really easy to get hold off and so efficient and sympathetic when providing updates on the stage of the purchase. We would not have been able to complete the purchase on time without her and Will's help.
+
+She was brilliant in ensuring an efficient handover, for helping us to get familiar with the property and for organising the information so efficiently.` },
+ { name:'Gazelle S.', year:2024, tags:[],
+   text:`The sales team Emily and Beste here were very helpful in accommodating my needs regarding extra appointments for measuring up, and sorting out an issue with access for my rather large cargo bike. They will always make themselves available to assist you and are quick to respond. Communication is excellent, service even better.` },
+ { name:'Sergio B.', year:2025, tags:['after'], size:'dark',
+   excerpt:'Even though the sale is now complete, I still find myself occasionally calling Beste with questions about the property! Her patience seems endless',
+   text:`I recently had the pleasure of purchasing a property through Site Sales Property Group, and I couldn’t be more impressed with their professionalism and efficiency. The entire team handled the process with great care, answering all my questions with patience and expertise, which made the experience smooth and stress-free.
+
+I’d especially like to highlight Ms. Beste for her outstanding support and dedication. Her warm, attentive approach and deep knowledge truly set her apart. She ensured every detail was addressed and went above and beyond to make sure I felt confident and informed throughout the entire process.
+
+Even though the sale is now complete, I still find myself occasionally calling Beste with questions about the property! Her patience seems endless, and I’m incredibly grateful for her continued support.
+
+If you’re considering a property purchase, I highly recommend working with Site Sales Property Group.` },
+ { name:'Ivan I.', year:2025, dev:'The Green, Loughton', tags:['so'],
+   text:`We have got 2 bed flat through SO at The Green in Loughton.Georgia Goldhawk was our sales consultant and her impeccable services made our journey smooth and easy!So from behalf of my family I want to Thank her and who knows may be the next purchase is just around the corner and,we will use her services again.` },
+ { name:'Julie L.', year:2022, tags:[],
+   text:`Kelly Hannan is highly recommended. Professional and on point. This was a long distance sale as I live 3.5 hours away. It was absolutely the smoothest process from the beginning to the end. Kelly made contact and checked back at each point in the process. There literally was not one single glitch. She was beyond helpful and knowledgeable. I just can’t say how grateful I am to have her as a realtor. I was so impressed I made sure her supervisor was aware of this gem of a realtor on the team.` },
+ { name:'Ben E.', year:2020, tags:['first'],
+   excerpt:'As a first time buyer buying a property is daunting but Sam assured me the whole time everything was going swimmingly',
+   text:`After enquiring about a property back in late july i was appointed my Agent , Sam.
+
+Sam went above and beyond to make the sale as quick and as smoothly as possible chasing people who needed chasing on time etc and being extremely professional and helpful along the way.
+
+As a first time buyer buying a property is daunting but Sam assured me the whole time everything was going swimmingly and even though everytime he have me an update i would call him immediately after to dumb it down for me he never once hesitated to help me out with some aspects a first time buyer wouldnt know
+
+Sam is Truly a huge credit to the company and i would like to thank Sam and Sitesales as whole for making this journey a great one
+
+I'm now happily moved in with my mrs and we are glad it went the way it did as i have heard some horror stories from a few of my friends on their move in process, there were some bumps in the road caused by other companies but Sam dealt with them head on and got them sorted there and then ,
+
+Thank you so much !
+
+Ben and Courtney` },
+ { name:'Natalie F.', year:2024, tags:['after'],
+   text:`I highly recommend site sales. My flat is so beautiful and Irina has been Amazing and is still very helpful even after being in my flat for almost 6 months.` },
+ { name:'Amber C.', year:2024, tags:['first'], size:'big',
+   excerpt:'They made my first home-buying experience not just successful, but truly special.',
+   text:`Purchasing my first home with Site Sale was an absolute pleasure, and I couldn't be more impressed with the experience. The sales team, Beste and Emily, were exceptional from start to finish. Their professionalism, attention to detail, and genuine care for my needs throughout the buying process made all the difference.
+
+I am incredibly grateful for their guidance and would highly recommend Site Sale, particularly Beste and Emily, to anyone looking to purchase a home. They made my first home-buying experience not just successful, but truly special.` },
+];
+
+const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
+const initials = (n) => n.replace(/[^A-Za-z ]/g, '').split(' ').filter(Boolean).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
+const stars = (n = 5) => STAR.repeat(Math.floor(n)) + (n % 1 ? HALF : '');
+document.querySelectorAll('.rating .stars').forEach((el) => { el.innerHTML = stars(4.5); });
+
+const mosaic = document.getElementById('mosaic');
+R.forEach((r, i) => {
+  const card = document.createElement('article');
+  card.dataset.tags = r.tags.join(' ');
+  if (r.kind === 'video') {
+    card.className = 'card video';
+    card.innerHTML = `<div class="thumb"><div class="play"><svg viewBox="0 0 16 18" fill="currentColor"><path d="M0 0l16 9-16 9z"/></svg></div><span class="dev" style="opacity:.75">${esc(r.sub)}</span><h3>${esc(r.title)}</h3></div>`;
+    mosaic.appendChild(card);
+    return;
+  }
+  const short = !r.excerpt;
+  card.className = `card is-click ${r.size || ''}`;
+  card.tabIndex = 0;
+  card.setAttribute('role', 'button');
+  card.setAttribute('aria-label', `Read ${r.name}'s full review`);
+  const body = short ? r.text.split(/\n\n+/).map((p) => `<p class="quote">${esc(p)}</p>`).join('') : `<p class="quote">…${esc(r.excerpt)}…</p>`;
+  card.innerHTML = `${MARK}${r.dev ? `<span class="dev">${esc(r.dev)}</span>` : ''}${body}
+    <div class="who"><div class="avatar">${initials(r.name)}</div><div><b>${esc(r.name)}</b><span>${r.year}</span></div></div>
+    <div class="meta"><span class="gmark">${G} Google review</span>${short ? '' : '<span class="more">Read full review</span>'}</div>`;
+  const open = () => show(r);
+  card.addEventListener('click', open);
+  card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+  mosaic.appendChild(card);
+});
+
+// Full review: the whole text, with the card's excerpt highlighted so you can see where it came from.
+const dlg = document.getElementById('dlg');
+function show(r) {
+  document.getElementById('dlg-av').textContent = initials(r.name);
+  document.getElementById('dlg-name').textContent = r.name;
+  document.getElementById('dlg-sub').textContent = [r.dev, r.year].filter(Boolean).join(' · ');
+  document.getElementById('dlg-stars').innerHTML = stars(5);
+  document.getElementById('dlg-g').innerHTML = `${G} Google review`;
+  document.getElementById('dlg-text').innerHTML = r.text.split(/\n\n+/).map((p) => {
+    let h = esc(p);
+    if (r.excerpt) h = h.replace(esc(r.excerpt), `<mark>${esc(r.excerpt)}</mark>`);
+    return `<p>${h}</p>`;
+  }).join('');
+  dlg.showModal();
+}
+dlg.addEventListener('click', (e) => { if (e.target === dlg || e.target.closest('[data-close]')) dlg.close(); });
+
+// Filter chips
+document.querySelectorAll('.chip').forEach((chip) => chip.addEventListener('click', () => {
+  document.querySelectorAll('.chip').forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+  const tag = chip.dataset.tag;
+  mosaic.querySelectorAll('.card').forEach((c) => { c.hidden = !!tag && !c.dataset.tags.split(' ').includes(tag); });
+}));
+</script>
+</body>
+</html>
