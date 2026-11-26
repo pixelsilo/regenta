@@ -36,7 +36,8 @@ h1 .g { font-size:1.12em; }
 .chip[aria-pressed="true"] { background:var(--green); color:var(--sand); border-color:var(--green); }
 
 /* mosaic */
-.mosaic { columns:3; column-gap:1.25rem; padding-bottom:6rem; }
+.mosaic { display:flex; gap:1.25rem; align-items:flex-start; padding-bottom:6rem; }
+.mosaic-col { flex:1 1 0; min-width:0; }
 .card { break-inside:avoid; margin:0 0 1.25rem; border-radius:1.5rem; padding:2rem; background:#fff; display:flex; flex-direction:column; gap:1.25rem; transition:transform .4s var(--ease), box-shadow .4s var(--ease), opacity .3s; }
 .card[hidden] { display:none; }
 .card.is-click { cursor:pointer; }
@@ -88,12 +89,12 @@ dialog[open] { animation:pop .45s var(--ease); }
 .full mark { background:rgba(233,196,106,.35); color:inherit; padding:0 .1em; border-radius:.2em; }
 .dlg .meta a { text-decoration:underline; text-underline-offset:3px; }
 
-@media (max-width:991px) { .mosaic { columns:2; } .st-hero .wrap { grid-template-columns:1fr; } .rating { justify-self:start; } }
-@media (max-width:600px) { .wrap { padding:0 1rem; } .mosaic { columns:1; } .st-hero { padding:5rem 0 3.5rem; } .dlg { padding:2rem 1.5rem; } }
+@media (max-width:991px) { .st-hero .wrap { grid-template-columns:1fr; } .rating { justify-self:start; } }
+@media (max-width:600px) { .wrap { padding:0 1rem; } .st-hero { padding:5rem 0 3.5rem; } .dlg { padding:2rem 1.5rem; } }
 </style>
 </head>
 <body>
-<div class="note">Mock for Luke (#57, Purchaser stories). Quotes are verbatim from Regenta's Google and Trustpilot reviews; excerpts are marked with … and every excerpt opens the full review. Video tiles are placeholders until the video case studies arrive.</div>
+<div class="note">Mock for Luke (#57, Purchaser stories). Quotes are verbatim from Regenta's Google and Trustpilot reviews; excerpts are marked with … and every excerpt opens the full review. Video tiles are placeholders until the video case studies arrive. Order: highest Order number first, then reviews without one, newest first; cards fill left to right.</div>
 
 <header class="st-hero"><div class="wrap">
   <div>
@@ -147,7 +148,7 @@ const MARK = '<svg class="mark" viewBox="0 0 44 32" fill="currentColor" aria-hid
 // excerpt: an exact sentence from the review, shown on the card with "…"; the card opens the full review.
 // size: big (sand, Griffiths), dark, or normal. Names as they appear on Google, shortened to first name + initial.
 const R = [
- { name:'Chiara M.', year:2026, date:'23 April 2026', dev:'Shared Ownership', tags:['so','first'], size:'big',
+ { name:'Chiara M.', posted:'2026-04', year:2026, date:'23 April 2026', dev:'Shared Ownership', tags:['so','first'], size:'big',
    source:'trustpilot', title:'Thank you Amy - you are the best!', callout:'an exceptionally fast turnaround', url:'https://uk.trustpilot.com/reviews/69ea6bb767c2a32c3c9e28d4',
    excerpt:'I completed on my home just 28 days after submitting my application - an exceptionally fast turnaround.',
    text:`I had an excellent experience with Regenta while purchasing my home through the shared ownership scheme. I was supported throughout the entire process by Amy, who was absolutely outstanding from start to finish.
@@ -159,53 +160,53 @@ Amy also kindly offered to liaise with my solicitors to help speed up the proces
 This would not have been possible without Amy’s professionalism, efficiency, and genuine kindness. I’m incredibly grateful for her support and would highly recommend both her and Regenta to anyone considering shared ownership.
 
 P.S. A small piece of advice for future buyers: make sure to check every detail of the property carefully during viewings. In my case, I only noticed a few minor issues (such as some scratches on appliances and a small crack in the wall) after completion. As is standard in the process, the property is sold “as seen”, so it was too late to raise any requests at that stage. This is not a complaint - just something I wish I had been more aware of beforehand. It’s a common aspect of buying through any agency, but worth keeping in mind so you can feel fully confident in your purchase.` },
- { name:'Gurcan G.', year:2026, dev:'Marleigh Park, Cambridge', tags:[],
+ { name:'Gurcan G.', posted:'2026-07', order:100, year:2026, dev:'Marleigh Park, Cambridge', tags:[],
    text:`We had a great experience buying our home at Marleigh Park, Cambridge. From the very first time Georgia introduced us to the development through to completion, she was always friendly, professional and incredibly helpful.
 
 She kept us well informed throughout the process and made everything feel smooth and straightforward. We’re absolutely loving our new home and are very grateful for all of Georgia’s help.` },
- { kind:'video', title:'Video case study', sub:'Coming soon', tags:['video'] },
- { name:'Imogen L.', year:2022, dev:'Shared Ownership, Brighton', tags:['so','first'], size:'dark',
+ { kind:'video', posted:'2026-11', order:80, title:'Video case study', sub:'Coming soon', tags:['video'] },
+ { name:'Imogen L.', posted:'2022-11', order:90, year:2022, dev:'Shared Ownership, Brighton', tags:['so','first'], size:'dark',
    excerpt:'It\'s clear with Jon and Site Sales that it\'s a human first approach, and I genuinely felt looked after, informed and represented every step of the way.',
    text:`I have just completed on (and moved into) a shared ownership flat in Brighton with the support of Jon Robinson from Site Sales. From first viewing, through second and desperate third viewings too, Jon was a patient, knowledgable and authentic guide. It's clear with Jon and Site Sales that it's a human first approach, and I genuinely felt looked after, informed and represented every step of the way. It can sometimes be a scary and confusing time buying your first home on your own, but Jon made the entire process so much more approachable. No question was too small, and Jon was always a phone call away to help/measure things/cry to! I felt Jon had a genuine interest in helping me achieve what I wanted, whether that be going through with the sale or not. It was a genuinely heart warming experience getting my keys from Jon at the final tour of the flat. I could not recommend Jon and Site Sales enough. If only I could buy another one! Thank you so much Jon!` },
- { name:'Janet W.', year:2023, tags:[],
+ { name:'Janet W.', posted:'2023-11', order:50, year:2023, tags:[],
    text:`A huge thank you to Jon Robinson for making my dreams come true. Jon is so kind and approachable and nothing seemed too much trouble. I was desperate to complete before Christmas as I was potentially homeless and Jon pulled out every stop to make sure this happened. I cannot thank him enough.` },
- { name:'Stefania K.', year:2026, tags:['first','after'],
+ { name:'Stefania K.', posted:'2026-04', year:2026, tags:['first','after'],
    excerpt:'As a first-time buyer, the process felt quite overwhelming, especially as I had just had a baby at the time. Patrizia was really helpful throughout',
    text:`As a first-time buyer, the process felt quite overwhelming, especially as I had just had a baby at the time. Patrizia was really helpful throughout — she explained things clearly, kept me updated during delays, and was always easy to reach.
 
 Even after moving in, she remained supportive when I had an issue with the boiler. I really appreciated her professionalism and responsiveness, and she made a real difference. I’d happily recommend her.` },
- { name:'Abid S.', year:2022, tags:['first','after'], size:'big', callout:'she assisted me on every occasion',
+ { name:'Abid S.', posted:'2022-11', order:65, year:2022, tags:['first','after'], size:'big', callout:'she assisted me on every occasion',
    excerpt:'I asked her about various things from the name of the colour of the paint in my home, to where to find the electric metre, and she assisted me on every occasion.',
    text:`I was assisted Georgia from Site Sales during my property purchase. All I can say is that she was terrific, right from the start till the end. She was warm, friendly and answered all my questions, no matter how small. I was a first time buyer and so everything was new to me, and Georgia helped me feel at ease with the process. She was professional yet warm and friendly. For example, after moving in, Georgia said I could email her with any questions, and so I did. I asked her about various things from the name of the colour of the paint in my home, to where to find the electric metre, and she assisted me on every occasion. It was a pleasure to meet her and I'm glad I was guided into my new home by Georgia.` },
- { name:'Mr Mehmets', year:2026, dev:'East Wick and Sweetwater', tags:['first'],
+ { name:'Mr Mehmets', posted:'2026-07', year:2026, dev:'East Wick and Sweetwater', tags:['first'],
    text:`Me and my partner recently purchased our first home through Regenta and we are extremely happy with the support we received throughout the whole home buying process. Zoë has been particularly helpful and has been very responsive and answered any questions we have - we are currently moving our things across and the whole team at EastWick and SweetWater continues to provide us with support and are very proactive in making the move as smooth as possible.` },
- { name:'Rosie S.', year:2025, tags:['first'],
+ { name:'Rosie S.', posted:'2025-11', order:45, year:2025, tags:['first'],
    text:`We have just completed on our first property and it wouldn’t have been possible without Georgia from the Site Sales team. She was always so informative, patient and kind to us. My partner was away overseas for the majority of the process, and Georgia supported me throughout. Everything was dealt with professionally but much quicker than we anticipated so we couldn’t have been happier :)` },
- { name:'Danielle D.', year:2022, tags:[], size:'dark',
+ { name:'Danielle D.', posted:'2022-11', order:60, year:2022, tags:[], size:'dark',
    excerpt:'She actually called me to let me know when a flat that was affordable for me came back up, and let me come back to see and measure the flat as many times as I needed to',
    text:`My first viewing was with a gentleman named Rob. He was so kind and made the experience really relaxed and pleasant, where I've found some places rush you and it's a bit stressful. I think the patient approach actually adds to the feel of the property. He even joined in helping me get a really nice video of the flat to show my family 🤣 from then on I dealt with Amy who went above and beyond repeatedly despite me being a bit of a pain at times. She actually called me to let me know when a flat that was affordable for me came back up, and let me come back to see and measure the flat as many times as I needed to and fielded my never ending questions. All my dreams are coming true now and the team has really contributed to it in a genuine way.` },
- { name:'Shane B.', year:2024, tags:[],
+ { name:'Shane B.', posted:'2024-11', order:75, year:2024, tags:[],
    text:`We had the pleasure of buying our flat through Deborah Thompson and Abby at Vodion. I can honestly say without their help I don't think we'd have gone for it.
 
 They were both super responsive without being pushy, and reassuring in their guidance and knowledge. Clearly two people passionate about their roles.
 
 Can't recommend them highly enough - they deserve a pay rise!` },
- { kind:'video', title:'Video case study', sub:'Coming soon', tags:['video'] },
- { name:'Melly B.', year:2021, dev:'Shared Ownership', tags:['so','first'], size:'big', callout:'a massive thank you to him',
+ { kind:'video', posted:'2026-11', order:55, title:'Video case study', sub:'Coming soon', tags:['video'] },
+ { name:'Melly B.', posted:'2021-11', order:95, year:2021, dev:'Shared Ownership', tags:['so','first'], size:'big', callout:'a massive thank you to him',
    excerpt:'without sam i dont think we wouldve been able to get a property at 20 so a massive thank you to him.',
    text:`if you are lucky enough to come across sam in your experience with site sales, count your lucky stars, he made buying the property very easy and simple. me and my girlfriend are very young and didnt know anything when coming to buy a property with shared ownership but sams contacts made it very easy for us. we needed a mortgage broker he knew someone. we needed a solicitor he knew someone. without sam i dont think we wouldve been able to get a property at 20 so a massive thank you to him.` },
- { name:'Stevie H.', year:2019, dev:'Trader’s Quarter, London', tags:['so'],
+ { name:'Stevie H.', posted:'2019-11', year:2019, dev:'Trader’s Quarter, London', tags:['so'],
    text:`Completed yesterday on a shared ownership scheme at Trader's Quarter in London. Richard Sinclair (the on site sales person) was very professional and honest. Any time my partner and I had a question, he was always quick to respond, and considerate of what a big deal this purchase was for us personally. He made the process alot of fun and exciting!` },
- { name:'Jadranka B.', year:2021, tags:[],
+ { name:'Jadranka B.', posted:'2021-11', year:2021, tags:[],
    excerpt:'She has been amazing in co-ordinating Help to Buy, solicitor and mortgage broker, really easy to get hold off and so efficient and sympathetic when providing updates on the stage of the purchase.',
    text:`Many, many thanks to Georgia Goldhawk for all her help during the whole process of purchasing the property, she has made the whole experience less stressful.
 
 She has been amazing in co-ordinating Help to Buy, solicitor and mortgage broker, really easy to get hold off and so efficient and sympathetic when providing updates on the stage of the purchase. We would not have been able to complete the purchase on time without her and Will's help.
 
 She was brilliant in ensuring an efficient handover, for helping us to get familiar with the property and for organising the information so efficiently.` },
- { name:'Gazelle S.', year:2024, tags:[],
+ { name:'Gazelle S.', posted:'2024-11', order:70, year:2024, tags:[],
    text:`The sales team Emily and Beste here were very helpful in accommodating my needs regarding extra appointments for measuring up, and sorting out an issue with access for my rather large cargo bike. They will always make themselves available to assist you and are quick to respond. Communication is excellent, service even better.` },
- { name:'Sergio B.', year:2025, tags:['after'], size:'dark',
+ { name:'Sergio B.', posted:'2025-11', order:85, year:2025, tags:['after'], size:'dark',
    excerpt:'Even though the sale is now complete, I still find myself occasionally calling Beste with questions about the property! Her patience seems endless',
    text:`I recently had the pleasure of purchasing a property through Site Sales Property Group, and I couldn’t be more impressed with their professionalism and efficiency. The entire team handled the process with great care, answering all my questions with patience and expertise, which made the experience smooth and stress-free.
 
@@ -214,11 +215,11 @@ I’d especially like to highlight Ms. Beste for her outstanding support and ded
 Even though the sale is now complete, I still find myself occasionally calling Beste with questions about the property! Her patience seems endless, and I’m incredibly grateful for her continued support.
 
 If you’re considering a property purchase, I highly recommend working with Site Sales Property Group.` },
- { name:'Ivan I.', year:2025, dev:'The Green, Loughton', tags:['so'],
+ { name:'Ivan I.', posted:'2025-11', year:2025, dev:'The Green, Loughton', tags:['so'],
    text:`We have got 2 bed flat through SO at The Green in Loughton.Georgia Goldhawk was our sales consultant and her impeccable services made our journey smooth and easy!So from behalf of my family I want to Thank her and who knows may be the next purchase is just around the corner and,we will use her services again.` },
- { name:'Julie L.', year:2022, tags:[],
+ { name:'Julie L.', posted:'2022-11', year:2022, tags:[],
    text:`Kelly Hannan is highly recommended. Professional and on point. This was a long distance sale as I live 3.5 hours away. It was absolutely the smoothest process from the beginning to the end. Kelly made contact and checked back at each point in the process. There literally was not one single glitch. She was beyond helpful and knowledgeable. I just can’t say how grateful I am to have her as a realtor. I was so impressed I made sure her supervisor was aware of this gem of a realtor on the team.` },
- { name:'Ben E.', year:2020, tags:['first'],
+ { name:'Ben E.', posted:'2020-11', year:2020, tags:['first'],
    excerpt:'As a first time buyer buying a property is daunting but Sam assured me the whole time everything was going swimmingly',
    text:`After enquiring about a property back in late july i was appointed my Agent , Sam.
 
@@ -233,9 +234,9 @@ I'm now happily moved in with my mrs and we are glad it went the way it did as i
 Thank you so much !
 
 Ben and Courtney` },
- { name:'Natalie F.', year:2024, tags:['after'],
+ { name:'Natalie F.', posted:'2024-11', year:2024, tags:['after'],
    text:`I highly recommend site sales. My flat is so beautiful and Irina has been Amazing and is still very helpful even after being in my flat for almost 6 months.` },
- { name:'Amber C.', year:2024, tags:['first'], size:'big', callout:'truly special',
+ { name:'Amber C.', posted:'2024-11', order:40, year:2024, tags:['first'], size:'big', callout:'truly special',
    excerpt:'They made my first home-buying experience not just successful, but truly special.',
    text:`Purchasing my first home with Site Sale was an absolute pleasure, and I couldn't be more impressed with the experience. The sales team, Beste and Emily, were exceptional from start to finish. Their professionalism, attention to detail, and genuine care for my needs throughout the buying process made all the difference.
 
@@ -248,13 +249,17 @@ const stars = (n = 5) => STAR.repeat(Math.floor(n)) + (n % 1 ? HALF : '');
 document.querySelectorAll('.rating .stars').forEach((el) => { el.innerHTML = stars(4.5); });
 
 const mosaic = document.getElementById('mosaic');
+// Order: highest Order number first (100 before 50 before 29), then everything without one,
+// newest first. To push a review to the top, give it a higher Order than any other.
+R.sort((a, b) => ((b.order ?? -Infinity) - (a.order ?? -Infinity)) || String(b.posted).localeCompare(String(a.posted)));
+const cards = [];
 R.forEach((r, i) => {
   const card = document.createElement('article');
   card.dataset.tags = r.tags.join(' ');
   if (r.kind === 'video') {
     card.className = 'card video';
     card.innerHTML = `<div class="thumb"><div class="play"><svg viewBox="0 0 16 18" fill="currentColor"><path d="M0 0l16 9-16 9z"/></svg></div><span class="dev" style="opacity:.75">${esc(r.sub)}</span><h3>${esc(r.title)}</h3></div>`;
-    mosaic.appendChild(card);
+    cards.push(card);
     return;
   }
   const short = !r.excerpt;
@@ -277,8 +282,24 @@ R.forEach((r, i) => {
   const open = () => show(r);
   card.addEventListener('click', open);
   card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
-  mosaic.appendChild(card);
+  cards.push(card);
 });
+
+// Lay the cards out in columns, left to right: each card goes into whichever column is shortest,
+// so the order reads across the page (plain CSS columns would read down the first column first).
+const COLS = [[600, 1], [991, 2], [Infinity, 3]];
+let colCount = 0;
+function layout(force) {
+  const n = COLS.find(([w]) => window.innerWidth <= w)[1];
+  if (n === colCount && !force) return;
+  colCount = n;
+  const cols = Array.from({ length: n }, () => Object.assign(document.createElement('div'), { className: 'mosaic-col' }));
+  mosaic.replaceChildren(...cols);
+  cards.filter((c) => !c.hidden).forEach((c) => cols.reduce((a, b) => (b.offsetHeight < a.offsetHeight ? b : a)).appendChild(c));
+}
+layout(true);
+window.addEventListener('resize', () => layout());
+document.fonts?.ready.then(() => layout(true));
 
 // Full review: the whole text, with the card's excerpt highlighted so you can see where it came from.
 const dlg = document.getElementById('dlg');
@@ -307,7 +328,8 @@ dlg.addEventListener('click', (e) => { if (e.target === dlg || e.target.closest(
 document.querySelectorAll('.chip').forEach((chip) => chip.addEventListener('click', () => {
   document.querySelectorAll('.chip').forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
   const tag = chip.dataset.tag;
-  mosaic.querySelectorAll('.card').forEach((c) => { c.hidden = !!tag && !c.dataset.tags.split(' ').includes(tag); });
+  cards.forEach((c) => { c.hidden = !!tag && !c.dataset.tags.split(' ').includes(tag); });
+  layout(true);
 }));
 </script>
 </body>
