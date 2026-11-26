@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mock: Service template options | Regenta (#57)</title>
+<script src="https://use.typekit.net/ptn3etu.js"></script>
+<script>try{Typekit.load();}catch(e){}</script>
+<style>
+  /* Mock only: three layouts for the Services template, filled with the real Sales item.
+     Every piece of copy, the image, the contact and the form fields come from the CMS item
+     (Hero Copy, Hero Image, Content Part 1, Lead Contact, FormSpark form). Nothing invented. */
+  :root { --green:#0b2b26; --green-2:#173833; --sand:#e3e5db; --line:rgba(11,43,38,.2); }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--sand); color:var(--green); font-family:area-normal, area, "Area Normal", system-ui, sans-serif; }
+  .g { font-family:Griffiths, serif; font-weight:400; font-style:normal; }
+  a { color:inherit; text-decoration:none; }
+  img { display:block; max-width:100%; }
+  .wrap { width:100%; max-width:1440px; margin:0 auto; padding:0 2rem; }
+  .eyebrow { font-size:.72rem; letter-spacing:.22em; text-transform:uppercase; font-weight:600; opacity:.7; margin:0 0 1.25rem; }
+  .h1 { font-size:clamp(3.2rem, 7vw, 6.5rem); line-height:.92; font-weight:700; letter-spacing:-.01em; margin:0; }
+  .h2 { font-size:clamp(2rem, 3.4vw, 3.2rem); line-height:1.08; font-weight:700; margin:0; }
+  .lead { font-size:clamp(1.2rem, 1.6vw, 1.45rem); line-height:1.45; margin:0; }
+  .body p { font-size:1.1rem; line-height:1.6; margin:0 0 1.25rem; }
+  .btn { display:inline-flex; align-items:center; gap:1rem; border-radius:99px; padding:1.05rem 2rem; font-size:1rem; border:1px solid currentColor; transition:background .3s, color .3s; cursor:pointer; background:none; font-family:inherit; color:inherit; }
+  .btn.solid { background:var(--sand); color:var(--green); border-color:var(--sand); }
+  .btn.dark { background:var(--green); color:var(--sand); border-color:var(--green); }
+  .btn:hover { background:#fff; color:var(--green); border-color:#fff; }
+
+  /* nav: static copy, professional set with the new Services / Homes switch */
+  .nav { position:absolute; inset:0 0 auto 0; z-index:10; height:112px; display:flex; align-items:center; color:#fff; }
+  .nav.on-sand { color:var(--green); }
+  .nav .wrap { display:flex; align-items:center; justify-content:space-between; }
+  .nav-l { display:flex; align-items:center; gap:2rem; }
+  .logo { font-size:1.8rem; letter-spacing:.06em; font-weight:500; }
+  .switch { display:flex; gap:1.5rem; padding-left:2rem; border-left:1px solid currentColor; font-size:.85rem; }
+  .switch span:last-child { opacity:.55; }
+  .links { display:flex; gap:1.75rem; align-items:center; font-size:.62rem; letter-spacing:.2em; font-weight:600; }
+  .pill { background:var(--sand); color:var(--green); border-radius:99px; padding:.8rem 1.4rem; letter-spacing:0; font-size:1rem; font-weight:500; }
+  .on-sand .pill { background:var(--green); color:var(--sand); }
+
+  /* contact: person + always-open form (replaces the "Contact Form" dropdown) */
+  .person { display:flex; gap:1.25rem; align-items:center; }
+  .person img { width:5.5rem; height:5.5rem; border-radius:50%; object-fit:cover; object-position:top; }
+  .person b { display:block; font-size:1.25rem; }
+  .person span { opacity:.75; font-size:.95rem; }
+  .form { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  .form label { display:flex; flex-direction:column; gap:.45rem; font-size:.85rem; }
+  .form .full { grid-column:1 / -1; }
+  .form input, .form textarea { font:inherit; font-size:1rem; color:inherit; background:transparent; border:1px solid currentColor; border-radius:.75rem; padding:.9rem 1rem; opacity:.9; }
+  .form textarea { min-height:7.5rem; resize:vertical; }
+  .form .check { flex-direction:row; align-items:center; gap:.6rem; }
+  .form .check input { width:1.1rem; height:1.1rem; padding:0; }
+  .form .check a { text-decoration:underline; }
+  .form .row-end { grid-column:1 / -1; display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap; }
+
+  /* reused sections, unchanged (placeholders) */
+  .reuse { margin:0 2rem 1.5rem; border:2px dashed rgba(11,43,38,.35); border-radius:1rem; padding:2.25rem; text-align:center; font-size:.95rem; }
+  .reuse b { display:block; font-size:1.15rem; margin-bottom:.35rem; }
+
+  /* ---------- A: green panel hero ---------- */
+  .a-hero { background:var(--green); color:var(--sand); border-radius:0 0 1.5rem 1.5rem; padding:11rem 0 4.5rem; }
+  .a-hero .wrap { display:grid; grid-template-columns:1.15fr 1fr; gap:4rem; align-items:end; }
+  .a-hero .h1 { margin-bottom:2rem; }
+  .a-hero .lead { max-width:38rem; margin-bottom:1.25rem; }
+  .a-hero p.sub { opacity:.8; line-height:1.55; max-width:34rem; margin:0 0 2.25rem; }
+  .a-hero .img { aspect-ratio:4/5; border-radius:1rem; overflow:hidden; max-height:34rem; justify-self:end; width:100%; }
+  .a-hero .img img { width:100%; height:100%; object-fit:cover; }
+  .a-body { padding:7rem 0 5rem; }
+  .a-body .wrap { display:grid; grid-template-columns:1fr 1fr; gap:5rem; }
+  .a-quote { grid-column:1 / -1; font-family:Griffiths, serif; font-size:clamp(1.8rem, 3vw, 2.8rem); line-height:1.2; margin:1rem 0 0; padding-top:3rem; border-top:1px solid var(--line); max-width:62rem; }
+  .a-contact { background:var(--green); color:var(--sand); border-radius:1.5rem; margin:0 2rem 6rem; padding:4.5rem 3.5rem; display:grid; grid-template-columns:1fr 1.3fr; gap:4rem; }
+  .a-contact .h2 { margin:0 0 2rem; }
+  .a-contact .person { margin-bottom:2rem; }
+  .a-contact .direct { display:flex; flex-direction:column; gap:.6rem; font-size:1.05rem; }
+  .a-contact .direct a { border-bottom:1px solid rgba(227,229,219,.3); padding-bottom:.6rem; display:flex; justify-content:space-between; }
+
+  /* ---------- B: full-bleed image hero, sticky contact card ---------- */
+  .b-hero { position:relative; min-height:88svh; color:#fff; display:flex; align-items:flex-end; overflow:hidden; }
+  .b-hero img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .b-hero::after { content:""; position:absolute; inset:0; background:linear-gradient(90deg, rgba(11,43,38,.92) 0%, rgba(11,43,38,.7) 45%, rgba(11,43,38,.1) 100%), linear-gradient(0deg, rgba(11,43,38,.85) 0%, rgba(11,43,38,0) 45%); }
+  .b-hero .wrap { position:relative; z-index:1; padding-bottom:5rem; }
+  .b-hero .h1 { margin-bottom:1.75rem; }
+  .b-hero .lead { max-width:40rem; margin-bottom:2.25rem; }
+  .b-hero .btns { display:flex; gap:.75rem; flex-wrap:wrap; }
+  .b-body { padding:6.5rem 0 6rem; }
+  .b-body .wrap { display:grid; grid-template-columns:1.3fr 1fr; gap:5rem; align-items:start; }
+  .b-body .intro { font-size:clamp(1.4rem, 2vw, 1.8rem); line-height:1.4; font-weight:500; margin:0 0 2.5rem; }
+  .b-quote { margin:2.5rem 0; padding:2rem 0 2rem 2rem; border-left:2px solid var(--green); font-family:Griffiths, serif; font-size:clamp(1.5rem, 2.2vw, 2rem); line-height:1.25; }
+  .b-card { position:sticky; top:7rem; background:var(--green); color:var(--sand); border-radius:1.5rem; padding:2.25rem; }
+  .b-card .h3 { font-size:1.9rem; font-weight:700; line-height:1.1; margin:0 0 1.75rem; }
+  .b-card .person { margin-bottom:1.75rem; padding-bottom:1.75rem; border-bottom:1px solid rgba(227,229,219,.2); }
+  .b-card .form { grid-template-columns:1fr; gap:.8rem; }
+  .b-card .form textarea { min-height:6rem; }
+
+  /* ---------- C: statement-led, image band, contact at the end ---------- */
+  .c-hero { padding:12rem 0 4rem; }
+  .c-hero .top { display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; margin-bottom:3rem; }
+  .c-hero .h1 { font-size:clamp(3.6rem, 9vw, 8.5rem); }
+  .c-hero .jump { display:flex; gap:.75rem; flex-wrap:wrap; }
+  .c-statement { font-size:clamp(1.7rem, 3vw, 2.8rem); line-height:1.15; font-weight:700; max-width:68rem; margin:0; }
+  .c-statement .g { font-size:1.06em; }
+  .c-img { margin:0 2rem; border-radius:1.5rem; overflow:hidden; aspect-ratio:21/9; }
+  .c-img img { width:100%; height:100%; object-fit:cover; }
+  .c-body { padding:6rem 0 5rem; }
+  .c-body .wrap { display:grid; grid-template-columns:16rem 1fr; gap:4rem; }
+  .c-body .col { max-width:46rem; }
+  .c-quote { font-family:Griffiths, serif; font-size:clamp(1.7rem, 2.8vw, 2.5rem); line-height:1.2; margin:2.5rem 0; }
+  .c-index { padding:1rem 0 6rem; }
+  .c-row { display:grid; grid-template-columns:4rem 1fr 1.4fr 2rem; gap:2rem; align-items:center; padding:1.75rem 0; border-top:1px solid var(--line); }
+  .c-row:last-child { border-bottom:1px solid var(--line); }
+  .c-row .n { font-size:.75rem; letter-spacing:.2em; }
+  .c-row .t { font-size:clamp(1.5rem, 2.2vw, 2rem); font-weight:700; }
+  .c-row:hover .t { font-family:Griffiths, serif; font-weight:400; }
+  .c-row .s { opacity:.8; line-height:1.5; }
+  .c-row.is-current { opacity:.4; pointer-events:none; }
+  .c-contact { background:var(--green); color:var(--sand); border-radius:1.5rem; margin:0 2rem 6rem; padding:4.5rem 3.5rem; display:grid; grid-template-columns:1fr 1.3fr; gap:4rem; align-items:start; }
+  .c-contact .h2 { margin:1.5rem 0 1.25rem; }
+  .c-contact p { opacity:.8; line-height:1.55; max-width:28rem; }
+
+  /* switcher + notes (mock chrome) */
+  .opt { display:none; } .opt.is-on { display:block; }
+  .picker { position:fixed; left:50%; transform:translateX(-50%); bottom:1rem; z-index:50; display:flex; gap:.35rem; background:#fff; border-radius:99px; padding:.35rem; box-shadow:0 8px 30px rgba(0,0,0,.25); font:14px/1 system-ui, sans-serif; }
+  .picker button { border:0; background:none; border-radius:99px; padding:.7rem 1.1rem; cursor:pointer; font:inherit; color:#0b2b26; }
+  .picker button.is-on { background:#0b2b26; color:#fff; }
+  .note { position:fixed; right:1rem; top:1rem; z-index:50; background:#fff; color:#0b2b26; border-radius:.75rem; padding:.9rem 1rem; font:13px/1.45 system-ui, sans-serif; max-width:21rem; box-shadow:0 8px 30px rgba(0,0,0,.2); }
+  .note b { display:block; margin-bottom:.25rem; }
+  .note button { float:right; border:0; background:none; cursor:pointer; font-size:16px; line-height:1; margin:-.2rem -.3rem 0 .5rem; }
+
+  @media (max-width: 991px) {
+    .links a:not(.pill) { display:none; }
+    .a-hero .wrap, .a-body .wrap, .a-contact, .b-body .wrap, .c-contact, .c-body .wrap { grid-template-columns:1fr; gap:2.5rem; }
+    .a-hero .img { aspect-ratio:4/3; max-height:none; }
+    .b-card { position:static; }
+    .c-row { grid-template-columns:2.5rem 1fr 1.5rem; } .c-row .s { display:none; }
+  }
+  @media (max-width: 767px) {
+    .wrap { padding:0 1rem; }
+    .nav { height:76px; } .logo { font-size:1.35rem; } .switch { padding-left:1rem; gap:1rem; font-size:.75rem; } .nav-l { gap:1rem; } .pill { display:none; }
+    .a-hero { padding:8rem 0 2.5rem; border-radius:0 0 1.25rem 1.25rem; }
+    .a-body, .b-body, .c-body { padding:4rem 0 3rem; }
+    .a-contact, .c-contact { margin:0 1rem 4rem; padding:2.5rem 1.5rem; border-radius:1.25rem; }
+    .form { grid-template-columns:1fr; }
+    .b-hero { min-height:80svh; } .b-hero .wrap { padding-bottom:3rem; }
+    .c-hero { padding:8rem 0 2.5rem; } .c-hero .top { flex-direction:column; align-items:flex-start; } .c-img { margin:0 1rem; aspect-ratio:4/3; border-radius:1.25rem; }
+    .reuse { margin:0 1rem 1rem; }
+    .note { left:1rem; right:1rem; top:auto; bottom:4.5rem; max-width:none; }
+    .picker button { white-space:nowrap; padding:.65rem .8rem; font-size:12px; }
+    .picker .long { display:none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== A ===================== -->
+<div class="opt is-on" data-opt="A">
+  <header class="nav"><div class="wrap">
+    <div class="nav-l"><span class="logo">REGENTA</span><span class="switch"><span>Services</span><span>Homes</span></span></div>
+    <nav class="links"><a>OUR SERVICES</a><a>ABOUT US</a><a>BUILT BY REGENTA</a><a>CASE STUDIES</a><a>NEWS</a><a>CONTACT US</a><a class="pill">Properties</a></nav>
+  </div></header>
+
+  <section class="a-hero"><div class="wrap">
+    <div>
+      <p class="eyebrow">Our services</p>
+      <h1 class="h1">Sales</h1>
+      <p class="lead">The numbers speak for themselves: three decades of excellence, delivering transformative sales solutions and efficient marketing programmes for premium developments.</p>
+      <p class="sub">We have acquired a special talent for illuminating the unique character of each project through bespoke strategies, tailored to the specific ambitions of every client partnership.</p>
+      <a class="btn" href="#a-contact">Talk to Ross <span>↓</span></a>
+    </div>
+    <div class="img"><img src="https://cdn.prod.website-files.com/63e575590da52be2a3c31dcf/66e835ded598ee599e7e39b0_198_HiRes_BuyersJourney_Corporate_SiteSales_4K8A8998_1_30.jpg" alt=""></div>
+  </div></section>
+
+  <section class="a-body"><div class="wrap body">
+    <p class="lead">What distinguishes us from traditional estate agencies is our absolute focus on new homes. Specialising exclusively within this highly competitive market segment, we are intimately attuned to the new build homebuyer journey and deploy innovative methodologies designed to enhance this experience.</p>
+    <div><p>How do we stay relentless? Relentless is our ethos. From management down to trainees, our training sessions explore emerging techniques, ensure every aspect of the customer journey is considered which keeps us at the cutting edge, ably backed up by specialised leadership training for our management team. By investing in our staff, we consistently deliver exceptional sales service for our clients.</p></div>
+    <blockquote class="a-quote">“Our sales division comprises a team of exceptional professionals who leverage their expertise across both private and affordable housing sectors to orchestrate diverse tenure schemes to exacting standards.”</blockquote>
+  </div></section>
+
+  <div class="reuse"><b>Recent work</b>Three case studies for this service (as now)</div>
+
+  <section class="a-contact" id="a-contact" style="margin-top:5rem">
+    <div>
+      <p class="eyebrow">Talk to us</p>
+      <h2 class="h2">Talk to Ross <span class="g">today</span></h2>
+      <div class="person"><img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/6842ebc8caeb8db3c2afa781_Ross.avif" alt=""><div><b>Ross Smith</b><span>Director and Sales lead contact</span></div></div>
+      <div class="direct"><a href="#">ross@regenta.co.uk <span>↗</span></a><a href="#">+44 (0)20 8502 5758 <span>↗</span></a></div>
+    </div>
+    <form class="form" onsubmit="return false">
+      <label>Name*<input></label><label>Email*<input></label>
+      <label class="full">Phone number<input></label>
+      <label class="full">Message<textarea placeholder="Tell us about your scheme"></textarea></label>
+      <div class="row-end"><label class="check"><input type="checkbox"> I have read and agree to your <a href="#">Privacy Policy</a>*</label><button class="btn solid">Send message →</button></div>
+    </form>
+  </section>
+
+  <div class="reuse"><b>Built by Regenta strip</b>Unchanged</div>
+  <div class="reuse"><b>Other services</b>Our services carousel (as now)</div>
+  <div class="reuse"><b>Footer</b></div>
+</div>
+
+<!-- ===================== B ===================== -->
+<div class="opt" data-opt="B">
+  <header class="nav"><div class="wrap">
+    <div class="nav-l"><span class="logo">REGENTA</span><span class="switch"><span>Services</span><span>Homes</span></span></div>
+    <nav class="links"><a>OUR SERVICES</a><a>ABOUT US</a><a>BUILT BY REGENTA</a><a>CASE STUDIES</a><a>NEWS</a><a>CONTACT US</a><a class="pill">Properties</a></nav>
+  </div></header>
+
+  <section class="b-hero">
+    <img src="https://cdn.prod.website-files.com/63e575590da52be2a3c31dcf/66e835ded598ee599e7e39b0_198_HiRes_BuyersJourney_Corporate_SiteSales_4K8A8998_1_30.jpg" alt="">
+    <div class="wrap">
+      <p class="eyebrow">Our services</p>
+      <h1 class="h1">Sales</h1>
+      <p class="lead">The numbers speak for themselves: three decades of excellence, delivering transformative sales solutions and efficient marketing programmes for premium developments.</p>
+      <div class="btns"><a class="btn solid" href="#b-card">Talk to Ross</a><a class="btn" href="#">See our work</a></div>
+    </div>
+  </section>
+
+  <section class="b-body"><div class="wrap">
+    <div class="body">
+      <p class="intro">We have acquired a special talent for illuminating the unique character of each project through bespoke strategies, tailored to the specific ambitions of every client partnership.</p>
+      <p>What distinguishes us from traditional estate agencies is our absolute focus on new homes. Specialising exclusively within this highly competitive market segment, we are intimately attuned to the new build homebuyer journey and deploy innovative methodologies designed to enhance this experience.</p>
+      <blockquote class="b-quote">Our sales division comprises a team of exceptional professionals who leverage their expertise across both private and affordable housing sectors to orchestrate diverse tenure schemes to exacting standards.</blockquote>
+      <p>How do we stay relentless? Relentless is our ethos. From management down to trainees, our training sessions explore emerging techniques, ensure every aspect of the customer journey is considered which keeps us at the cutting edge, ably backed up by specialised leadership training for our management team. By investing in our staff, we consistently deliver exceptional sales service for our clients.</p>
+    </div>
+    <aside class="b-card" id="b-card">
+      <h2 class="h3">Talk to Ross <span class="g">today</span></h2>
+      <div class="person"><img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/6842ebc8caeb8db3c2afa781_Ross.avif" alt=""><div><b>Ross Smith</b><span>Director and Sales lead contact</span><br><a href="#" style="text-decoration:underline">ross@regenta.co.uk</a></div></div>
+      <form class="form" onsubmit="return false">
+        <label>Name*<input></label><label>Email*<input></label><label>Phone number<input></label>
+        <label>Message<textarea></textarea></label>
+        <label class="check"><input type="checkbox"> I agree to the <a href="#">Privacy Policy</a>*</label>
+        <button class="btn solid" style="justify-content:center">Send message →</button>
+      </form>
+    </aside>
+  </div></section>
+
+  <div class="reuse"><b>Recent work</b>Three case studies for this service (as now)</div>
+  <div class="reuse"><b>Built by Regenta strip</b>Unchanged</div>
+  <div class="reuse"><b>Other services</b>Our services carousel (as now)</div>
+  <div class="reuse"><b>Footer</b></div>
+</div>
+
+<!-- ===================== C ===================== -->
+<div class="opt" data-opt="C">
+  <header class="nav on-sand"><div class="wrap">
+    <div class="nav-l"><span class="logo">REGENTA</span><span class="switch"><span>Services</span><span>Homes</span></span></div>
+    <nav class="links"><a>OUR SERVICES</a><a>ABOUT US</a><a>BUILT BY REGENTA</a><a>CASE STUDIES</a><a>NEWS</a><a>CONTACT US</a><a class="pill">Properties</a></nav>
+  </div></header>
+
+  <section class="c-hero"><div class="wrap">
+    <div class="top">
+      <div><p class="eyebrow">Our services · 01</p><h1 class="h1">Sales</h1></div>
+      <div class="jump"><a class="btn dark" href="#c-contact">Talk to Ross</a><a class="btn" href="#">Recent work</a></div>
+    </div>
+    <p class="c-statement">The numbers speak for themselves: <span class="g">three decades of excellence</span>, delivering transformative sales solutions and efficient marketing programmes for premium developments.</p>
+  </div></section>
+  <div class="c-img"><img src="https://cdn.prod.website-files.com/63e575590da52be2a3c31dcf/66e835ded598ee599e7e39b0_198_HiRes_BuyersJourney_Corporate_SiteSales_4K8A8998_1_30.jpg" alt=""></div>
+
+  <section class="c-body"><div class="wrap">
+    <p class="eyebrow">How we work</p>
+    <div class="col body">
+      <p class="lead" style="margin-bottom:1.75rem">We have acquired a special talent for illuminating the unique character of each project through bespoke strategies, tailored to the specific ambitions of every client partnership.</p>
+      <p>What distinguishes us from traditional estate agencies is our absolute focus on new homes. Specialising exclusively within this highly competitive market segment, we are intimately attuned to the new build homebuyer journey and deploy innovative methodologies designed to enhance this experience.</p>
+      <blockquote class="c-quote">“Our sales division comprises a team of exceptional professionals who leverage their expertise across both private and affordable housing sectors to orchestrate diverse tenure schemes to exacting standards.”</blockquote>
+      <p>How do we stay relentless? Relentless is our ethos. From management down to trainees, our training sessions explore emerging techniques, ensure every aspect of the customer journey is considered which keeps us at the cutting edge, ably backed up by specialised leadership training for our management team. By investing in our staff, we consistently deliver exceptional sales service for our clients.</p>
+    </div>
+  </div></section>
+
+  <div class="reuse"><b>Recent work</b>Three case studies for this service (as now)</div>
+
+  <section class="c-contact" id="c-contact" style="margin-top:5rem">
+    <div>
+      <div class="person"><img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/6842ebc8caeb8db3c2afa781_Ross.avif" alt=""><div><b>Ross Smith</b><span>Director and Sales lead contact</span></div></div>
+      <h2 class="h2">Talk to Ross <span class="g">today</span></h2>
+      <p>Email <a href="#" style="text-decoration:underline">ross@regenta.co.uk</a> or call +44 (0)20 8502 5758, or send a message here.</p>
+    </div>
+    <form class="form" onsubmit="return false">
+      <label>Name*<input></label><label>Email*<input></label>
+      <label class="full">Phone number<input></label>
+      <label class="full">Message<textarea></textarea></label>
+      <div class="row-end"><label class="check"><input type="checkbox"> I have read and agree to your <a href="#">Privacy Policy</a>*</label><button class="btn solid">Send message →</button></div>
+    </form>
+  </section>
+
+  <section class="c-index"><div class="wrap">
+    <p class="eyebrow">Other services</p>
+    <a class="c-row is-current"><span class="n">01</span><span class="t">Sales</span><span class="s">You're here</span><span>→</span></a>
+    <a class="c-row" href="#"><span class="n">02</span><span class="t">Marketing</span><span class="s">Collaborating with some of London's most visionary design, media and creative partners.</span><span>→</span></a>
+    <a class="c-row" href="#"><span class="n">03</span><span class="t">Market Intelligence</span><span class="s">Link Description from the CMS</span><span>→</span></a>
+    <a class="c-row" href="#"><span class="n">04</span><span class="t">Development Consultancy</span><span class="s">Link Description from the CMS</span><span>→</span></a>
+  </div></section>
+
+  <div class="reuse"><b>Built by Regenta strip</b>Unchanged</div>
+  <div class="reuse"><b>Footer</b></div>
+</div>
+
+<div class="picker" role="tablist">
+  <button class="is-on" data-pick="A">A<span class="long"> · Green panel</span></button>
+  <button data-pick="B">B<span class="long"> · Photo + side card</span></button>
+  <button data-pick="C">C<span class="long"> · Statement-led</span></button>
+</div>
+
+<div class="note" id="note"><button aria-label="Close" onclick="this.parentNode.remove()">×</button>
+  <b data-note-title>A · Green panel hero</b><span data-note-body></span>
+</div>
+
+<script>
+  const NOTES = {
+    A: ['A · Green panel hero', 'Same rounded green panel as Purchaser stories and the Property Search bar. Name big, statement as the lead, photo as a rounded card. Body in two columns with the blockquote as a full-width pull quote. Contact is its own green section with Ross, email, phone and the form always open, no dropdown.'],
+    B: ['B · Photo hero, side card', 'Closest to today: full-bleed photo with the Professional Services gradient. The contact card sits beside the body copy and stays in view as you read (sticky), with the form open inside it. Two buttons in the hero: Talk to Ross, See our work.'],
+    C: ['C · Statement-led', 'Sand hero with the service name very large and the statement as a big heading (an italic phrase from the CMS rich text becomes the Griffiths emphasis). Photo as a wide rounded band. Contact after Recent work, then an Other services list in the Professional Services style instead of the carousel.'],
+  };
+  const pick = (k) => {
+    document.querySelectorAll('.opt').forEach(o => o.classList.toggle('is-on', o.dataset.opt === k));
+    document.querySelectorAll('[data-pick]').forEach(b => b.classList.toggle('is-on', b.dataset.pick === k));
+    const n = document.getElementById('note'); if (n) { n.querySelector('[data-note-title]').textContent = NOTES[k][0]; n.querySelector('[data-note-body]').textContent = NOTES[k][1]; }
+    history.replaceState(null, '', '#' + k); window.scrollTo(0, 0);
+  };
+  document.querySelectorAll('[data-pick]').forEach(b => b.addEventListener('click', () => pick(b.dataset.pick)));
+  pick((location.hash || '#A').slice(1).toUpperCase().replace(/[^ABC]/g, '') || 'A');
+</script>
+</body>
+</html>
