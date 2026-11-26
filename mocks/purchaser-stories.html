@@ -43,7 +43,9 @@ h1 .g { font-size:1.12em; }
 .card.is-click:hover { transform:translateY(-4px); box-shadow:0 24px 48px -28px rgba(11,43,38,.35); }
 .mark { width:2.2rem; height:auto; color:currentColor; opacity:.25; }
 .quote { font-size:1.12rem; line-height:1.5; }
-.card.big .quote { font-family:Griffiths, serif; font-size:1.85rem; line-height:1.18; letter-spacing:-.005em; }
+.card.big .quote { font-size:1.2rem; line-height:1.5; }
+/* A few key words from the quote, in Griffiths at 1.6x the copy around them */
+.callout { font-family:Griffiths, serif; font-weight:400; font-size:1.6em; line-height:1.1; letter-spacing:-.005em; padding-right:.12em; }
 .card.big { background:var(--sand); }
 .card.dark { background:var(--green); color:var(--sand); }
 .who { display:flex; align-items:center; gap:.85rem; margin-top:auto; }
@@ -84,7 +86,7 @@ dialog[open] { animation:pop .45s var(--ease); }
 .dlg .meta a { text-decoration:underline; text-underline-offset:3px; }
 
 @media (max-width:991px) { .mosaic { columns:2; } .st-hero .wrap { grid-template-columns:1fr; } .rating { justify-self:start; } }
-@media (max-width:600px) { .wrap { padding:0 1rem; } .mosaic { columns:1; } .st-hero { padding:5rem 0 3.5rem; } .dlg { padding:2rem 1.5rem; } .card.big .quote { font-size:1.6rem; } }
+@media (max-width:600px) { .wrap { padding:0 1rem; } .mosaic { columns:1; } .st-hero { padding:5rem 0 3.5rem; } .dlg { padding:2rem 1.5rem; } }
 </style>
 </head>
 <body>
@@ -143,7 +145,7 @@ const MARK = '<svg class="mark" viewBox="0 0 44 32" fill="currentColor" aria-hid
 // size: big (sand, Griffiths), dark, or normal. Names as they appear on Google, shortened to first name + initial.
 const R = [
  { name:'Chiara M.', year:2026, date:'23 April 2026', dev:'Shared Ownership', tags:['so','first'], size:'big',
-   source:'trustpilot', title:'Thank you Amy - you are the best!', url:'https://uk.trustpilot.com/reviews/69ea6bb767c2a32c3c9e28d4',
+   source:'trustpilot', title:'Thank you Amy - you are the best!', callout:'just 28 days', url:'https://uk.trustpilot.com/reviews/69ea6bb767c2a32c3c9e28d4',
    excerpt:'I completed on my home just 28 days after submitting my application - an exceptionally fast turnaround.',
    text:`I had an excellent experience with Regenta while purchasing my home through the shared ownership scheme. I was supported throughout the entire process by Amy, who was absolutely outstanding from start to finish.
 
@@ -169,7 +171,7 @@ She kept us well informed throughout the process and made everything feel smooth
    text:`As a first-time buyer, the process felt quite overwhelming, especially as I had just had a baby at the time. Patrizia was really helpful throughout — she explained things clearly, kept me updated during delays, and was always easy to reach.
 
 Even after moving in, she remained supportive when I had an issue with the boiler. I really appreciated her professionalism and responsiveness, and she made a real difference. I’d happily recommend her.` },
- { name:'Abid S.', year:2022, tags:['first','after'], size:'big',
+ { name:'Abid S.', year:2022, tags:['first','after'], size:'big', callout:'the colour of the paint',
    excerpt:'I asked her about various things from the name of the colour of the paint in my home, to where to find the electric metre, and she assisted me on every occasion.',
    text:`I was assisted Georgia from Site Sales during my property purchase. All I can say is that she was terrific, right from the start till the end. She was warm, friendly and answered all my questions, no matter how small. I was a first time buyer and so everything was new to me, and Georgia helped me feel at ease with the process. She was professional yet warm and friendly. For example, after moving in, Georgia said I could email her with any questions, and so I did. I asked her about various things from the name of the colour of the paint in my home, to where to find the electric metre, and she assisted me on every occasion. It was a pleasure to meet her and I'm glad I was guided into my new home by Georgia.` },
  { name:'Mr Mehmets', year:2026, dev:'East Wick and Sweetwater', tags:['first'],
@@ -186,7 +188,7 @@ They were both super responsive without being pushy, and reassuring in their gui
 
 Can't recommend them highly enough - they deserve a pay rise!` },
  { kind:'video', title:'Video case study', sub:'Coming soon', tags:['video'] },
- { name:'Melly B.', year:2021, dev:'Shared Ownership', tags:['so','first'], size:'big',
+ { name:'Melly B.', year:2021, dev:'Shared Ownership', tags:['so','first'], size:'big', callout:'a property at 20',
    excerpt:'without sam i dont think we wouldve been able to get a property at 20 so a massive thank you to him.',
    text:`if you are lucky enough to come across sam in your experience with site sales, count your lucky stars, he made buying the property very easy and simple. me and my girlfriend are very young and didnt know anything when coming to buy a property with shared ownership but sams contacts made it very easy for us. we needed a mortgage broker he knew someone. we needed a solicitor he knew someone. without sam i dont think we wouldve been able to get a property at 20 so a massive thank you to him.` },
  { name:'Stevie H.', year:2019, dev:'Trader’s Quarter, London', tags:['so'],
@@ -230,7 +232,7 @@ Thank you so much !
 Ben and Courtney` },
  { name:'Natalie F.', year:2024, tags:['after'],
    text:`I highly recommend site sales. My flat is so beautiful and Irina has been Amazing and is still very helpful even after being in my flat for almost 6 months.` },
- { name:'Amber C.', year:2024, tags:['first'], size:'big',
+ { name:'Amber C.', year:2024, tags:['first'], size:'big', callout:'truly special',
    excerpt:'They made my first home-buying experience not just successful, but truly special.',
    text:`Purchasing my first home with Site Sale was an absolute pleasure, and I couldn't be more impressed with the experience. The sales team, Beste and Emily, were exceptional from start to finish. Their professionalism, attention to detail, and genuine care for my needs throughout the buying process made all the difference.
 
@@ -257,7 +259,8 @@ R.forEach((r, i) => {
   card.tabIndex = 0;
   card.setAttribute('role', 'button');
   card.setAttribute('aria-label', `Read ${r.name}'s full review`);
-  const body = short ? r.text.split(/\n\n+/).map((p) => `<p class="quote">${esc(p)}</p>`).join('') : `<p class="quote">…${esc(r.excerpt)}…</p>`;
+  const ex = r.callout ? esc(r.excerpt).replace(esc(r.callout), `<span class="callout">${esc(r.callout)}</span>`) : esc(r.excerpt || '');
+  const body = short ? r.text.split(/\n\n+/).map((p) => `<p class="quote">${esc(p)}</p>`).join('') : `<p class="quote">…${ex}${/[.!?]$/.test(r.excerpt) ? '' : '…'}</p>`;
   card.innerHTML = `${MARK}${r.dev ? `<span class="dev">${esc(r.dev)}</span>` : ''}${body}
     <div class="who"><div class="avatar">${initials(r.name)}</div><div><b>${esc(r.name)}</b><span>${r.year}</span></div></div>
     <div class="meta"><span class="gmark">${SRC[r.source || 'google'].mark} ${SRC[r.source || 'google'].label}</span>${short ? '' : '<span class="more">Read full review</span>'}</div>`;
