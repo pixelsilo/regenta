@@ -55,6 +55,7 @@ function setup(wrap) {
   // --- build the list from the select's options --------------------------------
   function build() {
     list.textContent = '';
+    order = [];
     options = [...select.options].map((opt, i) => {
       const el = template.cloneNode(true);
       el.id = `${id}-opt-${i}`;
@@ -102,13 +103,27 @@ function setup(wrap) {
       el.setAttribute('aria-disabled', String(off));
       if (off) el.classList.remove('is-active');
     });
+    reorder();
   }
 
   const usable = (i) => !select.options[i]?.disabled;
-  // Arrow keys step over greyed-out options.
-  function step(from, dir) {
-    for (let i = from + dir; i >= 0 && i < options.length; i += dir) if (usable(i)) return i;
-    return from;
+
+  // Available options first, greyed-out ones after (each group keeps its CMS order), so with a
+  // long list like locations you don't scroll past greyed rows to reach the ones that work.
+  // Only our list moves: the native select keeps its order.
+  let order = [];
+  function reorder() {
+    const next = options.map((_, n) => n).sort((a, b) => (usable(b) - usable(a)) || a - b);
+    if (next.join() === order.join()) return;
+    order = next;
+    order.forEach((n) => list.appendChild(options[n]));
+  }
+
+  // Arrow keys, Page Up/Down, Home/End move through the list as shown, skipping greyed rows.
+  function step(from, delta) {
+    const shown = order.filter(usable);
+    const at = Math.max(0, shown.indexOf(from));
+    return shown[Math.max(0, Math.min(shown.length - 1, at + delta))] ?? from;
   }
 
   // --- open / close ----------------------------------------------------------------
@@ -198,10 +213,10 @@ function setup(wrap) {
     const keys = {
       ArrowDown: () => setActive(step(activeIndex, 1)),
       ArrowUp: () => setActive(step(activeIndex, -1)),
-      Home: () => setActive(0),
-      End: () => setActive(options.length - 1),
-      PageDown: () => setActive(activeIndex + 5),
-      PageUp: () => setActive(activeIndex - 5),
+      Home: () => setActive(step(activeIndex, -Infinity)),
+      End: () => setActive(step(activeIndex, Infinity)),
+      PageDown: () => setActive(step(activeIndex, 5)),
+      PageUp: () => setActive(step(activeIndex, -5)),
       Enter: () => choose(activeIndex),
       ' ': () => choose(activeIndex),
       Escape: () => close({ focusButton: true }),
