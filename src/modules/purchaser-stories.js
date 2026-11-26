@@ -7,7 +7,7 @@
 //   [data-stories-filter="first|so|after"]   filter buttons; "" = All stories (aria-pressed toggled)
 //   [data-stories-list]                      the collection list (items are laid out in columns here)
 //     [data-review]                          one per review, with attributes bound to CMS fields:
-//         data-order (Order), data-date (Date posted), data-style (Card style: Normal|Big|Dark),
+//         data-order (Order), data-date (Date posted), class bound to Card style (normal|big|dark|video),
 //         data-source (Source: Google|Trustpilot)
 //       [data-review-tag="first|so|after"]  (hidden) one per filter, visibility bound to its switch
 //                                          (Webflow can't bind a Switch to an attribute)
@@ -31,7 +31,7 @@
 //
 // Order: highest Order first, then reviews with no Order, newest first.
 // Layout: cards go left to right into the shortest column (3 columns, 2 below 992px, 1 below 600px).
-// Classes added (styled in Webflow): card .is-big / .is-dark, avatar .is-dark, filter .is-active,
+// Classes added (styled in Webflow): filter .is-active,
 // modal .is-open, body .is-modal-open,
 // .review-callout on the italic phrase, .review-highlight on the excerpt inside the popup.
 
@@ -56,7 +56,6 @@ export default function purchaserStories(root) {
     const callout = text(el.querySelector('[data-review-callout]'));
     const name = text(el.querySelector('[data-review-name]'));
     const avatarText = text(el.querySelector('[data-review-avatar]'));
-    const style = (el.getAttribute('data-style') || '').toLowerCase();
     const source = (el.getAttribute('data-source') || 'Google').toLowerCase().includes('trust') ? 'trustpilot' : 'google';
     const date = Date.parse(el.getAttribute('data-date') || '') || 0;
     const tag = (t) => shown(el.querySelector(`[data-review-tag="${t}"]`)) || on(el.getAttribute(`data-${t}`));
@@ -76,20 +75,9 @@ export default function purchaserStories(root) {
     };
     r.tags.video = !!r.video;
 
-    // Card style (Big / Dark): Webflow can't set a class from an option field
-    el.classList.toggle('is-big', style === 'big');
-    el.classList.toggle('is-dark', style === 'dark');
-    el.querySelector('[data-review-avatar]')?.classList.toggle('is-dark', style === 'dark');
-    // What shows on each card (source label, Read full review, development, the video poster
-    // or the review layout) is set with conditional visibility in Webflow, so the parts a
-    // review doesn't use are never served. This script hides nothing on the cards.
-
-    // Video cards: a full-bleed poster (4:5) with a play button and the label, title and name
-    // over a gradient, as in the mock.
-    if (r.video) {
-      el.classList.add('is-video');
-      el.querySelector('[data-review-video]')?.classList.add('is-full');
-    }
+    // Everything on the card is set in Webflow: CMS bindings, conditional visibility, and the
+    // card's class bound to Card style (normal / big / dark / video). This script only orders,
+    // lays out, filters and opens the cards.
 
     // Every card opens its full review
     el.setAttribute('role', 'button');
