@@ -18,8 +18,8 @@
 //       [data-review-name], [data-review-year] (filled with the year of Date posted),
 //       [data-review-avatar], [data-review-dev],
 //       [data-review-title] (hidden), [data-review-link] (hidden link, Link to review)
-//       [data-review-more]                   "Read full review" (hidden when there's no excerpt)
-//       [data-review-google] / [data-review-trustpilot]   the two source labels; one is hidden
+//       [data-review-more]                   "Read full review" (conditional: Excerpt is set)
+//       [data-review-google] / [data-review-trustpilot]   source labels (conditional: Source is …)
 //       [data-review-video] (poster image + play button), hidden links [data-review-video-file]
 //       (Video (MP4) upload) and [data-review-video-url] (Video URL): either makes it a video card
 //   [data-stories-filter="video"]            shows only video case studies
@@ -103,22 +103,15 @@ export default function purchaserStories(root) {
     }
     const yearEl = el.querySelector('[data-review-year]');
     if (yearEl && r.year) yearEl.textContent = r.year;
-    hide(el.querySelector('[data-review-google]'), source !== 'google');
-    hide(el.querySelector('[data-review-trustpilot]'), source !== 'trustpilot');
-    hide(el.querySelector('[data-review-more]'), !excerpt);
-    hide(el.querySelector('[data-review-dev]'), !r.dev);
+    // What shows on each card (source label, Read full review, development, the video poster
+    // or the review layout) is set with conditional visibility in Webflow, so the parts a
+    // review doesn't use are never served. This script hides nothing on the cards.
 
     // Video cards: a full-bleed poster (4:5) with a play button and the label, title and name
-    // over a gradient, as in the mock. The review layout inside the card is hidden.
-    const poster = el.querySelector('[data-review-video]');
-    hide(poster, !r.video);
+    // over a gradient, as in the mock.
     if (r.video) {
       el.classList.add('is-video');
-      poster?.classList.add('is-full');
-      ['.review-mark', '[data-review-dev]', '[data-review-quote]', '.review-who', '.review-meta']
-        .forEach((sel) => hide(el.querySelector(`:scope > ${sel}`), true));
-      const caption = poster?.querySelector('.review-video_caption');
-      caption?.querySelectorAll('div').forEach((d) => hide(d, !d.textContent.trim()));
+      el.querySelector('[data-review-video]')?.classList.add('is-full');
     }
 
     // Every card opens its full review
