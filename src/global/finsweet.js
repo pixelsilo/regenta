@@ -6,6 +6,7 @@
 // Each entry: the element that shows the page needs it → the script to load.
 // v1 scripts are the same files as before; they only load on pages that still use v1 attributes.
 // Property Search uses none of these since #57: its filters are global/property-filter.js.
+// Number count is gone too (#57): the stats use global/count-up.js.
 // Mirror Click is gone (only the old Property Search map used it); the results cards' pin
 // embeds still carry fs-mirrorclick-element, which nothing reads now.
 const SCRIPTS = [
@@ -13,7 +14,6 @@ const SCRIPTS = [
   { needs: '[fs-cmssort-element="list"]', src: 'https://cdn.jsdelivr.net/npm/@finsweet/attributes-cmssort@1/cmssort.js' },
   { needs: '[fs-rangeslider-element]', v1Only: true, src: 'https://cdn.jsdelivr.net/npm/@finsweet/attributes-rangeslider@1/rangeslider.js' },
   { needs: '[fs-richtext-element]', src: 'https://cdn.jsdelivr.net/npm/@finsweet/attributes-richtext@1/richtext.js' },
-  { needs: '[fs-numbercount-element]', src: 'https://cdn.jsdelivr.net/npm/@finsweet/attributes-numbercount@1/numbercount.js' },
   { needs: '[fs-accordion-element]', src: 'https://cdn.jsdelivr.net/npm/@finsweet/attributes-accordion@1/accordion.js' },
 ];
 
