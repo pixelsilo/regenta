@@ -25,13 +25,30 @@ export default function countUp() {
   if (!els.length) return;
   const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window);
 
+  const pending = new Set();
+  const done = (el) => { pending.delete(el); io?.unobserve(el); };
+
   const io = still ? null : new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (!entry.isIntersecting) return;
-      io.unobserve(entry.target);
+      done(entry.target);
       run(entry.target);
     });
   }, { threshold: 0.4 });
+
+  // Jumped past a number without it ever showing (anchor link, fast fling)? Show the real value,
+  // so nobody scrolls back up to a 0.
+  let queued = false;
+  const checkPassed = () => {
+    queued = false;
+    pending.forEach((el) => {
+      if (el.getBoundingClientRect().bottom >= 0) return;
+      done(el);
+      el.textContent = fmt(Number(el.dataset.countTo));
+    });
+    if (!pending.size) window.removeEventListener('scroll', onScroll);
+  };
+  const onScroll = () => { if (!queued) { queued = true; requestAnimationFrame(checkPassed); } };
 
   els.forEach((el) => {
     const to = Number(el.textContent.replace(/[^\d.]/g, ''));
@@ -40,6 +57,11 @@ export default function countUp() {
     el.setAttribute('aria-label', fmt(to));
     if (still) { el.textContent = fmt(to); return; }
     el.textContent = '0';
+    pending.add(el);
     io.observe(el);
   });
+  if (pending.size) {
+    window.addEventListener('scroll', onScroll, { passive: true });
+    checkPassed();
+  }
 }
