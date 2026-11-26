@@ -148,6 +148,16 @@ The Developments collection has a "Custom Code" rich-text field. In use on 24 No
 
 If more developments need this, a CMS switch plus a small module would be better than pasting script into each item. Many developments also have iframes (video embeds) in their rich text; those are content, not code.
 
+## Go-live checklist
+
+Things to do at or after the next full live publish (only on Luke's go; a live publish ships every pending change).
+
+- **Before publishing:** say what's pending. Staging carries the housekeeping work (#1, #2, #7 need Elle's approval), #57, the footer and the Area centring.
+- **One Goodmayes temporary patch:** on 26 Nov 2026 its CMS "Custom Code" field (`custom-code-2`, item `6943cadf2a0286884687c3d5`) got a patch, published as that item only. It hides plots that were deleted but are still live (424, 437, 478, an old 458 and an old 463), sets "Pricing starting from" to £315,000 / £78,650, and leaves only Elle's five plots (417, 447, 458, 463, 477). After the full publish removes the deleted plots: clear that field, publish the item, and check the price list and starting price on the live page.
+- **Unpublished and archived, still live until the full publish:** One Goodmayes plot 454 (at Elle's request); Beaufort Park and its plots 3059 and 3052 (25 Nov 2026). Check their pages stop resolving on regenta.co.uk after the publish.
+- **Code:** merge the working branch to `main`; delete the root `slider.js`, `so-calculator.js` and `sd-calculator.js` (see "Old files in the repo root").
+- **Webflow clean-up:** delete the unused "footer (old, backup 24 Nov 2026)" component once the new footer is approved.
+
 ## Migration plan
 
 0. ✅ Save copies of the code and set up Vite with the loader. No site change.
