@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mock: case study page options | Regenta (#57)</title>
+<script src="https://use.typekit.net/ptn3etu.js"></script>
+<script>try{Typekit.load();}catch(e){}</script>
+<script src="case-study-data.js"></script>
+<style>
+  /* Mock only. Three layouts for the Case Studies Template, filled with the real CMS content of
+     Film Square (3 stats), Barnardo's Garden Village (2 stats, no gallery) and No.1 Wood Street (1 stat).
+     Every layout copes with 0-4 stats: the stats are a list that only shows what's filled in. */
+  :root { --green:#0b2b26; --green-2:#173833; --sand:#e3e5db; --sand-2:#eef0e8; --line:rgba(11,43,38,.16); --line-l:rgba(227,229,219,.25); }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--sand); color:var(--green); font-family:area-normal, area, "Area Normal", system-ui, sans-serif; }
+  a { color:inherit; text-decoration:none; }
+  img { display:block; max-width:100%; }
+  .g { font-family:Griffiths, serif; font-weight:400; }
+  .wrap { max-width:1440px; margin:0 auto; padding:0 2rem; }
+  .eb { font-size:.72rem; letter-spacing:.22em; text-transform:uppercase; font-weight:600; opacity:.7; margin:0 0 1rem; }
+  .h1 { font-size:clamp(2.6rem, 5vw, 4.6rem); line-height:1; font-weight:700; letter-spacing:-.01em; margin:0; }
+  .chips { display:flex; flex-wrap:wrap; gap:.4rem; }
+  .chip { font-size:.78rem; border:1px solid currentColor; border-radius:99px; padding:.45rem .8rem; opacity:.85; }
+  .logo-card { background:#fff; border-radius:.75rem; display:grid; place-items:center; padding:1rem; }
+  .logo-card img { max-height:4.5rem; max-width:100%; object-fit:contain; }
+
+  /* rich text body (as it would be styled inside the bound Rich Text) */
+  .rt { font-size:1.1rem; line-height:1.65; max-width:44rem; }
+  .rt p { margin:0 0 1.25rem; }
+  .rt h3 { font-size:1.6rem; line-height:1.15; margin:2.5rem 0 1rem; }
+  .rt strong { font-weight:600; }
+  .rt em { font-family:Griffiths, serif; font-style:normal; font-size:1.2em; line-height:1.4; display:inline; }
+  .rt p:has(> em:only-child) { margin-bottom:1.5rem; }
+
+  /* nav stub */
+  .nav { background:var(--green); color:var(--sand); height:112px; display:flex; align-items:center; }
+  .nav .wrap { width:100%; display:flex; justify-content:space-between; align-items:center; }
+  .nav .logo { font-size:1.7rem; letter-spacing:.06em; } .nav .r { font-size:.62rem; letter-spacing:.2em; font-weight:600; display:flex; gap:1.6rem; align-items:center; }
+  .nav .dot { width:2.6rem; height:2.6rem; border-radius:50%; background:var(--sand); }
+  .reuse { margin:0 2rem 1.25rem; border:2px dashed rgba(11,43,38,.3); border-radius:1rem; padding:2rem; text-align:center; font-size:.9rem; }
+  .reuse b { display:block; font-size:1.1rem; margin-bottom:.3rem; }
+
+  /* ---------------- A: editorial, facts sidebar ---------------- */
+  .A-hero { padding:5rem 0 3rem; }
+  .A-hero .top { display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; flex-wrap:wrap; }
+  .A-hero .meta { margin-top:1.5rem; display:flex; gap:1rem; align-items:center; flex-wrap:wrap; }
+  .A-hero .date { font-size:.95rem; opacity:.7; }
+  .A-gal { padding:0 2rem; max-width:1440px; margin:0 auto; display:grid; grid-template-columns:2fr 1fr; grid-template-rows:1fr 1fr; gap:.75rem; height:clamp(22rem, 42vw, 38rem); }
+  .A-gal .i { border-radius:1.25rem; overflow:hidden; background:#cfd3c6; }
+  .A-gal .i img { width:100%; height:100%; object-fit:cover; }
+  .A-gal .i:first-child { grid-row:1 / -1; }
+  .A-gal.n1 { grid-template-columns:1fr; } .A-gal.n1 .i { grid-row:1 / -1; }
+  .A-gal.n2 .i:nth-child(2) { grid-row:1 / -1; }
+  .A-body { padding:5rem 0 6rem; }
+  .A-body .wrap { display:grid; grid-template-columns:22rem 1fr; gap:5rem; align-items:start; }
+  .facts { position:sticky; top:2rem; background:var(--sand-2); border-radius:1.25rem; padding:1.5rem; display:flex; flex-direction:column; gap:1.25rem; }
+  .facts dl { margin:0; display:flex; flex-direction:column; }
+  .facts .row { display:flex; justify-content:space-between; gap:1rem; padding:.85rem 0; border-bottom:1px solid var(--line); }
+  .facts .row:first-child { padding-top:0; }
+  .facts dt { font-size:.85rem; opacity:.65; } .facts dd { margin:0; font-weight:600; text-align:right; }
+  .facts .logos { display:grid; grid-template-columns:1fr 1fr; gap:.5rem; }
+  .facts .logos.one { grid-template-columns:1fr; }
+  .facts .cap { font-size:.7rem; letter-spacing:.18em; text-transform:uppercase; opacity:.55; margin:0 0 .35rem; }
+
+  /* ---------------- B: big numbers band ---------------- */
+  .B-hero { padding:5rem 0 3.5rem; }
+  .B-hero .wrap { display:grid; grid-template-columns:1.3fr 1fr; gap:4rem; align-items:end; }
+  .B-hero .lead { font-family:Griffiths, serif; font-size:clamp(1.5rem, 2.3vw, 2.1rem); line-height:1.25; margin:1.5rem 0 0; }
+  .B-hero .side { display:flex; flex-direction:column; gap:1rem; align-items:flex-start; }
+  .B-hero .side .logo-card { width:14rem; height:8rem; }
+  .B-hero .date { opacity:.7; }
+  .B-img { max-width:1440px; margin:0 auto; padding:0 2rem; }
+  .B-img .main { border-radius:1.5rem; overflow:hidden; aspect-ratio:21/9; }
+  .B-img .main img { width:100%; height:100%; object-fit:cover; }
+  .B-img .thumbs { display:grid; grid-template-columns:repeat(4, 1fr); gap:.75rem; margin-top:.75rem; }
+  .B-img .thumbs div { border-radius:.85rem; overflow:hidden; aspect-ratio:4/3; }
+  .B-img .thumbs img { width:100%; height:100%; object-fit:cover; }
+  .B-band { background:var(--green); color:var(--sand); margin:4rem 2rem 0; border-radius:1.5rem; padding:3rem; display:flex; }
+  .B-band .stat { flex:1 1 0; padding:0 2.5rem; border-left:1px solid var(--line-l); }
+  .B-band .stat:first-child { border-left:0; padding-left:0; }
+  .B-band .stat b { display:block; font-size:clamp(2rem, 3.6vw, 3.4rem); line-height:1; font-weight:700; }
+  .B-band .stat span { display:block; margin-top:.75rem; opacity:.7; font-size:.85rem; letter-spacing:.18em; text-transform:uppercase; }
+  .B-band.n1 { justify-content:center; text-align:center; } .B-band.n1 .stat { flex:0 1 auto; }
+  .B-band .client { flex:0 0 auto; display:flex; align-items:center; gap:1rem; padding-left:2.5rem; border-left:1px solid var(--line-l); }
+  .B-band .client .logo-card { width:9rem; height:5.5rem; }
+  .B-body { padding:5rem 0 6rem; }
+  .B-body .wrap { display:grid; grid-template-columns:1fr minmax(0, 46rem) 1fr; }
+  .B-body .rt { grid-column:2; }
+  .B-body .chips { grid-column:2; margin-bottom:2.5rem; }
+
+  /* ---------------- C: cover hero ---------------- */
+  .C-hero { position:relative; min-height:88svh; color:#fff; display:flex; align-items:flex-end; overflow:hidden; }
+  .C-hero > img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .C-hero::after { content:""; position:absolute; inset:0; background:linear-gradient(0deg, rgba(11,43,38,.95) 0%, rgba(11,43,38,.55) 40%, rgba(11,43,38,.1) 75%); }
+  .C-hero .wrap { position:relative; z-index:1; width:100%; padding-bottom:3rem; }
+  .C-hero .meta { display:flex; gap:1rem; align-items:center; margin:1.25rem 0 2.25rem; flex-wrap:wrap; opacity:.9; }
+  .C-stats { display:flex; flex-wrap:wrap; gap:.6rem; }
+  .C-stats div { background:rgba(227,229,219,.12); border:1px solid rgba(227,229,219,.3); backdrop-filter:blur(10px); border-radius:1rem; padding:1rem 1.25rem; min-width:10rem; }
+  .C-stats b { display:block; font-size:1.6rem; line-height:1.1; }
+  .C-stats span { display:block; font-size:.72rem; letter-spacing:.18em; text-transform:uppercase; opacity:.75; margin-top:.4rem; }
+  .C-body { padding:5rem 0 4rem; }
+  .C-body .wrap { display:grid; grid-template-columns:16rem 1fr; gap:4.5rem; align-items:start; }
+  .C-side { display:flex; flex-direction:column; gap:1.25rem; position:sticky; top:2rem; }
+  .C-side .logo-card { height:7rem; }
+  .C-side .cap { font-size:.7rem; letter-spacing:.18em; text-transform:uppercase; opacity:.55; margin:0 0 .4rem; }
+  .C-gal { padding:0 0 5rem; }
+  .C-gal .track { display:flex; gap:.75rem; overflow-x:auto; padding:0 2rem; scroll-snap-type:x mandatory; }
+  .C-gal .track div { flex:0 0 min(42rem, 80vw); aspect-ratio:3/2; border-radius:1.25rem; overflow:hidden; scroll-snap-align:start; }
+  .C-gal .track img { width:100%; height:100%; object-fit:cover; }
+
+  /* switchers */
+  .bar { position:fixed; left:50%; transform:translateX(-50%); bottom:1rem; z-index:50; display:flex; gap:.5rem; background:#fff; border-radius:99px; padding:.35rem; box-shadow:0 8px 30px rgba(0,0,0,.25); font:13px/1 system-ui, sans-serif; }
+  .bar .grp { display:flex; gap:.2rem; } .bar .sep { width:1px; background:#ddd; margin:.2rem .2rem; }
+  .bar button { border:0; background:none; border-radius:99px; padding:.65rem .95rem; cursor:pointer; font:inherit; color:#0b2b26; white-space:nowrap; }
+  .bar button.is-on { background:#0b2b26; color:#fff; }
+
+  @media (max-width: 991px) {
+    .A-body .wrap, .C-body .wrap, .B-hero .wrap { grid-template-columns:1fr; gap:2.5rem; }
+    .facts, .C-side { position:static; }
+    .B-band { flex-wrap:wrap; gap:1.5rem 0; } .B-band .client { flex-basis:100%; border-left:0; padding-left:0; padding-top:1.5rem; border-top:1px solid var(--line-l); }
+  }
+  @media (max-width: 767px) {
+    .wrap { padding:0 1rem; } .nav { height:76px; } .nav .r a { display:none; }
+    .A-gal { padding:0 1rem; grid-template-columns:1fr 1fr; grid-template-rows:auto auto; height:auto; } .A-gal .i { aspect-ratio:4/3; } .A-gal .i:first-child { grid-column:1 / -1; grid-row:auto; aspect-ratio:3/2; } .A-gal.n2 .i:nth-child(2) { grid-row:auto; }
+    .B-img { padding:0 1rem; } .B-img .main { aspect-ratio:4/3; } .B-band { margin:3rem 1rem 0; padding:2rem 1.5rem; flex-direction:column; gap:1.5rem; } .B-band .stat { border-left:0; padding:0 0 1.5rem; border-bottom:1px solid var(--line-l); } .B-band.n1 { text-align:left; }
+    .C-gal .track { padding:0 1rem; } .reuse { margin:0 1rem 1rem; }
+    .bar { left:.5rem; right:.5rem; transform:none; overflow-x:auto; }
+  }
+</style>
+</head>
+<body>
+<header class="nav"><div class="wrap"><span class="logo">REGENTA</span><span class="r"><a>ABOUT US</a><a>BUILT BY REGENTA</a><a>CASE STUDIES</a><a>NEWS</a><a>CONTACT US</a><span class="dot"></span></span></div></header>
+<main id="page"></main>
+
+<div class="bar">
+  <div class="grp" id="opts"><button data-o="A" class="is-on">A · Facts sidebar</button><button data-o="B">B · Numbers band</button><button data-o="C">C · Cover hero</button></div>
+  <span class="sep"></span>
+  <div class="grp" id="cases"></div>
+</div>
+
+<script>
+  const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const chips = (c) => `<div class="chips">${c.services.map((s) => `<span class="chip">${esc(s)}</span>`).join('')}</div>`;
+  const logo = (src, alt) => src ? `<div class="logo-card"><img src="${src}" alt="${esc(alt)}"></div>` : '';
+  const reuse = () => `<div class="reuse"><b>More case studies</b>Two other case studies (as now, but leaving out the one you're on)</div><div class="reuse"><b>Our services</b>Services list or carousel (as now)</div><div class="reuse"><b>Footer</b></div>`;
+
+  const A = (c) => {
+    const imgs = c.images.slice(0, 3);
+    const logos = [c.logo && `<div><p class="cap">Development</p>${logo(c.logo, c.name)}</div>`, c.clientLogo && `<div><p class="cap">Client</p>${logo(c.clientLogo, c.client)}</div>`].filter(Boolean);
+    return `
+    <section class="A-hero"><div class="wrap">
+      <p class="eb">Case study</p>
+      <div class="top"><h1 class="h1">${esc(c.name)}</h1></div>
+      <div class="meta"><span class="date">${esc(c.date)}</span>${chips(c)}</div>
+    </div></section>
+    <div class="A-gal n${imgs.length}">${imgs.map((s) => `<div class="i"><img src="${s}" alt=""></div>`).join('')}</div>
+    <section class="A-body"><div class="wrap">
+      <aside class="facts">
+        ${c.stats.length ? `<dl>${c.stats.map(([k, v]) => `<div class="row"><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}${c.client ? `<div class="row"><dt>Client</dt><dd>${esc(c.client)}</dd></div>` : ''}</dl>` : ''}
+        ${logos.length ? `<div class="logos ${logos.length === 1 ? 'one' : ''}">${logos.join('')}</div>` : ''}
+      </aside>
+      <div class="rt">${c.body}</div>
+    </div></section>${reuse()}`;
+  };
+
+  const B = (c) => {
+    const [main, ...rest] = c.images;
+    const stats = c.stats.map(([k, v]) => `<div class="stat"><b>${esc(v)}</b><span>${esc(k)}</span></div>`).join('');
+    const client = c.client ? `<div class="client">${c.clientLogo ? logo(c.clientLogo, c.client) : ''}<div><span style="display:block;opacity:.6;font-size:.75rem;letter-spacing:.18em;text-transform:uppercase">Client</span><b style="font-size:1.1rem">${esc(c.client)}</b></div></div>` : '';
+    return `
+    <section class="B-hero"><div class="wrap">
+      <div><p class="eb">Case study · ${esc(c.date)}</p><h1 class="h1">${esc(c.name)}</h1>${c.summary ? `<p class="lead">${esc(c.summary.replace(/^["'“‘]|["'”’]$/g, '').split(/(?<=[.!?])\s/).slice(0, 2).join(' '))}</p>` : ''}</div>
+      <div class="side">${logo(c.logo, c.name)}${chips(c)}</div>
+    </div></section>
+    <div class="B-img">${main ? `<div class="main"><img src="${main}" alt=""></div>` : ''}${rest.length ? `<div class="thumbs">${rest.slice(0, 4).map((s) => `<div><img src="${s}" alt=""></div>`).join('')}</div>` : ''}</div>
+    ${c.stats.length || c.client ? `<div class="B-band n${c.stats.length}">${stats}${client}</div>` : ''}
+    <section class="B-body"><div class="wrap"><div class="rt">${c.body}</div></div></section>${reuse()}`;
+  };
+
+  const C = (c) => `
+    <section class="C-hero"><img src="${c.images[0] || ''}" alt="">
+      <div class="wrap">
+        <p class="eb" style="opacity:.85">Case study</p>
+        <h1 class="h1">${esc(c.name)}</h1>
+        <div class="meta"><span>${esc(c.date)}</span>${chips(c)}</div>
+        ${c.stats.length ? `<div class="C-stats">${c.stats.map(([k, v]) => `<div><b>${esc(v)}</b><span>${esc(k)}</span></div>`).join('')}</div>` : ''}
+      </div>
+    </section>
+    <section class="C-body"><div class="wrap">
+      <aside class="C-side">
+        ${c.logo ? `<div><p class="cap">Development</p>${logo(c.logo, c.name)}</div>` : ''}
+        ${c.client ? `<div><p class="cap">Client</p>${c.clientLogo ? logo(c.clientLogo, c.client) : `<b>${esc(c.client)}</b>`}</div>` : ''}
+      </aside>
+      <div class="rt">${c.body}</div>
+    </div></section>
+    ${c.images.length > 1 ? `<section class="C-gal"><div class="track">${c.images.slice(1).map((s) => `<div><img src="${s}" alt=""></div>`).join('')}</div></section>` : ''}${reuse()}`;
+
+  const R = { A, B, C };
+  let opt = 'A', idx = 0;
+  const casesEl = document.getElementById('cases');
+  CASES.forEach((c, i) => { const b = document.createElement('button'); b.textContent = `${c.name.split(',')[0]} (${c.stats.length})`; b.dataset.i = i; if (!i) b.classList.add('is-on'); casesEl.appendChild(b); });
+  const render = () => {
+    document.getElementById('page').innerHTML = R[opt](CASES[idx]);
+    document.querySelectorAll('[data-o]').forEach((b) => b.classList.toggle('is-on', b.dataset.o === opt));
+    document.querySelectorAll('[data-i]').forEach((b) => b.classList.toggle('is-on', +b.dataset.i === idx));
+    history.replaceState(null, '', `#${opt}${idx}`);
+  };
+  document.getElementById('opts').addEventListener('click', (e) => { if (e.target.dataset.o) { opt = e.target.dataset.o; render(); scrollTo(0, 0); } });
+  casesEl.addEventListener('click', (e) => { if (e.target.dataset.i) { idx = +e.target.dataset.i; render(); scrollTo(0, 0); } });
+  const m = location.hash.match(/#([ABC])(\d)?/); if (m) { opt = m[1]; idx = +(m[2] || 0); }
+  render();
+</script>
+</body>
+</html>
