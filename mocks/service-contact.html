@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mock: service contact panel options | Regenta (#57)</title>
+<script src="https://use.typekit.net/ptn3etu.js"></script>
+<script>try{Typekit.load();}catch(e){}</script>
+<style>
+  /* Mock only. Three layouts for the contact panel on the service pages, with the real
+     Development Consultancy lead contact and the same form fields (name, email, phone, message, privacy). */
+  :root { --green:#0b2b26; --green-2:#173833; --sand:#e3e5db; --sand-2:#eef0e8; --line:rgba(227,229,219,.35); }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--sand); color:var(--green); font-family:area-normal, area, "Area Normal", system-ui, sans-serif; padding:4rem 2rem 8rem; }
+  a { color:inherit; }
+  .g { font-family:Griffiths, serif; font-weight:400; }
+  .wrap { max-width:1376px; margin:0 auto; }
+  .eb { font-size:.72rem; letter-spacing:.22em; text-transform:uppercase; font-weight:600; opacity:.7; margin:0 0 1rem; }
+  .h { font-size:clamp(2.2rem, 3.4vw, 3.1rem); line-height:1.02; font-weight:700; margin:0; }
+  .h .g { font-size:1.12em; }
+  label { display:flex; flex-direction:column; gap:.45rem; font-size:.8rem; }
+  input, textarea { font:inherit; font-size:1rem; color:inherit; background:transparent; border:1px solid currentColor; border-radius:.75rem; padding:.9rem 1rem; }
+  textarea { min-height:7rem; resize:vertical; }
+  .check { flex-direction:row; align-items:center; gap:.6rem; font-size:.85rem; }
+  .check input { width:1.05rem; height:1.05rem; padding:0; border-radius:.25rem; }
+  .btn { display:inline-flex; align-items:center; gap:.85rem; border-radius:99px; padding:1rem 1.9rem; font:inherit; font-size:1rem; border:1px solid currentColor; background:none; color:inherit; cursor:pointer; text-decoration:none; white-space:nowrap; }
+  .btn i { font-style:normal; display:inline-grid; place-items:center; width:1.6rem; height:1.6rem; border-radius:50%; background:currentColor; }
+  .btn i svg { width:.55rem; height:.55rem; }
+  .req { font-size:.75rem; opacity:.6; font-style:italic; }
+  .opt { display:none; } .opt.is-on { display:block; }
+
+  /* ---------- A: portrait card ---------- */
+  .a { background:var(--green); color:var(--sand); border-radius:1.5rem; padding:.75rem; display:grid; grid-template-columns:minmax(16rem, .8fr) 2fr; gap:.75rem; }
+  .a-photo { position:relative; border-radius:1rem; overflow:hidden; min-height:32rem; background:#22403b; }
+  .a-photo img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 20%; }
+  .a-photo::after { content:""; position:absolute; inset:0; background:linear-gradient(0deg, rgba(11,43,38,.92) 0%, rgba(11,43,38,0) 55%); }
+  .a-who { position:absolute; left:1.5rem; right:1.5rem; bottom:1.5rem; z-index:1; }
+  .a-who b { display:block; font-size:1.5rem; line-height:1.1; }
+  .a-who span { display:block; opacity:.8; margin-top:.35rem; font-size:.9rem; line-height:1.4; }
+  .a-links { display:flex; gap:.5rem; margin-top:1.1rem; flex-wrap:wrap; }
+  .a-links a { font-size:.8rem; text-decoration:none; border:1px solid var(--line); border-radius:99px; padding:.5rem .9rem; }
+  .a-links a:hover { background:var(--sand); color:var(--green); }
+  .a-body { padding:3rem 3rem 2.5rem; display:flex; flex-direction:column; gap:2.25rem; }
+  .a-form { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  .a-form .full { grid-column:1 / -1; }
+  .a-form input, .a-form textarea { border-color:var(--line); }
+  .a-foot { grid-column:1 / -1; display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap; margin-top:.5rem; }
+  .a .btn { background:var(--sand); color:var(--green); border-color:var(--sand); }
+  .a .btn i { background:var(--green); } .a .btn i svg { fill:var(--sand); }
+
+  /* ---------- B: two-tone, form on a light card ---------- */
+  .b { background:var(--green); color:var(--sand); border-radius:1.5rem; padding:.75rem; display:grid; grid-template-columns:1fr 1.25fr; gap:.75rem; }
+  .b-left { padding:3rem 2.5rem 2.5rem; display:flex; flex-direction:column; justify-content:space-between; gap:3rem; }
+  .b-person { display:flex; gap:1rem; align-items:center; padding-top:1.5rem; border-top:1px solid var(--line); }
+  .b-person img { width:4rem; height:4rem; border-radius:50%; object-fit:cover; object-position:50% 15%; }
+  .b-person b { display:block; font-size:1.1rem; }
+  .b-person span { display:block; opacity:.75; font-size:.85rem; margin-top:.15rem; }
+  .b-direct { display:flex; flex-direction:column; gap:.15rem; margin-top:1.75rem; }
+  .b-direct a { display:flex; justify-content:space-between; align-items:center; text-decoration:none; padding:.85rem 0; border-bottom:1px solid var(--line); }
+  .b-direct a span { opacity:.6; font-size:.85rem; }
+  .b-card { background:var(--sand-2); color:var(--green); border-radius:1rem; padding:2.5rem; display:grid; grid-template-columns:1fr 1fr; gap:1rem; align-content:start; }
+  .b-card .full { grid-column:1 / -1; }
+  .b-card input, .b-card textarea { background:#fff; border-color:transparent; }
+  .b-card input:focus, .b-card textarea:focus { outline:2px solid var(--green); }
+  .b-card .b-title { grid-column:1 / -1; font-size:1.25rem; font-weight:700; margin:0 0 .5rem; }
+  .b-foot { grid-column:1 / -1; display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap; margin-top:.5rem; }
+  .b .btn { background:var(--green); color:var(--sand); border-color:var(--green); }
+  .b .btn i { background:var(--sand); } .b .btn i svg { fill:var(--green); }
+
+  /* ---------- C: centred, conversational ---------- */
+  .c { background:var(--green); color:var(--sand); border-radius:1.5rem; padding:4.5rem 3rem 3.5rem; }
+  .c-head { max-width:46rem; margin:0 auto 3rem; text-align:center; display:flex; flex-direction:column; align-items:center; }
+  .c-faces { display:flex; align-items:center; gap:.75rem; margin-bottom:1.75rem; background:rgba(227,229,219,.08); border:1px solid var(--line); border-radius:99px; padding:.4rem 1.1rem .4rem .4rem; }
+  .c-faces img { width:2.6rem; height:2.6rem; border-radius:50%; object-fit:cover; object-position:50% 15%; }
+  .c-faces span { font-size:.85rem; text-align:left; line-height:1.3; }
+  .c-faces span b { display:block; font-size:.95rem; }
+  .c-head p { opacity:.8; line-height:1.55; margin:1.25rem 0 0; max-width:34rem; }
+  .c-links { display:flex; gap:.6rem; margin-top:1.5rem; flex-wrap:wrap; justify-content:center; }
+  .c-links a { text-decoration:none; font-size:.9rem; border:1px solid var(--line); border-radius:99px; padding:.65rem 1.1rem; }
+  .c-links a:hover { background:var(--sand); color:var(--green); }
+  .c-form { max-width:58rem; margin:0 auto; display:grid; grid-template-columns:repeat(3, 1fr); gap:1rem; }
+  .c-form .full { grid-column:1 / -1; }
+  .c-form input, .c-form textarea { border-color:var(--line); }
+  .c-foot { grid-column:1 / -1; display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap; margin-top:.5rem; padding-top:1.25rem; border-top:1px solid var(--line); }
+  .c .btn { background:var(--sand); color:var(--green); border-color:var(--sand); }
+  .c .btn i { background:var(--green); } .c .btn i svg { fill:var(--sand); }
+
+  .picker { position:fixed; left:50%; transform:translateX(-50%); bottom:1rem; z-index:50; display:flex; gap:.35rem; background:#fff; border-radius:99px; padding:.35rem; box-shadow:0 8px 30px rgba(0,0,0,.25); font:14px/1 system-ui, sans-serif; }
+  .picker button { border:0; background:none; border-radius:99px; padding:.7rem 1.1rem; cursor:pointer; font:inherit; color:#0b2b26; white-space:nowrap; }
+  .picker button.is-on { background:#0b2b26; color:#fff; }
+  .note { max-width:1376px; margin:0 auto 1.5rem; font:13px/1.5 system-ui, sans-serif; opacity:.8; }
+
+  @media (max-width: 991px) {
+    .a, .b { grid-template-columns:1fr; }
+    .a-photo { min-height:22rem; }
+    .c-form { grid-template-columns:1fr 1fr; }
+  }
+  @media (max-width: 767px) {
+    body { padding:2rem 1rem 6rem; }
+    .a-body, .b-left { padding:2rem 1.25rem 1.5rem; }
+    .b-card { padding:1.5rem; }
+    .a-form, .b-card, .c-form { grid-template-columns:1fr; }
+    .c { padding:3rem 1.25rem 2rem; }
+    .picker .long { display:none; }
+  }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><symbol id="ur" viewBox="0 0 7 7"><path d="M0.753846 7L0 6.24615L5.16923 1.07692H0.538462V0H7V6.46154H5.92308V1.83077L0.753846 7Z"/></symbol></svg>
+
+<p class="note" id="note"></p>
+
+<!-- A -->
+<div class="opt is-on wrap" data-opt="A">
+  <section class="a">
+    <div class="a-photo">
+      <img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/6842eb8fcf53f6edc5267d19_Alex%20Piggott.avif" alt="">
+      <div class="a-who">
+        <b>Alex Piggott</b>
+        <span>Development Director and Development Consultancy lead contact</span>
+        <div class="a-links"><a href="#">Email Alex</a><a href="#">+44 (0)20 8502 5758</a></div>
+      </div>
+    </div>
+    <div class="a-body">
+      <div><p class="eb">Get in touch</p><h2 class="h">Talk to Alex <span class="g">today</span></h2></div>
+      <form class="a-form" onsubmit="return false">
+        <label>Name*<input></label><label>Email*<input></label>
+        <label class="full">Phone number<input></label>
+        <label class="full">Message<textarea placeholder="Your message"></textarea></label>
+        <div class="a-foot"><label class="check"><input type="checkbox"> I have read and agree to your <a href="#">Privacy Policy</a>*</label><button class="btn">Send message <i><svg><use href="#ur"/></svg></i></button></div>
+      </form>
+    </div>
+  </section>
+</div>
+
+<!-- B -->
+<div class="opt wrap" data-opt="B">
+  <section class="b">
+    <div class="b-left">
+      <div>
+        <p class="eb">Get in touch</p>
+        <h2 class="h">Talk to Alex <span class="g">today</span></h2>
+        <div class="b-direct"><a href="#">Email Alex <span>↗</span></a><a href="#">+44 (0)20 8502 5758 <span>↗</span></a></div>
+      </div>
+      <div class="b-person"><img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/6842eb8fcf53f6edc5267d19_Alex%20Piggott.avif" alt=""><div><b>Alex Piggott</b><span>Development Director and Development Consultancy lead contact</span></div></div>
+    </div>
+    <form class="b-card" onsubmit="return false">
+      <p class="b-title">Send Alex a message</p>
+      <label>Name*<input></label><label>Email*<input></label>
+      <label class="full">Phone number<input></label>
+      <label class="full">Message<textarea placeholder="Your message"></textarea></label>
+      <div class="b-foot"><label class="check"><input type="checkbox"> I have read and agree to your <a href="#">Privacy Policy</a>*</label><button class="btn">Send message <i><svg><use href="#ur"/></svg></i></button></div>
+    </form>
+  </section>
+</div>
+
+<!-- C -->
+<div class="opt wrap" data-opt="C">
+  <section class="c">
+    <div class="c-head">
+      <div class="c-faces"><img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/6842eb8fcf53f6edc5267d19_Alex%20Piggott.avif" alt=""><span><b>Alex Piggott</b>Development Director</span></div>
+      <h2 class="h">Talk to Alex <span class="g">today</span></h2>
+      <div class="c-links"><a href="#">Email Alex</a><a href="#">Call +44 (0)20 8502 5758</a></div>
+    </div>
+    <form class="c-form" onsubmit="return false">
+      <label>Name*<input></label><label>Email*<input></label><label>Phone number<input></label>
+      <label class="full">Message<textarea placeholder="Your message"></textarea></label>
+      <div class="c-foot"><label class="check"><input type="checkbox"> I have read and agree to your <a href="#">Privacy Policy</a>*</label><button class="btn">Send message <i><svg><use href="#ur"/></svg></i></button></div>
+    </form>
+  </section>
+</div>
+
+<div class="picker">
+  <button class="is-on" data-pick="A">A<span class="long"> · Portrait card</span></button>
+  <button data-pick="B">B<span class="long"> · Form on a light card</span></button>
+  <button data-pick="C">C<span class="long"> · Centred</span></button>
+</div>
+
+<script>
+  const NOTES = {
+    A: 'A · Portrait card: the lead contact\'s photo fills a tall rounded card on the left, with name, role and email / phone chips over it. The heading and form take the rest of the panel.',
+    B: 'B · Form on a light card: green half with the heading, email and phone as ruled links, and the person at the foot; the form sits on a light inset card with white fields.',
+    C: 'C · Centred: a small "who you\'re talking to" chip, a centred heading and contact pills, then the form below in three columns with a ruled footer.',
+  };
+  const pick = (k) => {
+    document.querySelectorAll('.opt').forEach(o => o.classList.toggle('is-on', o.dataset.opt === k));
+    document.querySelectorAll('[data-pick]').forEach(b => b.classList.toggle('is-on', b.dataset.pick === k));
+    document.getElementById('note').textContent = NOTES[k] + ' "*required" is dropped: the asterisks already say it.';
+    history.replaceState(null, '', '#' + k);
+  };
+  document.querySelectorAll('[data-pick]').forEach(b => b.addEventListener('click', () => pick(b.dataset.pick)));
+  pick(((location.hash || '#A').slice(1).toUpperCase().match(/[ABC]/) || ['A'])[0]);
+</script>
+</body>
+</html>
