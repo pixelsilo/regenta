@@ -11,8 +11,11 @@ export default function stickyFilters() {
   if (!bar) return;
   const nav = document.querySelector('.navbar');
 
+  // Round down: the nav's bottom edge lands on fractions of a pixel (rem sizes on phones,
+  // e.g. 37.9px), and rounding up left a hairline gap where the results showed through.
+  // Flooring tucks the bar under the nav (which sits above it) by under a pixel instead.
   const place = () => {
-    bar.style.top = `${nav ? Math.max(0, Math.round(nav.getBoundingClientRect().bottom)) : 0}px`;
+    bar.style.top = `${nav ? Math.max(0, Math.floor(nav.getBoundingClientRect().bottom)) : 0}px`;
   };
   place();
   if (nav && 'ResizeObserver' in window) new ResizeObserver(place).observe(nav);
