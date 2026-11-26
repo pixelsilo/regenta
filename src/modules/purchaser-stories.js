@@ -37,6 +37,8 @@ const text = (el) => (el?.textContent || '').trim();
 const on = (v) => /^(true|1|yes)$/i.test(String(v || '').trim());
 // Webflow keeps conditionally hidden elements in the page with this class
 const shown = (el) => !!el && !el.classList.contains('w-condition-invisible');
+// Hide or show regardless of the element's display class (a [hidden] attribute loses to display:flex)
+const hide = (el, off) => { if (el) { el.hidden = off; el.style.display = off ? 'none' : ''; } };
 const initials = (n) => n.replace(/[^A-Za-z ]/g, '').split(' ').filter(Boolean).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
 
 function quoteHtml(excerpt, callout) {
@@ -92,10 +94,10 @@ export default function purchaserStories(root) {
     }
     const yearEl = el.querySelector('[data-review-year]');
     if (yearEl && r.year) yearEl.textContent = r.year;
-    el.querySelector('[data-review-google]')?.toggleAttribute('hidden', source !== 'google');
-    el.querySelector('[data-review-trustpilot]')?.toggleAttribute('hidden', source !== 'trustpilot');
-    el.querySelector('[data-review-more]')?.toggleAttribute('hidden', !excerpt);
-    if (!r.dev) el.querySelector('[data-review-dev]')?.setAttribute('hidden', '');
+    hide(el.querySelector('[data-review-google]'), source !== 'google');
+    hide(el.querySelector('[data-review-trustpilot]'), source !== 'trustpilot');
+    hide(el.querySelector('[data-review-more]'), !excerpt);
+    hide(el.querySelector('[data-review-dev]'), !r.dev);
 
     // Every card opens its full review
     el.setAttribute('role', 'button');
@@ -171,7 +173,7 @@ export default function purchaserStories(root) {
     if (av) (av.querySelector('.button-text') || av).textContent = initials(r.name);
     if (slot('name')) slot('name').textContent = r.name;
     if (slot('sub')) slot('sub').textContent = [r.dev, r.year].filter(Boolean).join(' · ');
-    if (slot('title')) { slot('title').textContent = r.title; slot('title').hidden = !r.title; }
+    if (slot('title')) { slot('title').textContent = r.title; hide(slot('title'), !r.title); }
     const body = slot('text');
     if (body && r.full) {
       body.innerHTML = r.full.innerHTML;
@@ -183,11 +185,11 @@ export default function purchaserStories(root) {
         });
       }
     }
-    slot('google')?.toggleAttribute('hidden', r.source !== 'google');
-    slot('trustpilot')?.toggleAttribute('hidden', r.source !== 'trustpilot');
+    hide(slot('google'), r.source !== 'google');
+    hide(slot('trustpilot'), r.source !== 'trustpilot');
     const link = slot('link');
     if (link) {
-      link.hidden = !r.link;
+      hide(link, !r.link);
       if (r.link) link.setAttribute('href', r.link);
       const label = link.querySelector('div') || link;
       label.textContent = r.source === 'trustpilot' ? 'See it on Trustpilot' : 'See it on Google';
