@@ -43,6 +43,39 @@ const on = (v) => /^(true|1|yes)$/i.test(String(v || '').trim());
 const shown = (el) => !!el && !el.classList.contains('w-condition-invisible');
 // Hide or show regardless of the element's display class (a [hidden] attribute loses to display:flex)
 const hide = (el, off) => { if (el) { el.hidden = off; el.style.display = off ? 'none' : ''; } };
+// Site Sales is now Regenta. Cards say Regenta (in italics, "Previously Site Sales" on hover); the full
+// review keeps the buyer's words, with Site Sales in italics and "Now known as Regenta" on hover.
+// "on site sales person" is a job, not the company, so it's left alone.
+const OLD_NAME = /(?<!\bon )\bsite ?sales(?: property group)?\b/gi;
+const HAS_OLD_NAME = new RegExp(OLD_NAME.source, 'i'); // no g flag, so test() keeps no state
+const SKIP = '.brand-name, [data-review-full], [data-review-title], [data-review-link]';
+function rename(root, toRegenta) {
+  if (!root) return;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode: (node) => {
+      const skip = node.parentElement.closest(SKIP);
+      return skip && skip !== root && root.contains(skip) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT;
+    },
+  });
+  const nodes = [];
+  while (walker.nextNode()) if (HAS_OLD_NAME.test(walker.currentNode.nodeValue)) nodes.push(walker.currentNode);
+  nodes.forEach((node) => {
+    const frag = document.createDocumentFragment();
+    let last = 0;
+    node.nodeValue.replace(OLD_NAME, (match, at) => {
+      frag.append(node.nodeValue.slice(last, at));
+      const em = document.createElement('em');
+      em.className = 'brand-name';
+      em.textContent = toRegenta ? 'Regenta' : match;
+      em.title = toRegenta ? 'Previously Site Sales' : 'Now known as Regenta';
+      frag.append(em);
+      last = at + match.length;
+      return match;
+    });
+    frag.append(node.nodeValue.slice(last));
+    node.replaceWith(frag);
+  });
+}
 // The words the card quotes, as they appear in the full review (no ellipses)
 const quoted = (excerpt, callout) => [excerpt, callout].filter(Boolean).join(' ').replace(/^…+|…+$/g, '').trim();
 
@@ -91,6 +124,9 @@ export default function purchaserStories(root) {
     });
     return r;
   });
+
+  // Cards show the current name (after the quote is read, so the popup still finds and highlights it)
+  reviews.forEach((r) => rename(r.el, true));
 
   // Highest Order first, then no Order, newest first
   const ordered = Number.isFinite;
@@ -166,6 +202,7 @@ export default function purchaserStories(root) {
           if (p.innerHTML.includes(ex)) p.innerHTML = p.innerHTML.replace(ex, `<mark class="review-highlight">${ex}</mark>`);
         });
       }
+      rename(body, false); // the buyer's own words, with the old name marked
     }
     hide(slot('google'), !!r.video || r.source !== 'google');
     hide(slot('trustpilot'), !!r.video || r.source !== 'trustpilot');
