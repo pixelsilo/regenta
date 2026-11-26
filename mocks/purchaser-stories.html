@@ -45,12 +45,15 @@ h1 .g { font-size:1.12em; }
 .quote { font-size:1.12rem; line-height:1.5; }
 .card.big .quote { font-size:1.2rem; line-height:1.5; }
 /* A few key words from the quote, in Griffiths at 1.6x the copy around them */
-.callout { font-family:Griffiths, serif; font-weight:400; font-size:1.6em; line-height:1.1; letter-spacing:-.005em; padding-right:.12em; }
+.callout { display:block; margin-top:.35rem; font-family:Griffiths, serif; font-weight:400; font-size:2.1em; line-height:1.05; letter-spacing:-.005em; padding-right:.12em; }
 .card.big { background:var(--sand); }
 .card.dark { background:var(--green); color:var(--sand); }
 .who { display:flex; align-items:center; gap:.85rem; margin-top:auto; }
 .avatar { width:2.6rem; height:2.6rem; border-radius:50%; background:var(--green); color:var(--sand); display:flex; align-items:center; justify-content:center; font-weight:600; font-size:.95rem; flex:none; }
 .card.dark .avatar { background:var(--sand); color:var(--green); }
+.avatar .button-text { line-height:1; translate:0 0.14em; }
+@supports (font: -apple-system-body) { .avatar .button-text { translate:0 -0.09em; } }
+@supports (text-box: trim-both cap alphabetic) { .avatar .button-text { translate:none; text-box:trim-both cap alphabetic; } }
 .who b { display:block; font-weight:600; }
 .who span { font-size:.85rem; opacity:.65; }
 .meta { display:flex; justify-content:space-between; align-items:center; gap:1rem; padding-top:1.1rem; border-top:1px solid rgba(11,43,38,.1); font-size:.85rem; }
@@ -145,7 +148,7 @@ const MARK = '<svg class="mark" viewBox="0 0 44 32" fill="currentColor" aria-hid
 // size: big (sand, Griffiths), dark, or normal. Names as they appear on Google, shortened to first name + initial.
 const R = [
  { name:'Chiara M.', year:2026, date:'23 April 2026', dev:'Shared Ownership', tags:['so','first'], size:'big',
-   source:'trustpilot', title:'Thank you Amy - you are the best!', callout:'just 28 days', url:'https://uk.trustpilot.com/reviews/69ea6bb767c2a32c3c9e28d4',
+   source:'trustpilot', title:'Thank you Amy - you are the best!', callout:'an exceptionally fast turnaround', url:'https://uk.trustpilot.com/reviews/69ea6bb767c2a32c3c9e28d4',
    excerpt:'I completed on my home just 28 days after submitting my application - an exceptionally fast turnaround.',
    text:`I had an excellent experience with Regenta while purchasing my home through the shared ownership scheme. I was supported throughout the entire process by Amy, who was absolutely outstanding from start to finish.
 
@@ -171,7 +174,7 @@ She kept us well informed throughout the process and made everything feel smooth
    text:`As a first-time buyer, the process felt quite overwhelming, especially as I had just had a baby at the time. Patrizia was really helpful throughout — she explained things clearly, kept me updated during delays, and was always easy to reach.
 
 Even after moving in, she remained supportive when I had an issue with the boiler. I really appreciated her professionalism and responsiveness, and she made a real difference. I’d happily recommend her.` },
- { name:'Abid S.', year:2022, tags:['first','after'], size:'big', callout:'the colour of the paint',
+ { name:'Abid S.', year:2022, tags:['first','after'], size:'big', callout:'she assisted me on every occasion',
    excerpt:'I asked her about various things from the name of the colour of the paint in my home, to where to find the electric metre, and she assisted me on every occasion.',
    text:`I was assisted Georgia from Site Sales during my property purchase. All I can say is that she was terrific, right from the start till the end. She was warm, friendly and answered all my questions, no matter how small. I was a first time buyer and so everything was new to me, and Georgia helped me feel at ease with the process. She was professional yet warm and friendly. For example, after moving in, Georgia said I could email her with any questions, and so I did. I asked her about various things from the name of the colour of the paint in my home, to where to find the electric metre, and she assisted me on every occasion. It was a pleasure to meet her and I'm glad I was guided into my new home by Georgia.` },
  { name:'Mr Mehmets', year:2026, dev:'East Wick and Sweetwater', tags:['first'],
@@ -188,7 +191,7 @@ They were both super responsive without being pushy, and reassuring in their gui
 
 Can't recommend them highly enough - they deserve a pay rise!` },
  { kind:'video', title:'Video case study', sub:'Coming soon', tags:['video'] },
- { name:'Melly B.', year:2021, dev:'Shared Ownership', tags:['so','first'], size:'big', callout:'a property at 20',
+ { name:'Melly B.', year:2021, dev:'Shared Ownership', tags:['so','first'], size:'big', callout:'a massive thank you to him',
    excerpt:'without sam i dont think we wouldve been able to get a property at 20 so a massive thank you to him.',
    text:`if you are lucky enough to come across sam in your experience with site sales, count your lucky stars, he made buying the property very easy and simple. me and my girlfriend are very young and didnt know anything when coming to buy a property with shared ownership but sams contacts made it very easy for us. we needed a mortgage broker he knew someone. we needed a solicitor he knew someone. without sam i dont think we wouldve been able to get a property at 20 so a massive thank you to him.` },
  { name:'Stevie H.', year:2019, dev:'Trader’s Quarter, London', tags:['so'],
@@ -259,10 +262,17 @@ R.forEach((r, i) => {
   card.tabIndex = 0;
   card.setAttribute('role', 'button');
   card.setAttribute('aria-label', `Read ${r.name}'s full review`);
-  const ex = r.callout ? esc(r.excerpt).replace(esc(r.callout), `<span class="callout">${esc(r.callout)}</span>`) : esc(r.excerpt || '');
+  // The callout takes its closing punctuation with it, so a full stop never sits on a line of its own.
+  let ex = esc(r.excerpt || '');
+  if (r.callout) {
+    const c = esc(r.callout), at = ex.indexOf(c);
+    let end = at + c.length;
+    if (/[.!?]/.test(ex[end] || '')) end += 1;
+    if (at >= 0) ex = `${ex.slice(0, at)}<span class="callout">${ex.slice(at, end)}</span>${ex.slice(end)}`;
+  }
   const body = short ? r.text.split(/\n\n+/).map((p) => `<p class="quote">${esc(p)}</p>`).join('') : `<p class="quote">…${ex}${/[.!?]$/.test(r.excerpt) ? '' : '…'}</p>`;
   card.innerHTML = `${MARK}${r.dev ? `<span class="dev">${esc(r.dev)}</span>` : ''}${body}
-    <div class="who"><div class="avatar">${initials(r.name)}</div><div><b>${esc(r.name)}</b><span>${r.year}</span></div></div>
+    <div class="who"><div class="avatar"><span class="button-text">${initials(r.name)}</span></div><div><b>${esc(r.name)}</b><span>${r.year}</span></div></div>
     <div class="meta"><span class="gmark">${SRC[r.source || 'google'].mark} ${SRC[r.source || 'google'].label}</span>${short ? '' : '<span class="more">Read full review</span>'}</div>`;
   const open = () => show(r);
   card.addEventListener('click', open);
@@ -273,7 +283,7 @@ R.forEach((r, i) => {
 // Full review: the whole text, with the card's excerpt highlighted so you can see where it came from.
 const dlg = document.getElementById('dlg');
 function show(r) {
-  document.getElementById('dlg-av').textContent = initials(r.name);
+  document.getElementById('dlg-av').innerHTML = `<span class="button-text">${initials(r.name)}</span>`;
   document.getElementById('dlg-name').textContent = r.name;
   document.getElementById('dlg-sub').textContent = [r.dev, r.date || r.year].filter(Boolean).join(' · ');
   document.getElementById('dlg-stars').innerHTML = stars(5);
