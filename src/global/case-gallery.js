@@ -58,10 +58,26 @@ function lightbox(srcs) {
 }
 
 function setup(gal) {
-  const items = [...gal.querySelectorAll('.cs-gal_item')]
-    .filter((item) => !item.classList.contains('w-condition-invisible') && item.querySelector('img'));
+  // A tile only counts if it has a photo: a case study with no Main Image still renders an empty tile.
+  const hasPhoto = (item) => {
+    const img = item.querySelector('img');
+    return img && img.getAttribute('src') && !img.classList.contains('w-dyn-bind-empty')
+      && !img.classList.contains('w-condition-invisible') && !item.classList.contains('w-condition-invisible');
+  };
+  const all = [...gal.querySelectorAll('.cs-gal_item')];
+  all.filter((item) => !hasPhoto(item)).forEach((item) => item.classList.add('is-off'));
+  const items = all.filter(hasPhoto);
   const n = items.length;
+
+  const count = gal.querySelector('.cs-gal_count');
+  if (count) {
+    if (n < 2) count.style.display = 'none';
+    else (count.querySelector('.button-text') || count).textContent = `${n} photos`;
+  }
   if (!n) return;
+
+  // Load every photo now, so a hidden one is ready before it fades into a tile.
+  items.forEach((item) => { item.querySelector('img').loading = 'eager'; });
 
   const open = lightbox(items.map((item) => item.querySelector('img').src));
   if (open) {
@@ -99,6 +115,8 @@ function setup(gal) {
 
   setInterval(() => {
     if (paused || document.hidden) return;
+    const img = queue[0].querySelector('img');
+    if (!img.complete || !img.naturalWidth) return; // not loaded yet: try again next tick
     const s = order[turn % order.length];
     turn += 1;
     const out = slots[s];
