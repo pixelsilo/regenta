@@ -24,13 +24,14 @@ import mapView from './modules/map-view.js';
 import autoScroll from './modules/auto-scroll.js';
 import serviceHero from './modules/service-hero.js';
 import purchaserStories from './modules/purchaser-stories.js';
+import logoMarquee from './modules/logo-marquee.js';
 
 // Site-wide behaviour that runs on every page.
 // Order matters: page fixes that change the DOM (prices, location options) run before finsweet loads the filters.
 const GLOBALS = [copyrightYear, formatPrice, hideOnTouch, nav, testimonialSlider, development, pageExtras, faq, sharedOwnershipCalculator, stampDutyCalculator, legacyFilterLinks, propertyFilter, filterSelect, stickyFilters, caseStudyCards, countUp, finsweet];
 
 // Opt-in modules, mounted on [data-module="<name>"] roots
-const MODULES = { map, 'map-view': mapView, 'auto-scroll': autoScroll, 'service-hero': serviceHero, 'purchaser-stories': purchaserStories };
+const MODULES = { map, 'map-view': mapView, 'auto-scroll': autoScroll, 'service-hero': serviceHero, 'purchaser-stories': purchaserStories, 'logo-marquee': logoMarquee };
 
 function boot() {
   window.__regentaBooted = true; // the loader shows hidden content if this never happens
