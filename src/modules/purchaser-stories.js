@@ -20,7 +20,11 @@
 //       [data-review-title] (hidden), [data-review-link] (hidden link, Link to review)
 //       [data-review-more]                   "Read full review" (hidden when there's no excerpt)
 //       [data-review-google] / [data-review-trustpilot]   the two source labels; one is hidden
+//       [data-review-video] (poster image + play button), hidden links [data-review-video-file]
+//       (Video (MP4) upload) and [data-review-video-url] (Video URL): either makes it a video card
+//   [data-stories-filter="video"]            shows only video case studies
 //   [data-review-modal]                      the popup (hidden until .is-open), with
+//       [data-modal-video] (an embed holding a <video controls> element),
 //       [data-modal-avatar], [data-modal-name], [data-modal-sub], [data-modal-title],
 //       [data-modal-text], [data-modal-google], [data-modal-trustpilot], [data-modal-link],
 //       [data-modal-close] (one or more), [data-modal-panel]
@@ -77,7 +81,12 @@ export default function purchaserStories(root) {
       dev: text(el.querySelector('[data-review-dev]')),
       year: date ? String(new Date(date).getFullYear()) : text(el.querySelector('[data-review-year]')),
       link: (el.querySelector('[data-review-link]')?.getAttribute('href') || '').replace(/^#$/, ''),
+      // Video case study: the uploaded MP4, or else the Video URL
+      video: [el.querySelector('[data-review-video-file]'), el.querySelector('[data-review-video-url]')]
+        .map((a) => (a?.getAttribute('href') || '').replace(/^#$/, '')).find(Boolean) || '',
+      poster: el.querySelector('[data-review-video] img')?.getAttribute('src') || '',
     };
+    r.tags.video = !!r.video;
 
     // Card: style, quote, initials, source label, "Read full review"
     el.classList.toggle('is-big', style === 'big');
@@ -99,10 +108,23 @@ export default function purchaserStories(root) {
     hide(el.querySelector('[data-review-more]'), !excerpt);
     hide(el.querySelector('[data-review-dev]'), !r.dev);
 
+    // Video cards: poster with a play button, the title as the quote, "Watch the video"
+    hide(el.querySelector('[data-review-video]'), !r.video);
+    if (r.video) {
+      el.classList.add('is-video');
+      hide(el.querySelector('.review-mark'), true);
+      hide(el.querySelector('[data-review-google]'), true);
+      hide(el.querySelector('[data-review-trustpilot]'), true);
+      if (quote) quote.innerHTML = `<p><strong>${esc(r.title || 'Video case study')}</strong></p>`;
+      const more = el.querySelector('[data-review-more]');
+      hide(more, false);
+      if (more) (more.querySelector('.button-text div') || more.querySelector('.button-text') || more).textContent = 'Watch the video →';
+    }
+
     // Every card opens its full review
     el.setAttribute('role', 'button');
     el.tabIndex = 0;
-    el.setAttribute('aria-label', `Read ${name}'s full review`);
+    el.setAttribute('aria-label', r.video ? `Watch ${r.title || 'the video case study'}` : `Read ${name}'s full review`);
     el.addEventListener('click', (event) => { if (!event.target.closest('a')) open(r); });
     el.addEventListener('keydown', (event) => {
       if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(r); }
@@ -185,11 +207,25 @@ export default function purchaserStories(root) {
         });
       }
     }
-    hide(slot('google'), r.source !== 'google');
-    hide(slot('trustpilot'), r.source !== 'trustpilot');
+    hide(slot('google'), !!r.video || r.source !== 'google');
+    hide(slot('trustpilot'), !!r.video || r.source !== 'trustpilot');
+    hide(modal.querySelector('.stories-stars'), !!r.video);
+    const player = slot('video');
+    const videoEl = player?.querySelector('video');
+    hide(player, !r.video);
+    if (videoEl) {
+      if (r.video) {
+        videoEl.poster = r.poster;
+        videoEl.src = r.video;
+        videoEl.play?.().catch(() => {}); // autoplay may be blocked; the controls are there
+      } else {
+        videoEl.removeAttribute('src');
+        videoEl.load();
+      }
+    }
     const link = slot('link');
     if (link) {
-      hide(link, !r.link);
+      hide(link, !r.link || !!r.video);
       if (r.link) link.setAttribute('href', r.link);
       const label = link.querySelector('div') || link;
       label.textContent = r.source === 'trustpilot' ? 'See it on Trustpilot' : 'See it on Google';
@@ -206,6 +242,8 @@ export default function purchaserStories(root) {
     modal.classList.remove('is-open');
     modal.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('is-modal-open');
+    const videoEl = slot('video')?.querySelector('video');
+    if (videoEl) { videoEl.pause(); videoEl.removeAttribute('src'); videoEl.load(); }
     lastFocus?.focus?.({ preventScroll: true });
   }
 
