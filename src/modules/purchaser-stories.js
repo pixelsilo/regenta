@@ -7,7 +7,7 @@
 //   [data-stories-filter="first|so|after"]   filter buttons; "" = All stories (aria-pressed toggled)
 //   [data-stories-list]                      the collection list (items are laid out in columns here)
 //     [data-review]                          one per review, with attributes bound to CMS fields:
-//         data-order (Order), data-date (Date posted), class bound to Card style (normal|big|dark|video),
+//         data-order (Order), data-date (Date posted), data-name, data-initials, data-dev, class bound to Card style (normal|big|dark|video),
 //         data-source (Source: Google|Trustpilot)
 //       [data-review-tag="first|so|after"]  (hidden) one per filter, visibility bound to its switch
 //                                          (Webflow can't bind a Switch to an attribute)
@@ -54,18 +54,20 @@ export default function purchaserStories(root) {
   const reviews = [...list.querySelectorAll('[data-review]')].map((el) => {
     const excerpt = text(el.querySelector('[data-review-excerpt]'));
     const callout = text(el.querySelector('[data-review-callout]'));
-    const name = text(el.querySelector('[data-review-name]'));
-    const avatarText = text(el.querySelector('[data-review-avatar]'));
+    // Name, initials and development are bound attributes on the card, because video cards
+    // don't render the name row or development label
+    const attr = (n) => (el.getAttribute(n) || '').trim();
+    const name = attr('data-name');
     const source = (el.getAttribute('data-source') || 'Google').toLowerCase().includes('trust') ? 'trustpilot' : 'google';
     const date = Date.parse(el.getAttribute('data-date') || '') || 0;
     const tag = (t) => shown(el.querySelector(`[data-review-tag="${t}"]`)) || on(el.getAttribute(`data-${t}`));
     const r = {
-      el, name, source, date, initials: avatarText, quote: quoted(excerpt, callout),
+      el, name, source, date, initials: attr('data-initials'), quote: quoted(excerpt, callout),
       order: Number.parseFloat(el.getAttribute('data-order')),
       tags: { first: tag('first'), so: tag('so'), after: tag('after') },
       full: el.querySelector('[data-review-full]'),
       title: text(el.querySelector('[data-review-title]')),
-      dev: text(el.querySelector('[data-review-dev]')),
+      dev: attr('data-dev'),
       year: date ? String(new Date(date).getFullYear()) : text(el.querySelector('[data-review-year]')),
       link: (el.querySelector('[data-review-link]')?.getAttribute('href') || '').replace(/^#$/, ''),
       // Video case study: the uploaded MP4, or else the Video URL
