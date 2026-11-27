@@ -1,11 +1,15 @@
 // Our own photo lightbox (not Webflow's). The .cs-lb markup and its classes are built in Webflow
 // (Case Studies template and News template); this only opens it, swaps the photo and handles keys and swipes.
 //   .cs-lb (.is-open)  .cs-lb_img  .cs-lb_count  [data-lb="prev|next|close"]
-// Returns open(index), or null when the page has no .cs-lb or there are no photos.
+// Returns open(index), or null when the page has no .cs-lb or there are no photos. The lightbox is moved to the
+// end of <body> so it always covers the nav (same on the case study and news templates).
 
 export default function lightbox(srcs) {
   const lb = document.querySelector('.cs-lb');
   if (!lb || !srcs.length) return null;
+  // Lift it out of the page layout: a parent with its own stacking context (e.g. a container with a z-index)
+  // would otherwise trap it under the fixed nav, whatever its own z-index.
+  if (lb.parentElement !== document.body) document.body.appendChild(lb);
   const img = lb.querySelector('.cs-lb_img');
   const count = lb.querySelector('.cs-lb_count');
   let i = 0;
