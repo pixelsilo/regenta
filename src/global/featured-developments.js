@@ -3,7 +3,8 @@
 // backdrop) with its photo fading into it. Webflow can't pick a text colour from a bound background,
 // so this does: dark brand colours get .is-dark on the card (sand text) and on the bed icon. It also
 // runs the card hover (photo zooms, description slides up, arrow fills) through .is-hover combos in
-// Webflow; the photo zoom used to be a Webflow interaction scoped to the old component.
+// Webflow (the photo fade also moves up); the photo zoom used to be a Webflow interaction scoped to the
+// old component. On touch screens a tap opens the card instead of following the link; the button links.
 import cardHover from '../lib/card-hover.js';
 
 const DARK = 0.35; // relative luminance below which text switches to sand
@@ -39,5 +40,26 @@ export default function featuredDevelopments() {
     const button = card.querySelector('.fd2_button');
     if (button) button.classList.toggle('is-same', distance(getComputedStyle(brand).backgroundColor, getComputedStyle(button).backgroundColor) < SAME);
   });
-  lists.forEach((list) => cardHover(list, 'a.fd2_slide', '.fd2_more, .fd2_ar, .fd_image'));
+  lists.forEach((list) => {
+    cardHover(list, 'a.fd2_slide', PARTS);
+    // Touch screens have no hover: a tap on the card opens or closes it (description, fade moving up)
+    // instead of following the link. Only the button goes to the development.
+    list.addEventListener('click', (event) => {
+      if (!TOUCH.matches) return;
+      const card = event.target.closest('a.fd2_slide');
+      if (!card || event.target.closest('.fd2_button')) return;
+      event.preventDefault();
+      const open = card.dataset.open !== '1';
+      list.querySelectorAll('a.fd2_slide').forEach((other) => setOpen(other, other === card && open));
+    });
+  });
+}
+
+const PARTS = '.fd2_more, .fd2_ar, .fd_image, .fd2_image-div';
+const TOUCH = window.matchMedia('(hover: none)');
+
+function setOpen(card, open) {
+  card.dataset.open = open ? '1' : '';
+  card.classList.toggle('is-hover', open);
+  card.querySelectorAll(PARTS).forEach((el) => el.classList.toggle('is-hover', open));
 }
