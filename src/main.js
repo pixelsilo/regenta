@@ -17,6 +17,7 @@ import propertyFilter from './global/property-filter.js';
 import filterSelect from './global/filter-select.js';
 import stickyFilters from './global/sticky-filters.js';
 import caseStudyCards from './global/case-study-cards.js';
+import newsStrip from './global/news-strip.js';
 import countUp from './global/count-up.js';
 import submitWait from './global/submit-wait.js';
 import caseGallery from './global/case-gallery.js';
@@ -36,7 +37,7 @@ import shareModule from './modules/share.js';
 
 // Site-wide behaviour that runs on every page.
 // Order matters: page fixes that change the DOM (prices, location options) run before finsweet loads the filters.
-const GLOBALS = [copyrightYear, formatPrice, hideOnTouch, nav, testimonialSlider, development, pageExtras, faq, sharedOwnershipCalculator, stampDutyCalculator, legacyFilterLinks, filterPanel, propertyFilter, filterSelect, stickyFilters, caseStudyCards, countUp, submitWait, caseGallery, finsweet];
+const GLOBALS = [copyrightYear, formatPrice, hideOnTouch, nav, testimonialSlider, development, pageExtras, faq, sharedOwnershipCalculator, stampDutyCalculator, legacyFilterLinks, filterPanel, propertyFilter, filterSelect, stickyFilters, caseStudyCards, newsStrip, countUp, submitWait, caseGallery, finsweet];
 
 // Opt-in modules, mounted on [data-module="<name>"] roots
 const MODULES = { map, 'map-view': mapView, 'auto-scroll': autoScroll, 'service-hero': serviceHero, 'purchaser-stories': purchaserStories, 'logo-marquee': logoMarquee, 'case-study-list': caseStudyList, 'news-list': newsList, 'news-article': newsArticle, 'prev-next': prevNextModule, share: shareModule };
