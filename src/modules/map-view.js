@@ -228,7 +228,8 @@ export default function mapView(root) {
     section.classList.toggle('is-map', isMap);
     hero?.classList.toggle('is-collapsed', fold);
     if (before !== null) {
-      if (!isMap) window.scrollBy(0, hero.offsetHeight - before);
+      // Phones keep their scroll position in map view too (the map is a full-screen layer)
+      if (!isMap || phonePanel()) window.scrollBy(0, hero.offsetHeight - before);
       requestAnimationFrame(() => { document.documentElement.style.overflowAnchor = ''; });
     }
     if (hero && !animate) {
@@ -238,12 +239,28 @@ export default function mapView(root) {
     lockPhone();
   }
 
-  // Phones, side-panel layout: the map is a full-screen layer under the nav and filter bar, so the
-  // page behind it mustn't scroll (it would carry the bar away and shrink the nav over the map).
+  // Phones, side-panel layout: the map is a full-screen layer under the nav and filter bar. Opening it
+  // leaves the page exactly where it is: no jump to the top (that grew the nav back to full height,
+  // and with the page locked you couldn't shrink it again), the results list stays underneath so the
+  // page keeps its length, the nav is held as it is, and the map starts right under the pinned bar.
+  // The page behind mustn't scroll while the map is open.
+  function phonePanel() {
+    return root.classList.contains('is-panel') && !DESKTOP.matches;
+  }
+  const navbar = document.querySelector('.navbar');
+  const placeMap = () => {
+    if (!locked || !band) return;
+    root.style.paddingTop = `${Math.round(band.getBoundingClientRect().bottom)}px`;
+  };
+  let locked = false;
+  if (navbar && 'ResizeObserver' in window) new ResizeObserver(placeMap).observe(navbar);
   function lockPhone() {
-    const lock = section.classList.contains('is-map') && root.classList.contains('is-panel') && !DESKTOP.matches;
-    if (lock) window.scrollTo(0, 0);
+    const lock = section.classList.contains('is-map') && phonePanel();
+    locked = lock;
     document.body.style.overflow = lock ? 'hidden' : '';
+    document.documentElement.toggleAttribute('data-nav-hold', lock); // global/nav.js leaves the nav alone
+    if (lock) placeMap();
+    else root.style.paddingTop = '';
     // The sections after this one (Featured developments, footer) would otherwise paint over the
     // map: it sits in a container that is its own stacking context. They can't be seen anyway.
     let next = root.closest('.section_property-search')?.nextElementSibling;
@@ -517,14 +534,15 @@ export default function mapView(root) {
   function setView(next, { remember = true } = {}) {
     view = next === 'map' ? 'map' : 'list';
     const isMap = view === 'map';
-    listViews.forEach((el) => { el.style.display = isMap ? 'none' : ''; });
+    // Phones keep the list under the full-screen map, so the page keeps its length and scroll position
+    listViews.forEach((el) => { el.style.display = isMap && !phonePanel() ? 'none' : ''; });
     setMode(isMap, { animate: remember });
     if (isMap) {
       showImages();
       stash(false);
       root.style.display = '';
-      // Map mode starts at the top of the page, wherever the list was scrolled to.
-      if (window.scrollY > 0) window.scrollTo({ top: 0, behavior: 'instant' });
+      // Map mode starts at the top of the page, wherever the list was scrolled to (not on phones).
+      if (window.scrollY > 0 && !phonePanel()) window.scrollTo({ top: 0, behavior: 'instant' });
     } else if (ready) {
       stash(true); // keep it drawn for next time
     } else {

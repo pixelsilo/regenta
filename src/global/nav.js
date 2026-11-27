@@ -81,6 +81,7 @@ export default function nav() {
     };
     const onScroll = () => {
       if (menu && menu.classList.contains('open')) return;
+      if (document.documentElement.hasAttribute('data-nav-hold')) return; // phone map view (map-view.js)
       const y = window.scrollY;
       if (y <= 0) { set(false); last = 0; return; }
       if (Math.abs(y - last) < STEP) return;
