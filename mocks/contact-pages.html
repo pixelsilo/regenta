@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mock: contact page layouts | Regenta</title>
+<script src="https://use.typekit.net/ptn3etu.js"></script>
+<script>try{Typekit.load();}catch(e){}</script>
+<style>
+  /* Mock only. Three layouts each for /contact-us (professional side, keeps its form and fields)
+     and /contact-buyers (buyer side, phone only, no form). Real copy, contacts and development phone numbers. */
+  :root { --green:#0b2b26; --green-2:#173833; --sand:#e3e5db; --sand-2:#eef0e8; --line:rgba(227,229,219,.3); --line-d:rgba(11,43,38,.15); }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--sand); color:var(--green); font-family:area-normal, area, "Area Normal", system-ui, sans-serif; }
+  a { color:inherit; }
+  .g { font-family:Griffiths, serif; font-weight:400; }
+  .wrap { max-width:1376px; margin:0 auto; padding:0 2rem; }
+  .eb { font-size:.72rem; letter-spacing:.22em; text-transform:uppercase; font-weight:600; opacity:.65; margin:0 0 1rem; }
+  .h1 { font-size:clamp(3rem, 6vw, 5.6rem); line-height:.95; font-weight:700; margin:0; letter-spacing:-.01em; }
+  .h1 .g, .h2 .g { font-size:1.12em; }
+  .h2 { font-size:clamp(2rem, 3.2vw, 3rem); line-height:1.02; font-weight:700; margin:0; }
+  .lead { font-size:1.15rem; line-height:1.55; max-width:36rem; margin:1.5rem 0 0; }
+  .muted { opacity:.7; }
+
+  /* switcher */
+  .sw { position:fixed; left:50%; bottom:1rem; transform:translateX(-50%); z-index:20; background:#fff; border:1px solid var(--line-d); border-radius:1.25rem; box-shadow:0 10px 30px rgba(11,43,38,.18); font-size:.85rem; width:min(1100px, calc(100% - 2rem)); }
+  body { padding-bottom:7rem; }
+  .sw .wrap { display:flex; gap:1.25rem; align-items:center; padding:.7rem 1rem; flex-wrap:wrap; }
+  .sw b { margin-right:.25rem; }
+  .sw button { font:inherit; border:1px solid var(--line-d); background:none; border-radius:99px; padding:.45rem .9rem; cursor:pointer; color:var(--green); }
+  .sw button.on { background:var(--green); color:var(--sand); border-color:var(--green); }
+  .sw .note { margin-left:auto; opacity:.65; max-width:32rem; line-height:1.35; font-size:.8rem; }
+  @media (max-width: 900px) { .sw .note { display:none; } }
+
+  /* fake nav for context */
+  .nav { background:var(--green); color:var(--sand); }
+  .nav .wrap { display:flex; align-items:center; justify-content:space-between; height:5.5rem; }
+  .nav .logo { font-weight:600; letter-spacing:.12em; font-size:1.5rem; display:flex; align-items:center; gap:.6rem; }
+  .nav .logo i { width:1.6rem; height:1.6rem; background:radial-gradient(circle, var(--sand) 30%, transparent 32%) 0 0/50% 50%; transform:rotate(45deg); display:inline-block; }
+  .nav nav { display:flex; gap:2rem; font-size:.7rem; letter-spacing:.2em; text-transform:uppercase; }
+
+  .opt { display:none; } .opt.on { display:block; }
+
+  /* shared bits */
+  .btn { display:inline-flex; align-items:center; gap:.85rem; border-radius:99px; padding:1rem 1.9rem; font:inherit; font-size:1rem; border:1px solid currentColor; background:none; color:inherit; cursor:pointer; text-decoration:none; white-space:nowrap; }
+  .btn i { font-style:normal; display:inline-grid; place-items:center; width:1.7rem; height:1.7rem; border-radius:50%; background:currentColor; }
+  .btn i svg { width:.6rem; height:.6rem; }
+  .btn.dark { background:var(--green); color:var(--sand); border-color:var(--green); } .btn.dark i path { stroke:var(--green); }
+  .btn.light { background:var(--sand); color:var(--green); border-color:var(--sand); } .btn.light i path { stroke:var(--sand); }
+  .btn.big { font-size:1.35rem; padding:1.2rem 2.2rem; }
+  label { display:flex; flex-direction:column; gap:.45rem; font-size:.8rem; }
+  input, textarea, select { font:inherit; font-size:1rem; color:inherit; background:transparent; border:1px solid var(--line-d); border-radius:.75rem; padding:.95rem 1rem; width:100%; }
+  textarea { min-height:8rem; resize:vertical; }
+  .check { flex-direction:row; align-items:center; gap:.6rem; font-size:.85rem; }
+  .check input { width:1.05rem; height:1.05rem; padding:0; border-radius:.25rem; flex:none; }
+  .form { display:grid; grid-template-columns:7rem 1fr 1fr; gap:1rem; }
+  .form .w2 { grid-column:span 2; } .form .full { grid-column:1 / -1; }
+  .form-foot { grid-column:1 / -1; display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap; margin-top:.5rem; }
+  .chips { display:flex; gap:.5rem; flex-wrap:wrap; }
+  .chip { font:inherit; font-size:.85rem; border:1px solid var(--line-d); border-radius:99px; padding:.6rem 1rem; background:none; color:inherit; cursor:pointer; }
+  .chip.on { background:var(--green); color:var(--sand); border-color:var(--green); }
+  .social { display:flex; gap:.5rem; }
+  .social a { width:2.6rem; height:2.6rem; border:1px solid currentColor; border-radius:50%; display:grid; place-items:center; text-decoration:none; font-size:.72rem; line-height:1; font-weight:600; opacity:.85; padding:0; }
+  .map { position:relative; border-radius:1rem; overflow:hidden; background:
+      linear-gradient(90deg, rgba(11,43,38,.06) 1px, transparent 1px) 0 0/42px 42px,
+      linear-gradient(rgba(11,43,38,.06) 1px, transparent 1px) 0 0/42px 42px, #d9dccf; }
+  .map::before { content:""; position:absolute; left:-10%; right:-10%; top:55%; height:14px; background:#cfd2c4; transform:rotate(-8deg); }
+  .map::after { content:""; position:absolute; top:-10%; bottom:-10%; left:38%; width:10px; background:#cfd2c4; transform:rotate(12deg); }
+  .map .pin { position:absolute; left:50%; top:46%; transform:translate(-50%,-100%); z-index:1; display:flex; flex-direction:column; align-items:center; gap:.4rem; }
+  .map .pin b { background:var(--green); color:var(--sand); font-size:.8rem; padding:.45rem .8rem; border-radius:99px; white-space:nowrap; }
+  .map .pin i { width:.9rem; height:.9rem; border-radius:50%; background:var(--green); box-shadow:0 0 0 6px rgba(11,43,38,.18); }
+  .arrow { display:inline-block; transition:transform .25s; }
+  a:hover .arrow { transform:translate(3px,-3px); }
+  section.pad { padding:6rem 0; }
+  @media (max-width: 900px) {
+    .form { grid-template-columns:1fr 1fr; } .form .w2 { grid-column:1 / -1; }
+    .nav nav { display:none; }
+    section.pad { padding:3.5rem 0; }
+  }
+
+  /* ============ CONTACT US ============ */
+  /* A: split screen, green info rail + form */
+  .ca { display:grid; grid-template-columns:minmax(22rem, .85fr) 1.4fr; min-height:calc(100vh - 8rem); }
+  .ca-rail { background:var(--green); color:var(--sand); padding:5rem 3rem 3rem; display:flex; flex-direction:column; justify-content:space-between; gap:3rem; }
+  .ca-list { display:flex; flex-direction:column; }
+  .ca-list > a, .ca-list > div { display:flex; justify-content:space-between; gap:1rem; align-items:baseline; padding:1.1rem 0; border-top:1px solid var(--line); text-decoration:none; font-size:1.2rem; }
+  .ca-list span { font-size:.75rem; letter-spacing:.18em; text-transform:uppercase; opacity:.6; }
+  .ca-list .r { text-align:right; line-height:1.35; }
+  .ca-office { border-radius:1rem; overflow:hidden; aspect-ratio:16/10; position:relative; }
+  .ca-office img { width:100%; height:100%; object-fit:cover; display:block; }
+  .ca-office p { position:absolute; left:1rem; bottom:1rem; margin:0; background:var(--sand); color:var(--green); font-size:.8rem; padding:.45rem .8rem; border-radius:99px; }
+  .ca-main { padding:5rem 4rem 4rem; display:flex; flex-direction:column; gap:2.5rem; max-width:56rem; }
+  .ca-step { display:flex; flex-direction:column; gap:.9rem; }
+  .ca-step > p { margin:0; font-weight:600; font-size:1.05rem; }
+  @media (max-width: 900px) { .ca { grid-template-columns:1fr; } .ca-main { padding:3rem 1.5rem; } .ca-rail { order:2; padding:3rem 1.5rem; } }
+
+  /* B: team-led */
+  .cb-top { display:grid; grid-template-columns:1.1fr 1fr; gap:4rem; align-items:end; }
+  .cb-team { display:grid; grid-template-columns:repeat(3, 1fr); gap:1rem; margin-top:4rem; }
+  .cb-p { position:relative; border-radius:1.25rem; overflow:hidden; aspect-ratio:4/5; background:#22403b; color:var(--sand); text-decoration:none; }
+  .cb-p img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 18%; transition:transform .5s cubic-bezier(.23,1,.32,1); }
+  .cb-p::after { content:""; position:absolute; inset:0; background:linear-gradient(0deg, rgba(11,43,38,.95) 0%, rgba(11,43,38,0) 55%); }
+  .cb-p:hover img { transform:scale(1.04); }
+  .cb-p div { position:absolute; left:1.4rem; right:1.4rem; bottom:1.3rem; z-index:1; }
+  .cb-p b { font-size:1.4rem; display:block; }
+  .cb-p span { display:block; font-size:.85rem; opacity:.8; margin-top:.25rem; }
+  .cb-p em { font-style:normal; display:inline-block; margin-top:.9rem; font-size:.75rem; border:1px solid var(--line); border-radius:99px; padding:.4rem .75rem; }
+  .cb-form { margin-top:1rem; background:var(--green); color:var(--sand); border-radius:1.5rem; padding:3rem; display:grid; grid-template-columns:1fr 1.6fr; gap:3rem; }
+  .cb-form input, .cb-form textarea, .cb-form select { border-color:var(--line); }
+  .cb-form select option { color:var(--green); }
+  .cb-form .chip { border-color:var(--line); } .cb-form .chip.on { background:var(--sand); color:var(--green); }
+  .cb-side { display:flex; flex-direction:column; justify-content:space-between; gap:2rem; }
+  .cb-side dl { margin:0; display:grid; gap:1.1rem; }
+  .cb-side dt { font-size:.72rem; letter-spacing:.2em; text-transform:uppercase; opacity:.6; }
+  .cb-side dd { margin:.3rem 0 0; font-size:1.15rem; line-height:1.4; }
+  @media (max-width: 900px) { .cb-top, .cb-form { grid-template-columns:1fr; gap:2rem; } .cb-team { grid-template-columns:1fr; } .cb-p { aspect-ratio:16/11; } .cb-form { padding:2rem 1.25rem; } }
+
+  /* C: map-first, address card over the map, form below with a short "what happens next" */
+  .cc-hero { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  .cc-head { background:var(--green); color:var(--sand); border-radius:1.5rem; padding:4rem 3rem; display:flex; flex-direction:column; justify-content:space-between; gap:3rem; min-height:34rem; }
+  .cc-quick { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; }
+  .cc-quick a { border:1px solid var(--line); border-radius:1rem; padding:1.25rem; text-decoration:none; display:flex; flex-direction:column; gap:.5rem; }
+  .cc-quick a span { font-size:.72rem; letter-spacing:.2em; text-transform:uppercase; opacity:.6; }
+  .cc-quick a b { font-weight:400; font-size:1.15rem; }
+  .cc-quick a:hover { background:var(--sand); color:var(--green); }
+  .cc-map { min-height:34rem; }
+  .cc-card { position:absolute; right:1.25rem; bottom:1.25rem; z-index:2; background:var(--sand-2); border-radius:1rem; padding:1.4rem 1.5rem; max-width:19rem; line-height:1.45; }
+  .cc-card b { display:block; font-size:1.05rem; margin-bottom:.3rem; }
+  .cc-card a { font-size:.85rem; display:inline-block; margin-top:.75rem; }
+  .cc-body { display:grid; grid-template-columns:.8fr 1.6fr; gap:4rem; margin-top:6rem; }
+  .cc-steps { list-style:none; margin:2rem 0 0; padding:0; counter-reset:s; }
+  .cc-steps li { counter-increment:s; display:grid; grid-template-columns:2.5rem 1fr; gap:.5rem; padding:1.1rem 0; border-top:1px solid var(--line-d); line-height:1.45; }
+  .cc-steps li::before { content:counter(s, decimal-leading-zero); font-size:.8rem; opacity:.55; padding-top:.2rem; }
+  .cc-form { background:var(--sand-2); border-radius:1.5rem; padding:2.75rem; }
+  .cc-form input, .cc-form textarea, .cc-form select { background:#fff; border-color:transparent; }
+  @media (max-width: 900px) { .cc-quick { grid-template-columns:1fr; } .cc-hero, .cc-body { grid-template-columns:1fr; } .cc-head, .cc-map { min-height:22rem; } .cc-head { padding:2.5rem 1.5rem; } .cc-form { padding:1.5rem; } .cc-body { margin-top:3rem; gap:2rem; } }
+
+  /* ============ CONTACT BUYERS ============ */
+  /* A: two routes */
+  .ba-routes { display:grid; grid-template-columns:1.35fr 1fr; gap:1rem; margin-top:3.5rem; }
+  .ba-card { border-radius:1.5rem; padding:2.5rem; display:flex; flex-direction:column; gap:1.5rem; }
+  .ba-dev { background:var(--green); color:var(--sand); }
+  .ba-call { background:var(--sand-2); }
+  .ba-card h3 { margin:0; font-size:1.6rem; line-height:1.15; }
+  .ba-card p { margin:0; line-height:1.55; opacity:.8; }
+  .ba-strip { display:grid; grid-template-columns:repeat(3, 1fr); gap:.6rem; }
+  .ba-strip a { position:relative; aspect-ratio:4/5; border-radius:.9rem; overflow:hidden; text-decoration:none; }
+  .ba-strip img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .ba-strip a::after { content:""; position:absolute; inset:0; background:linear-gradient(0deg, rgba(11,43,38,.9), transparent 55%); }
+  .ba-strip span { position:absolute; left:.8rem; right:.8rem; bottom:.75rem; z-index:1; font-size:.85rem; line-height:1.25; }
+  .ba-phone { font-size:clamp(1.8rem, 3vw, 2.6rem); font-weight:700; text-decoration:none; letter-spacing:-.01em; }
+  .ba-links { display:flex; flex-direction:column; margin-top:auto; }
+  .ba-links a { display:flex; justify-content:space-between; padding:.95rem 0; border-top:1px solid var(--line-d); text-decoration:none; }
+  @media (max-width: 900px) { .ba-routes { grid-template-columns:1fr; } .ba-card { padding:1.75rem 1.25rem; }
+    .ba-strip { grid-template-columns:none; grid-auto-flow:column; grid-auto-columns:72%; overflow-x:auto; scroll-snap-type:x mandatory; margin-right:-1.25rem; padding-right:1.25rem; }
+    .ba-strip a { scroll-snap-align:start; aspect-ratio:4/3; }
+    .ba-phone { font-size:1.75rem; white-space:nowrap; } }
+
+  /* B: phone hero + quick answers */
+  .bb-hero { background:var(--green); color:var(--sand); border-radius:1.5rem; padding:5rem 3rem; text-align:center; display:flex; flex-direction:column; align-items:center; }
+  .bb-hero .lead { margin-left:auto; margin-right:auto; opacity:.85; }
+  .bb-num { font-size:clamp(1.9rem, 7.5vw, 4.8rem); font-weight:700; text-decoration:none; margin:2.5rem 0 1.5rem; letter-spacing:-.01em; }
+  .bb-actions { display:flex; gap:.75rem; flex-wrap:wrap; justify-content:center; }
+  .bb-hero .btn.ghost { border-color:var(--line); }
+  .bb-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:1rem; margin-top:1rem; }
+  .bb-grid a { background:var(--sand-2); border-radius:1.25rem; padding:1.75rem; text-decoration:none; display:flex; flex-direction:column; gap:.75rem; min-height:12rem; }
+  .bb-grid a span { font-size:.72rem; letter-spacing:.2em; text-transform:uppercase; opacity:.6; }
+  .bb-grid a b { font-size:1.2rem; line-height:1.3; font-weight:600; }
+  .bb-grid a em { font-style:normal; margin-top:auto; font-size:.9rem; }
+  .bb-grid a:hover { background:#fff; }
+  .bb-faq h2 { margin:6rem 0 1.5rem; }
+  .bb-faq details { border-top:1px solid var(--line-d); padding:1.3rem 0; }
+  .bb-faq summary { cursor:pointer; font-size:1.2rem; font-weight:600; list-style:none; display:flex; justify-content:space-between; }
+  .bb-faq summary::after { content:"+"; font-weight:400; }
+  .bb-faq details[open] summary::after { content:"–"; }
+  .bb-faq details p { margin:.8rem 0 0; max-width:46rem; line-height:1.55; opacity:.8; }
+  @media (max-width: 900px) { .bb-grid { grid-template-columns:1fr 1fr; } .bb-hero { padding:3rem 1.25rem; } }
+
+  /* C: find your development's sales team */
+  .bc-top { display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:end; }
+  .bc-search { position:relative; margin-top:3.5rem; }
+  .bc-search input { font-size:1.25rem; padding:1.3rem 1.5rem 1.3rem 3.4rem; border-radius:99px; background:#fff; border-color:transparent; }
+  .bc-search svg { position:absolute; left:1.3rem; top:50%; transform:translateY(-50%); width:1.2rem; height:1.2rem; opacity:.6; }
+  .bc-list { margin-top:1.5rem; display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
+  .bc-row { display:grid; grid-template-columns:4.5rem 1fr auto; gap:1rem; align-items:center; background:var(--sand-2); border-radius:1rem; padding:.6rem 1rem .6rem .6rem; }
+  .bc-row img { width:4.5rem; height:4.5rem; border-radius:.7rem; object-fit:cover; }
+  .bc-row b { display:block; font-size:1.05rem; }
+  .bc-row span { font-size:.82rem; opacity:.65; }
+  .bc-row a.tel { text-decoration:none; font-size:.95rem; border:1px solid var(--line-d); border-radius:99px; padding:.6rem 1rem; white-space:nowrap; }
+  .bc-row a.tel:hover { background:var(--green); color:var(--sand); }
+  .bc-row a.page { font-size:.8rem; }
+  .bc-empty { display:none; padding:2rem 0; }
+  .bc-else { margin-top:4rem; background:var(--green); color:var(--sand); border-radius:1.5rem; padding:2.5rem 3rem; display:flex; justify-content:space-between; align-items:center; gap:2rem; flex-wrap:wrap; }
+  .bc-else p { margin:.5rem 0 0; opacity:.8; }
+  @media (max-width: 900px) { .bc-top { grid-template-columns:1fr; gap:1.5rem; } .bc-list { grid-template-columns:1fr; } .bc-row { grid-template-columns:3.5rem 1fr; } .bc-row img { width:3.5rem; height:3.5rem; } .bc-row .act { grid-column:1 / -1; display:flex; gap:.5rem; align-items:center; justify-content:space-between; } .bc-else { padding:2rem 1.25rem; } }
+</style>
+</head>
+<body>
+
+<div class="sw"><div class="wrap">
+  <span><b>Page</b> <button data-page="us" class="on">Contact Us (professional)</button> <button data-page="buy">Contact Buyers</button></span>
+  <span><b>Option</b> <button data-opt="a" class="on">A</button> <button data-opt="b">B</button> <button data-opt="c">C</button></span>
+  <span class="note" id="note"></span>
+</div></div>
+
+<header class="nav"><div class="wrap"><span class="logo"><i></i>REGENTA</span><nav id="navlinks"></nav></div></header>
+
+<!-- ===================== CONTACT US ===================== -->
+<main class="opt" id="us-a">
+  <div class="ca">
+    <div class="ca-main">
+      <div>
+        <p class="eb">Contact us</p>
+        <h1 class="h1">Let's <span class="g">talk</span></h1>
+        <p class="lead">Get in touch with the team today and find out how we can help make your next development a success.</p>
+      </div>
+      <div class="ca-step">
+        <p>What's it about?</p>
+        <div class="chips" data-chips>
+          <button class="chip on">Sales</button><button class="chip">Marketing</button><button class="chip">Market Intelligence</button><button class="chip">Development Consultancy</button><button class="chip">Something else</button>
+        </div>
+      </div>
+      <form class="form" onsubmit="return false">
+        <label>Title<select><option></option><option>Mr</option><option>Mrs</option><option>Miss</option><option>Dr</option></select></label>
+        <label>First name*<input></label>
+        <label>Surname*<input></label>
+        <label class="full">Email*<input type="email"></label>
+        <label class="full">Phone number<input type="tel"></label>
+        <label class="full">Message<textarea placeholder="Tell us about the site or scheme"></textarea></label>
+        <div class="form-foot">
+          <label class="check"><input type="checkbox"> I have read and agree to your&nbsp;<a href="#">Privacy Policy</a>*</label>
+          <button class="btn dark">Send message <i><svg viewBox="0 0 10 10"><path d="M2 8 8 2M3 2h5v5" stroke="#e3e5db" stroke-width="1.4" fill="none"/></svg></i></button>
+        </div>
+      </form>
+    </div>
+    <aside class="ca-rail">
+      <div class="ca-list">
+        <p class="eb">Talk to us directly</p>
+        <a href="tel:+442085025758"><span>Phone</span><b>+44 (0)20 8502 5758</b></a>
+        <a href="mailto:info@regenta.co.uk"><span>Email</span><b>info@regenta.co.uk</b></a>
+        <div><span>Office</span><b class="r">14 Devonshire Square<br>London EC2M 4YT</b></div>
+        <div><span>Social</span><div class="social"><a href="#">in</a><a href="#">ig</a><a href="#">fb</a></div></div>
+      </div>
+      <div class="ca-office">
+        <img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/68362e432005a0afe1417374_052_LowRes_OfficePhotography_SiteSales_4K2A9455%20copy.jpg" alt="">
+        <p>Devonshire Square, Liverpool Street</p>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<main class="opt" id="us-b"><section class="pad"><div class="wrap">
+  <div class="cb-top">
+    <div><p class="eb">Contact us</p><h1 class="h1">Let's <span class="g">talk</span></h1></div>
+    <p class="lead" style="margin:0">Get in touch with the team today and find out how we can help make your next development a success. Or speak to the person who leads the service you need.</p>
+  </div>
+  <div class="cb-team">
+    <a class="cb-p" href="#"><img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/6842ebc8caeb8db3c2afa781_Ross.avif" alt=""><div><b>Ross Smith</b><span>Director</span><em>Sales · Market Intelligence</em></div></a>
+    <a class="cb-p" href="#"><img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/685ab460966211d7b9f87aa5_HiRes_Sitesales-Regenta-Headshots-UpdatedChoices_0004.webp" alt=""><div><b>Rachel Bryan</b><span>Assistant Director - Operations &amp; Marketing</span><em>Marketing</em></div></a>
+    <a class="cb-p" href="#"><img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/6842eb8fcf53f6edc5267d19_Alex%20Piggott.avif" alt=""><div><b>Alex Piggott</b><span>Development Director</span><em>Development Consultancy</em></div></a>
+  </div>
+  <div class="cb-form">
+    <div class="cb-side">
+      <div><h2 class="h2" style="font-size:2rem">Send us <span class="g">a message</span></h2><p class="muted" style="line-height:1.55">It goes to the whole team, and the right person picks it up.</p></div>
+      <dl>
+        <div><dt>Phone</dt><dd><a href="tel:+442085025758" style="text-decoration:none">+44 (0)20 8502 5758</a></dd></div>
+        <div><dt>Email</dt><dd><a href="mailto:info@regenta.co.uk" style="text-decoration:none">info@regenta.co.uk</a></dd></div>
+        <div><dt>Office</dt><dd>14 Devonshire Square, London EC2M 4YT</dd></div>
+      </dl>
+    </div>
+    <form class="form" onsubmit="return false">
+      <div class="full chips" data-chips><button class="chip on">Sales</button><button class="chip">Marketing</button><button class="chip">Market Intelligence</button><button class="chip">Development Consultancy</button><button class="chip">Something else</button></div>
+      <label>Title<select><option></option><option>Mr</option><option>Mrs</option><option>Miss</option><option>Dr</option></select></label>
+      <label>First name*<input></label>
+      <label>Surname*<input></label>
+      <label class="w2" style="grid-column:1 / 3">Email*<input type="email"></label>
+      <label>Phone number<input type="tel"></label>
+      <label class="full">Message<textarea></textarea></label>
+      <div class="form-foot">
+        <label class="check"><input type="checkbox"> I have read and agree to your&nbsp;<a href="#">Privacy Policy</a>*</label>
+        <button class="btn light">Send message <i><svg viewBox="0 0 10 10"><path d="M2 8 8 2M3 2h5v5" stroke="#0b2b26" stroke-width="1.4" fill="none"/></svg></i></button>
+      </div>
+    </form>
+  </div>
+</div></section></main>
+
+<main class="opt" id="us-c"><section class="pad" style="padding-top:2rem"><div class="wrap">
+  <div class="cc-hero">
+    <div class="cc-head">
+      <div><p class="eb">Contact us</p><h1 class="h1">Let's <span class="g">talk</span></h1>
+      <p class="lead" style="opacity:.85">Get in touch with the team today and find out how we can help make your next development a success.</p></div>
+      <div class="cc-quick">
+        <a href="tel:+442085025758"><span>Call</span><b>+44 (0)20 8502 5758</b></a>
+        <a href="mailto:info@regenta.co.uk"><span>Email</span><b>info@regenta.co.uk</b></a>
+        <a href="#form"><span>Write to us</span><b>Send a message <span class="arrow">↓</span></b></a>
+        <a href="#"><span>Follow</span><b>LinkedIn <span class="arrow">↗</span></b></a>
+      </div>
+    </div>
+    <div class="map cc-map">
+      <div class="pin"><b>Regenta</b><i></i></div>
+      <div class="cc-card"><b>14 Devonshire Square</b>London EC2M 4YT<br><span class="muted">A short walk from Liverpool Street station.</span><br><a href="#">Get directions ↗</a></div>
+    </div>
+  </div>
+  <div class="cc-body" id="form">
+    <div>
+      <h2 class="h2">Tell us about <span class="g">your scheme</span></h2>
+      <ol class="cc-steps">
+        <li>Send us a few lines about the site or scheme, and what you need help with.</li>
+        <li>The right person in the team picks it up and gets back to you.</li>
+        <li>We arrange a call or a meeting at Devonshire Square or on site.</li>
+      </ol>
+    </div>
+    <form class="form cc-form" onsubmit="return false">
+      <label>Title<select><option></option><option>Mr</option><option>Mrs</option><option>Miss</option><option>Dr</option></select></label>
+      <label>First name*<input></label>
+      <label>Surname*<input></label>
+      <label class="full">Email*<input type="email"></label>
+      <label class="full">Phone number<input type="tel"></label>
+      <label class="full">Message<textarea></textarea></label>
+      <div class="form-foot">
+        <label class="check"><input type="checkbox"> I have read and agree to your&nbsp;<a href="#">Privacy Policy</a>*</label>
+        <button class="btn dark">Send message <i><svg viewBox="0 0 10 10"><path d="M2 8 8 2M3 2h5v5" stroke="#e3e5db" stroke-width="1.4" fill="none"/></svg></i></button>
+      </div>
+    </form>
+  </div>
+</div></section></main>
+
+<!-- ===================== CONTACT BUYERS ===================== -->
+<main class="opt" id="buy-a"><section class="pad"><div class="wrap">
+  <p class="eb">Contact us</p>
+  <h1 class="h1">Let's <span class="g">talk</span></h1>
+  <p class="lead">Interested in one of our homes? The quickest way to book a viewing or ask a question is on the development's own page, where you'll reach its sales team directly. For anything else, give us a call.</p>
+  <div class="ba-routes">
+    <div class="ba-card ba-dev">
+      <p class="eb" style="margin:0">About a development</p>
+      <h3>Book a viewing or ask about a home</h3>
+      <p>Each development has its own sales team. Find it and enquire, or call them from its page.</p>
+      <div class="ba-strip" id="baStrip"></div>
+      <div><a class="btn light" href="#">Search properties <i><svg viewBox="0 0 10 10"><path d="M2 8 8 2M3 2h5v5" stroke="#0b2b26" stroke-width="1.4" fill="none"/></svg></i></a></div>
+    </div>
+    <div class="ba-card ba-call">
+      <p class="eb" style="margin:0">Anything else</p>
+      <h3>Give us a call</h3>
+      <a class="ba-phone" href="tel:+442085025758">+44 (0)20 8502 5758</a>
+      <p>Questions about Shared Ownership, a home you've already bought, or something not listed here.</p>
+      <div><a class="btn dark" href="tel:+442085025758">Call us <i><svg viewBox="0 0 10 10"><path d="M2 8 8 2M3 2h5v5" stroke="#e3e5db" stroke-width="1.4" fill="none"/></svg></i></a></div>
+      <div class="ba-links">
+        <a href="#">Shared Ownership FAQs <span class="arrow">↗</span></a>
+        <a href="#">Shared Ownership calculator <span class="arrow">↗</span></a>
+        <a href="#">Stamp Duty calculator <span class="arrow">↗</span></a>
+        <a href="#">Purchaser stories <span class="arrow">↗</span></a>
+      </div>
+    </div>
+  </div>
+</div></section></main>
+
+<main class="opt" id="buy-b"><section class="pad"><div class="wrap">
+  <div class="bb-hero">
+    <p class="eb">Contact us</p>
+    <h1 class="h1">Let's <span class="g">talk</span></h1>
+    <p class="lead">Interested in one of our homes? The quickest way to book a viewing or ask a question is on the development's own page, where you'll reach its sales team directly. For anything else, give us a call.</p>
+    <a class="bb-num" href="tel:+442085025758">+44 (0)20 8502 5758</a>
+    <div class="bb-actions">
+      <a class="btn light" href="tel:+442085025758">Call us <i><svg viewBox="0 0 10 10"><path d="M2 8 8 2M3 2h5v5" stroke="#0b2b26" stroke-width="1.4" fill="none"/></svg></i></a>
+      <a class="btn ghost" href="#">Search properties</a>
+    </div>
+  </div>
+  <div class="bb-grid">
+    <a href="#"><span>Homes</span><b>Find a development and its sales team</b><em>Search properties ↗</em></a>
+    <a href="#"><span>Questions</span><b>How Shared Ownership works, step by step</b><em>Read the FAQs ↗</em></a>
+    <a href="#"><span>Costs</span><b>Work out your monthly Shared Ownership costs</b><em>Open the calculator ↗</em></a>
+    <a href="#"><span>Buyers</span><b>What buyers say about buying with us</b><em>Purchaser stories ↗</em></a>
+  </div>
+  <div class="bb-faq">
+    <h2 class="h2">Quick <span class="g">answers</span></h2>
+    <details open><summary>How do I book a viewing?</summary><p>Find the development on Property Search and use the enquiry form or phone number on its page. That goes straight to its sales team.</p></details>
+    <details><summary>Is Shared Ownership only for first-time buyers?</summary><p>No. It is also available to previous homeowners who can no longer afford to buy outright, existing shared owners looking to move, and some people following relationship breakdowns or life changes.</p></details>
+    <details><summary>How much deposit do I need?</summary><p>Typically between 5% and 10% of the share you are purchasing, rather than the full property value.</p></details>
+    <details><summary>Who do I call if something goes wrong after I move in?</summary><p>Depending on the issue: housing provider, management company, developer aftercare team or utility provider.</p></details>
+  </div>
+</div></section></main>
+
+<main class="opt" id="buy-c"><section class="pad"><div class="wrap">
+  <div class="bc-top">
+    <div><p class="eb">Contact us</p><h1 class="h1">Let's <span class="g">talk</span></h1></div>
+    <p class="lead" style="margin:0">The quickest way to book a viewing or ask about a home is to call the development's own sales team. Find it below.</p>
+  </div>
+  <div class="bc-search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+    <input id="bcQ" placeholder="Search by development or area, e.g. Greenwich">
+  </div>
+  <div class="bc-list" id="bcList"></div>
+  <p class="bc-empty" id="bcEmpty">No developments match that. Try another area, or call us on +44 (0)20 8502 5758.</p>
+  <div class="bc-else">
+    <div><h2 class="h2" style="font-size:2rem">Anything <span class="g">else?</span></h2><p>Questions about Shared Ownership, a home you've already bought, or something not listed here.</p></div>
+    <a class="btn light big" href="tel:+442085025758">+44 (0)20 8502 5758</a>
+  </div>
+</div></section></main>
+
+<script src="featured-data.js"></script>
+<script src="property-search-data.js"></script>
+<script>
+  const PHONES = {"east-wick-and-sweetwater":"03448920214","the-aura":"03448920215","fulham-quarter":"03448001762","west-street":"03447480063","granville-gardens-private-sale":"03447480062","makers-yard":"03448920124","abbeywharf":"03448001613","priory-court":"03448099158","this-is-silvertown":"03448920207","west-acre-square":"03448001760","nursery-mews":"03447480054","white-post-street":"03448920217","white-post-street---shared-ownership":"03448920217","wandsworth-common":"03448920153","one-goodmayes":"03448920219","northwick-parkside":"03448920210","priory-court---wheelchair-adaptable-properties":"03448099158","dominion-house":"03448920224","jigsaw":"03448920224","broadway-edge":"03448920213","park-rise":"03447480052","ladywell":"","mayfield":"","the-cube":"03447480058","this-is-southall":"03448009448"};
+  const fmt = (n) => n.replace(/^(\d{4})(\d{3})(\d{4})$/, '$1 $2 $3');
+  const NOTES = {
+    'us-a': 'A · Split screen. Form first, with a "What\'s it about?" topic picker (would need a new hidden field on the form relay). Green rail with direct contacts and an office photo.',
+    'us-b': 'B · Team-led. The three service leads as photo cards (link to their service pages), then the form in a green panel with the topic picker and direct contacts.',
+    'us-c': 'C · Map-first. Green heading block with four quick routes beside a map of Devonshire Square, then the form with a short "what happens next".',
+    'buy-a': 'A · Two routes. "About a development" (live featured developments + Search properties) beside "Anything else" (phone + FAQs, calculators, stories). No form.',
+    'buy-b': 'B · Phone hero. Big call-to-action, four quick links, then answers to common questions (copy from the FAQ page). No form.',
+    'buy-c': 'C · Find your sales team. Search the developments and call each one\'s sales line directly (Contact Number field from the CMS), with the main number for anything else. No form.'
+  };
+  const NAV = { us: ['About us', 'Built by Regenta', 'Case studies', 'News', 'Contact us'], buy: ['FAQs', 'Calculators', 'Purchaser stories', 'Contact us'] };
+  let page = 'us', opt = 'a';
+  function show() {
+    document.querySelectorAll('.opt').forEach((m) => m.classList.toggle('on', m.id === page + '-' + opt));
+    document.querySelectorAll('[data-page]').forEach((b) => b.classList.toggle('on', b.dataset.page === page));
+    document.querySelectorAll('[data-opt]').forEach((b) => b.classList.toggle('on', b.dataset.opt === opt));
+    document.getElementById('note').textContent = NOTES[page + '-' + opt];
+    document.getElementById('navlinks').innerHTML = NAV[page].map((n) => '<span>' + n + '</span>').join('');
+    history.replaceState(null, '', '#' + page + '-' + opt);
+  }
+  document.querySelectorAll('[data-page]').forEach((b) => b.onclick = () => { page = b.dataset.page; show(); });
+  document.querySelectorAll('[data-opt]').forEach((b) => b.onclick = () => { opt = b.dataset.opt; show(); });
+  const h = location.hash.slice(1).split('-'); if (h.length === 2 && NOTES[h.join('-')]) { [page, opt] = h; }
+  document.querySelectorAll('[data-chips]').forEach((g) => g.addEventListener('click', (e) => { const c = e.target.closest('.chip'); if (!c) return; g.querySelectorAll('.chip').forEach((x) => x.classList.toggle('on', x === c)); }));
+
+  // Buyers A: featured developments strip
+  document.getElementById('baStrip').innerHTML = window.FEATURED.slice(0, 3).map((d) =>
+    '<a href="#"><img src="' + d.img + '" alt=""><span>' + d.name + '</span></a>').join('');
+
+  // Buyers C: searchable sales lines (one row per development name)
+  const seen = new Set();
+  const devs = window.DEVS.filter((d) => { const k = d.name.replace(/ -.*$/, ''); if (seen.has(k)) return false; seen.add(k); return true; });
+  const list = document.getElementById('bcList');
+  list.innerHTML = devs.map((d) => {
+    const tel = PHONES[d.slug];
+    return '<div class="bc-row" data-q="' + (d.name + ' ' + d.region + ' ' + d.tenure.join(' ') + ' ' + d.desc).toLowerCase() + '">' +
+      '<img src="' + d.img + '" alt="">' +
+      '<div><b>' + d.name + '</b><span>' + d.region + ' · ' + d.tenure.join(', ') + '</span></div>' +
+      '<div class="act">' + (tel ? '<a class="tel" href="tel:' + tel + '">' + fmt(tel) + '</a>' : '<a class="page" href="#">Enquire on its page ↗</a>') + '</div></div>';
+  }).join('');
+  document.getElementById('bcQ').addEventListener('input', (e) => {
+    const q = e.target.value.trim().toLowerCase(); let n = 0;
+    list.querySelectorAll('.bc-row').forEach((r) => { const on = !q || r.dataset.q.includes(q); r.style.display = on ? '' : 'none'; n += on; });
+    document.getElementById('bcEmpty').style.display = n ? 'none' : 'block';
+  });
+  show();
+</script>
+</body>
+</html>
