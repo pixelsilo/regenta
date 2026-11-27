@@ -2,9 +2,11 @@
 
 **Result:** 164 of the 182 were deleted and published to staging. Webflow refused 18 because it still counts them as in use somewhere the API scan didn't show (likely leftover references in component variants or page history): `nm_link`, `nm_link.nm_link-services`, `nm_links`, `bpb_cl`, `bpb_content`, `bpb_image-div`, `Div Block 139`, `Dropdown 2`, `dropdown-link`, `dropdown-ci`, `fd_specs`, `fd_button`, `fd_slide`, `sp_js`, `hide-on-mobile`, `navbar_mini-link.faded.hide-on-mobile`, `icon-size_0.5rem`, `Collection List 5`. Those stay.
 
-Restored afterwards: `fs-cc-manager_component.move-up` (tablet and below: bottom 4rem). It's set on the cookie button on development pages outside the Designer's class list, so the scan missed it. `review-card.big` was also deleted, but it had no CSS, so nothing changed. It's still set by the purchaser-stories CMS "Card style" field (a class bound to the CMS), so recreate it if big cards ever need their own styling.
+Restored afterwards (both are set outside the Designer's class list, so neither Webflow's usage check nor the scan saw them):
+- `fs-cc-manager_component.move-up`: on the cookie button on development pages. Tablet and below: bottom 4rem.
+- `review-card.big`: set by the purchaser stories CMS "Card style" field, which is bound to the card's class. Background `--_regenta---green-white` (sand). The rule came from the pre-cleanup staging CSS; the live CSS doesn't have it yet because Purchaser Stories isn't live.
 
-After publishing, every class in the published pages' markup still has CSS except `big` (above), and the main pages render as before.
+Final check: of the 151 compound selectors that are no longer in the CSS, none matches an element on any published staging page.
 
 1473 classes and combos on the site (tag styles like body/h1 not counted).
 
