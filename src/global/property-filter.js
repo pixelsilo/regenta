@@ -202,6 +202,8 @@ export default function propertyFilter() {
     publishVisible(shown);
     availability();
     if (remember) writeQuery();
+    // global/filter-panel.js redraws its buttons, counts and active chips from this
+    form.dispatchEvent(new CustomEvent('filter:applied', { detail: { state: { ...state }, count: shown.size, total: data.length } }));
   }
 
   // Grey out choices that would show nothing alongside the other filters (and the price range):
@@ -221,7 +223,10 @@ export default function propertyFilter() {
       if (!select) return;
       let changed = false;
       [...select.options].forEach((option) => {
-        if (option.value === '') return;
+        if (option.value === '') { // the "all" option: what this filter shows when cleared
+          option.setAttribute('data-count', String(countWith(key, key === 'bedrooms' ? null : '')));
+          return;
+        }
         const n = countWith(key, key === 'bedrooms' ? num(option.value) : option.value);
         const off = n === 0 && option.index !== select.selectedIndex;
         option.setAttribute('data-count', String(n));
@@ -237,7 +242,10 @@ export default function propertyFilter() {
     const list = items[0]?.closest('[data-list-view]');
     if (!list || !list.offsetParent) return; // map view: nothing to scroll to
     const band = document.querySelector('[data-sticky-filters]');
-    const pinnedBottom = band && getComputedStyle(band).position === 'sticky' ? band.getBoundingClientRect().bottom : 0;
+    const nav = document.querySelector('.navbar');
+    const pinnedBottom = band && getComputedStyle(band).position === 'sticky'
+      ? band.getBoundingClientRect().bottom
+      : (nav ? nav.getBoundingClientRect().bottom : 0);
     const top = list.getBoundingClientRect().top;
     if (top < pinnedBottom) window.scrollTo({ top: window.scrollY + top - pinnedBottom - 24 });
   }
@@ -264,6 +272,16 @@ export default function propertyFilter() {
     state.priceFrom = from;
     state.priceTo = to;
     applySoon();
+  });
+
+  // A price range set from outside the slider (global/filter-panel.js quick ranges and chips).
+  // detail: { from, to }, null for no limit at that end.
+  form.addEventListener('filter:price', (event) => {
+    state.priceFrom = event.detail?.from ?? null;
+    state.priceTo = event.detail?.to ?? null;
+    range?.setRange(state.priceFrom, state.priceTo);
+    apply();
+    backToResults();
   });
 
   // Never submit (Enter in the form, old Webflow form handling)

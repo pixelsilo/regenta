@@ -179,6 +179,11 @@ export default function mapView(root) {
   // heading block's top padding (the heading itself is folded away), the filter bar and its
   // margin, plus the strip that tucks under the bar. Phones: CSS stacks map over list.
   function size() {
+    // Side panel layout (Property Search option B): Webflow sizes the map (.map-view.is-panel).
+    if (root.classList.contains('is-panel')) {
+      root.style.height = '';
+      return;
+    }
     if (!DESKTOP.matches || (!stashed && getComputedStyle(section).display === 'flex')) {
       root.style.height = '';
       return;
@@ -229,7 +234,8 @@ export default function mapView(root) {
         mapTypeControl: false,
         fullscreenControl: false,
         clickableIcons: false,
-        gestureHandling: DESKTOP.matches ? 'greedy' : 'cooperative',
+        // The panel layout's phone map is full screen, so one finger moves it there too
+        gestureHandling: DESKTOP.matches || root.classList.contains('is-panel') ? 'greedy' : 'cooperative',
       });
       card = makeCard(OverlayView, closeCard);
       gmap.addListener('click', closeCard); // a click on the map itself closes the card
