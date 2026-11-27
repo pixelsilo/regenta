@@ -29,6 +29,8 @@ const label = (field, option) => {
   return field === 'bedrooms' && /^\d+$/.test(option.value) ? `${option.value}+` : option.text.trim();
 };
 const money = (n) => `£${Number(n).toLocaleString('en-GB')}`;
+// Pill labels: £250k, £1.2m
+const short = (n) => (n >= 1e6 ? `£${+(n / 1e6).toFixed(2)}m` : n >= 1000 ? `£${Math.round(n / 1000)}k` : money(n));
 const devs = (n) => `${n} ${n === 1 ? 'development' : 'developments'}`;
 const X = '<svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true" style="display:block"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7"/></svg>';
 
@@ -57,10 +59,10 @@ export default function filterPanel() {
   const badges = [...document.querySelectorAll('[data-filter-active-n]')];
   let state = { tenure: '', region: '', bedrooms: null, priceFrom: null, priceTo: null };
 
-  const priceText = () => {
+  const priceText = (fmt = money) => {
     const { priceFrom: from, priceTo: to } = state;
     if (!from && to === null) return '';
-    return to === null ? `${money(from)}+` : !from ? `Up to ${money(to)}` : `${money(from)} – ${money(to)}`;
+    return to === null ? `${fmt(from)}+` : !from ? `Up to ${fmt(to)}` : `${fmt(from)} – ${fmt(to)}`;
   };
   const valueText = (field) => {
     const g = groups.find((x) => x.field === field);
@@ -73,6 +75,8 @@ export default function filterPanel() {
     return { el, field: el.getAttribute('data-filter-pop'), text, base: text?.getAttribute('data-filter-pop-label') || '' };
   });
   const sections = [...panel.querySelectorAll('[data-filter-section]')];
+  // The bar's own Clear all only shows once a filter is on
+  const barClears = [...document.querySelectorAll('[data-filter-clear]')].filter((el) => !panel.contains(el));
   sections.forEach((sec) => { sec.dataset.first = String(sec.classList.contains('is-first')); });
 
   const choose = (g, value) => {
@@ -135,7 +139,7 @@ export default function filterPanel() {
     const price = priceText();
     if (price) list.push({ text: price, clear: () => setPrice(null, null) });
     pills.forEach(({ el, field, text, base }) => {
-      const value = field === 'price' ? price : valueText(field);
+      const value = field === 'price' ? priceText(short) : valueText(field);
       el.classList.toggle('is-set', !!value);
       if (text) text.textContent = value || base;
     });
@@ -153,6 +157,7 @@ export default function filterPanel() {
       });
       active.style.display = list.length ? '' : 'none';
     }
+    barClears.forEach((el) => { el.style.visibility = list.length ? '' : 'hidden'; });
     badges.forEach((el) => {
       el.textContent = String(list.length);
       el.style.display = list.length ? '' : 'none';
