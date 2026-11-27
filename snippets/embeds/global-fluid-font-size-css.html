@@ -33,13 +33,18 @@
    Source: pixelsilo/regenta README > Area optical centring. */
 :root { --area-optical-shift: 0.14em; }
 @supports (font: -apple-system-body) { :root { --area-optical-shift: -0.09em; } }
-.button-text, .faq_nav-link > span, .alert-strip .w-richtext > :only-child { translate: 0 var(--area-optical-shift); }
+.button-text, .faq_nav-link > span, .faq_question-text, .alert-strip .w-richtext > :only-child { translate: 0 var(--area-optical-shift); }
 .heading-pill-1rem { padding-top: calc(0.7rem + var(--area-optical-shift)); padding-bottom: calc(0.7rem - var(--area-optical-shift)); }
+/* Bound category pills carry .button-text on the pill itself: move their padding, not the whole pill. */
+.csl-tag.button-text { translate: none; padding-top: calc(0.3rem + var(--area-optical-shift)); padding-bottom: calc(0.3rem - var(--area-optical-shift)); }
+.nw-card_tag.button-text { translate: none; padding-top: calc(0.35rem + var(--area-optical-shift)); padding-bottom: calc(0.35rem - var(--area-optical-shift)); }
 @supports (text-box: trim-both cap alphabetic) {
   :root { --area-optical-shift: 0em; }
-  .button-text, .faq_nav-link > span { text-box: trim-both cap alphabetic; margin-block: calc((1lh - 1cap) / 2); }
+  .button-text, .faq_nav-link > span, .faq_question-text { text-box: trim-both cap alphabetic; margin-block: calc((1lh - 1cap) / 2); }
   .alert-strip .w-richtext > :only-child { text-box: trim-both cap alphabetic; padding-block: calc((1lh - 1cap) / 2); } /* padding: rich text forces margin-top 0 */
   .heading-pill-1rem { text-box: trim-both cap alphabetic; padding-block: calc(0.7rem + (1lh - 1cap) / 2); }
+  .csl-tag.button-text { margin-block: 0; padding-block: calc(0.3rem + (1lh - 1cap) / 2); }
+  .nw-card_tag.button-text { margin-block: 0; padding-block: calc(0.35rem + (1lh - 1cap) / 2); }
 }
 </style>
 <!-- (Before Nov 2026 this embed also had an iOS-only `.button-text { top: -1em }` rule; it had no effect and was removed.) -->
