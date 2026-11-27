@@ -115,7 +115,7 @@ function makePin(OverlayView, LatLng) {
       this.el.style.left = `${point.x}px`;
       this.el.style.top = `${point.y}px`;
     }
-    set(cls, on) {
+    flag(cls, on) { // not set(): OverlayView inherits MVCObject.set, which setMap relies on
       this.el.classList.toggle(cls, on);
       this.el.style.zIndex = this.el.classList.contains('is-active') || this.el.classList.contains('is-hover') ? '5' : '';
     }
@@ -356,7 +356,7 @@ export default function mapView(root) {
     active = item;
     items.forEach((i) => {
       i.card?.classList.toggle('is-active', i === item);
-      markers.get(i.slug)?.set('is-active', i === item);
+      markers.get(i.slug)?.flag('is-active', i === item);
     });
     if (!item || !scroll || !sidebar) return;
     if (DESKTOP.matches) {
@@ -553,7 +553,7 @@ export default function mapView(root) {
   cardHover(root, '[data-map-card]', '.li_thumb, .map-card_title');
   items.forEach((item) => {
     if (!item.card) return;
-    const lift = (on) => markers.get(item.slug)?.set('is-hover', on);
+    const lift = (on) => markers.get(item.slug)?.flag('is-hover', on);
     item.card.addEventListener('mouseenter', () => lift(true));
     item.card.addEventListener('mouseleave', () => lift(false));
     item.card.addEventListener('click', () => open(item));
