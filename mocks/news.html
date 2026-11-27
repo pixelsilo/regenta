@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mock: News page and articles | Regenta (#57)</title>
+<script src="https://use.typekit.net/ptn3etu.js"></script>
+<script>try{Typekit.load();}catch(e){}</script>
+<script src="news-data.js"></script>
+<style>
+  /* Mock only. Three layouts for /news and three for the article template, filled with the real News
+     CMS items (49 published). "Category" is not a CMS field yet: it's guessed from the title here to
+     show what a category filter would add. Same look as the new case studies listing. */
+  :root { --green:#0b2b26; --green2:#173833; --sand:#e3e5db; --sand2:#eef0e8; --line:rgba(11,43,38,.15); }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--sand); color:var(--green); font-family:area-normal, area, "Area Normal", system-ui, sans-serif; }
+  a { color:inherit; text-decoration:none; }
+  button { font:inherit; color:inherit; background:none; border:0; padding:0; cursor:pointer; }
+  img { display:block; max-width:100%; }
+  .wrap { max-width:1440px; margin:0 auto; padding:0 2rem; }
+  .eb { font-size:.68rem; letter-spacing:.22em; text-transform:uppercase; opacity:.6; margin:0; }
+  .h1 { font-size:clamp(3rem, 7vw, 6.5rem); line-height:.98; margin:.8rem 0 0; font-weight:600; letter-spacing:-.015em; }
+  .g { font-family:Griffiths, serif; font-weight:400; }
+  .lede { max-width:34rem; font-size:1.05rem; line-height:1.55; opacity:.8; margin:1.25rem 0 0; }
+  .meta { display:flex; flex-wrap:wrap; gap:.4rem .9rem; align-items:center; font-size:.8rem; }
+  .meta .d { opacity:.6; }
+  .tag { border:1px solid var(--line); border-radius:99px; padding:.35rem .7rem; font-size:.72rem; line-height:1; white-space:nowrap; }
+  .on-dark .tag { border-color:rgba(255,255,255,.45); }
+  .clamp2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .clamp3 { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+  .ar { width:2.6rem; height:2.6rem; border-radius:50%; border:1px solid var(--line); display:grid; place-items:center; flex:none; transition:background .25s, color .25s; }
+  .back { display:inline-flex; align-items:center; gap:.6rem; font-size:.85rem; }
+  .back .ar { width:2.2rem; height:2.2rem; }
+  .back:hover .ar { background:var(--green); color:var(--sand); }
+  .noimg { background:var(--green); display:grid; place-items:center; color:var(--sand); font-size:1.3rem; letter-spacing:.2em; }
+  .chips { display:flex; flex-wrap:wrap; gap:.4rem; }
+  .chip { border:1px solid rgba(11,43,38,.25); border-radius:99px; padding:.55rem .95rem; font-size:.82rem; transition:background .2s, color .2s; }
+  .chip.on { background:var(--green); color:var(--sand); border-color:var(--green); }
+  .count { font-size:.85rem; opacity:.6; }
+  .more-btn { display:flex; margin:3rem auto 0; border:1px solid var(--green); border-radius:99px; padding:.95rem 1.6rem; font-size:.9rem; }
+  .more-btn:hover { background:var(--green); color:var(--sand); }
+
+  /* nav, note, footer stand-ins */
+  .nav { background:var(--green); color:var(--sand); height:112px; display:flex; align-items:center; }
+  .nav .wrap { width:100%; display:flex; justify-content:space-between; align-items:center; font-size:.62rem; letter-spacing:.2em; }
+  .nav b { font-size:1.6rem; letter-spacing:.08em; font-weight:500; }
+  .nav.over { position:absolute; left:0; right:0; top:0; z-index:5; background:none; }
+  .note { background:#fff8; border-bottom:1px solid var(--line); font:13px/1.5 system-ui, sans-serif; padding:.7rem 0; }
+  .foot { background:var(--green); color:var(--sand); padding:4rem 0; font-size:.8rem; text-align:center; letter-spacing:.2em; }
+
+  /* card (same as the ps-cs / case study cards) and a plain "post" card */
+  .card { position:relative; display:block; overflow:hidden; border-radius:1.25rem; background:var(--green); color:#fff; min-height:24rem; }
+  .card img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform 1.2s cubic-bezier(.2,.7,.2,1); }
+  .card:hover img { transform:scale(1.04); }
+  .card::after { content:""; position:absolute; inset:0; background:linear-gradient(0deg, rgba(11,43,38,.95) 0%, rgba(11,43,38,.55) 45%, rgba(11,43,38,.05) 85%); }
+  .card .body { position:absolute; z-index:1; left:0; right:0; bottom:0; padding:1.6rem; }
+  .card h3 { margin:.8rem 0 0; font-size:1.55rem; line-height:1.12; font-weight:600; }
+  .card p { margin:.6rem 0 0; font-size:.9rem; line-height:1.5; opacity:.85; }
+  .post { display:flex; flex-direction:column; gap:1rem; }
+  .post .im { aspect-ratio:4/3; border-radius:1rem; overflow:hidden; }
+  .post .im img { width:100%; height:100%; object-fit:cover; transition:transform 1s cubic-bezier(.2,.7,.2,1); }
+  .post:hover .im img { transform:scale(1.04); }
+  .post h3 { margin:0; font-size:1.3rem; line-height:1.2; font-weight:600; }
+  .post p { margin:0; font-size:.92rem; line-height:1.55; opacity:.75; }
+  .post:hover h3 { text-decoration:underline; text-underline-offset:.2em; text-decoration-thickness:1px; }
+
+  /* ================= LISTING A: front page ================= */
+  .la-hero { padding:4.5rem 0 2.5rem; display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; flex-wrap:wrap; }
+  .la-top { display:grid; grid-template-columns:1.65fr 1fr; grid-template-rows:auto; gap:1.5rem; }
+  .la-lead { min-height:clamp(28rem, 42vw, 40rem); }
+  .la-lead h3 { font-size:clamp(2rem, 3.4vw, 3.2rem); max-width:16ch; }
+  .la-lead p { max-width:38rem; font-size:1rem; }
+  .la-side { display:flex; flex-direction:column; gap:0; }
+  .la-side a { display:grid; grid-template-columns:8rem 1fr; grid-template-rows:auto; gap:1.1rem; padding:1.25rem 0; border-bottom:1px solid var(--line); align-items:start; }
+  .la-side a:first-child { padding-top:0; }
+  .la-side .im { aspect-ratio:1; border-radius:.85rem; overflow:hidden; } .la-side .im img { width:100%; height:100%; object-fit:cover; }
+  .la-side h3 { margin:.5rem 0 0; font-size:1.1rem; line-height:1.25; font-weight:600; }
+  .la-side a:hover h3 { text-decoration:underline; text-underline-offset:.2em; text-decoration-thickness:1px; }
+  .la-bar { display:flex; justify-content:space-between; align-items:center; gap:1rem; margin:4.5rem 0 2rem; padding-top:1.5rem; border-top:1px solid var(--line); }
+  .la-grid { display:grid; grid-template-columns:repeat(3, 1fr); grid-template-rows:auto; gap:3rem 1.5rem; }
+  .la-insight { background:var(--green); color:var(--sand); border-radius:1.5rem; padding:3rem; margin:5rem 0 0; display:grid; grid-template-columns:1fr 2fr; grid-template-rows:auto; gap:3rem; align-items:start; }
+  .la-insight h2 { margin:.8rem 0 0; font-size:clamp(2rem, 3.2vw, 3rem); line-height:1.05; font-weight:600; }
+  .la-insight .rows a { display:grid; grid-template-columns:7rem 1fr auto; grid-template-rows:auto; gap:1.5rem; align-items:center; padding:1.1rem 0; border-bottom:1px solid rgba(227,229,219,.2); }
+  .la-insight .rows a:first-child { padding-top:0; }
+  .la-insight .rows .d { font-size:.8rem; opacity:.6; } .la-insight .rows b { font-size:1.15rem; font-weight:600; }
+  .la-insight .ar { border-color:rgba(227,229,219,.3); }
+  .la-insight .rows a:hover .ar { background:var(--sand); color:var(--green); }
+
+  /* ================= LISTING B: index list ================= */
+  .lb-hero { padding:5rem 0 2.5rem; }
+  .lb-bar { display:flex; justify-content:space-between; align-items:center; gap:1rem; padding:1.25rem 0; flex-wrap:wrap; }
+  .lb-year { display:grid; grid-template-columns:10rem 1fr; grid-template-rows:auto; gap:2rem; border-top:1px solid var(--green); padding-top:1.25rem; margin-top:2.5rem; }
+  .lb-year > h2 { margin:0; font-size:2.6rem; line-height:1; font-weight:600; position:sticky; top:1.5rem; align-self:start; }
+  .lb-row { display:grid; grid-template-columns:7rem 9rem 1fr 10rem 2.6rem; grid-template-rows:auto; gap:1.5rem; align-items:center; padding:1.25rem 0; border-bottom:1px solid var(--line); }
+  .lb-row:first-child { padding-top:0; }
+  .lb-row .d { font-size:.82rem; opacity:.6; }
+  .lb-row .im { height:6.5rem; border-radius:.75rem; overflow:hidden; } .lb-row .im img { width:100%; height:100%; object-fit:cover; transition:transform .8s; }
+  .lb-row:hover .im img { transform:scale(1.06); }
+  .lb-row h3 { margin:0; font-size:1.35rem; line-height:1.2; font-weight:600; }
+  .lb-row p { margin:.45rem 0 0; font-size:.9rem; line-height:1.5; opacity:.65; }
+  .lb-row .c { justify-self:start; }
+  .lb-row:hover .ar { background:var(--green); color:var(--sand); }
+  .lb-list { padding-bottom:6rem; }
+
+  /* ================= LISTING C: magazine ================= */
+  .lc-hero { padding:4.5rem 0 2.5rem; display:grid; grid-template-columns:1fr auto; grid-template-rows:auto; gap:2rem; align-items:end; }
+  .lc-feat { display:grid; grid-template-columns:2fr 1fr; grid-template-rows:1fr 1fr; gap:1.5rem; height:clamp(34rem, 52vw, 46rem); }
+  .lc-feat > :first-child { grid-row:1 / -1; } .lc-feat .card { min-height:0; height:100%; }
+  .lc-feat > :first-child h3 { font-size:clamp(2rem, 3.4vw, 3.2rem); max-width:18ch; }
+  .lc-tabs { display:flex; gap:0; border-bottom:1px solid var(--line); margin:4.5rem 0 2.5rem; overflow-x:auto; scrollbar-width:none; }
+  .lc-tabs button { padding:1rem 1.25rem; font-size:.95rem; border-bottom:2px solid transparent; margin-bottom:-1px; opacity:.55; white-space:nowrap; }
+  .lc-tabs button.on { border-color:var(--green); opacity:1; }
+  .lc-tabs button span { font-size:.75rem; opacity:.6; margin-left:.3rem; }
+  .lc-grid { display:grid; grid-template-columns:repeat(4, 1fr); grid-template-rows:auto; gap:3rem 1.5rem; }
+  .lc-grid .post .im { aspect-ratio:1; }
+  .lc-grid .post h3 { font-size:1.15rem; }
+
+  /* ================= ARTICLE 1: reading column ================= */
+  .a1-head { padding:3.5rem 0 3rem; display:grid; grid-template-columns:16rem minmax(0, 52rem); grid-template-rows:auto; gap:4rem; }
+  .a1-head .h1 { font-size:clamp(2.6rem, 5vw, 4.8rem); }
+  .a1-head .lead { font-family:Griffiths, serif; font-size:clamp(1.35rem, 2vw, 1.8rem); line-height:1.35; margin:1.75rem 0 0; }
+  .a1-img { aspect-ratio:21/9; border-radius:1.5rem; overflow:hidden; } .a1-img img { width:100%; height:100%; object-fit:cover; }
+  .a1-body { padding:4.5rem 0 4rem; display:grid; grid-template-columns:16rem minmax(0, 46rem); grid-template-rows:auto; gap:4rem; }
+  .rail { position:sticky; top:2rem; align-self:start; display:flex; flex-direction:column; gap:1.5rem; }
+  .author { display:flex; gap:.85rem; align-items:center; }
+  .author img { width:3.4rem; height:3.4rem; border-radius:50%; object-fit:cover; object-position:top; }
+  .author b { display:block; font-weight:600; font-size:.95rem; } .author span { font-size:.8rem; opacity:.6; }
+  .rail .cap { font-size:.62rem; letter-spacing:.2em; text-transform:uppercase; opacity:.55; margin:0 0 .5rem; }
+  .share { display:flex; gap:.4rem; }
+  .share a { width:2.4rem; height:2.4rem; border-radius:50%; border:1px solid var(--line); display:grid; place-items:center; font-size:.72rem; font-weight:600; }
+  .share a:hover { background:var(--green); color:var(--sand); }
+  .rt { font-size:1.08rem; line-height:1.7; }
+  .rt p { margin:0 0 1.25rem; }
+  .rt h2, .rt h3 { font-size:1.5rem; line-height:1.2; margin:2.5rem 0 1rem; font-weight:600; }
+  .rt h4 { font-size:1.15rem; margin:2rem 0 .75rem; }
+  .rt > :first-child { margin-top:0; }
+  .rt strong { font-weight:600; }
+  .rt a { text-decoration:underline; text-underline-offset:.2em; word-break:break-word; }
+  .rt ul, .rt ol { padding-left:1.25rem; margin:0 0 1.25rem; } .rt li { margin-bottom:.4rem; }
+  .rt figure { margin:2rem 0; } .rt figure img { border-radius:1rem; width:100%; }
+  .rt blockquote { margin:2rem 0; padding-left:1.5rem; border-left:2px solid var(--green); font-family:Griffiths, serif; font-size:1.4rem; line-height:1.4; }
+  .gal { display:grid; grid-template-columns:repeat(4, 1fr); grid-template-rows:auto; gap:.75rem; }
+  .gal button { aspect-ratio:1; border-radius:.9rem; overflow:hidden; position:relative; cursor:zoom-in; }
+  .gal button img { width:100%; height:100%; object-fit:cover; transition:transform .8s; }
+  .gal button:hover img { transform:scale(1.05); }
+  .gal .plus { position:absolute; inset:0; background:rgba(11,43,38,.7); color:var(--sand); display:grid; place-items:center; font-size:1.4rem; font-weight:600; }
+  .gal-head { display:flex; justify-content:space-between; align-items:baseline; margin:3.5rem 0 1rem; padding-top:1.5rem; border-top:1px solid var(--line); }
+  .gal-head h2 { margin:0; font-size:1.5rem; font-weight:600; } .gal-head span { font-size:.85rem; opacity:.6; }
+  .video { aspect-ratio:16/9; border-radius:1.25rem; overflow:hidden; background:#000; margin:0 0 2.5rem; } .video iframe { width:100%; height:100%; border:0; }
+  .pn { display:grid; grid-template-columns:1fr 1fr; grid-template-rows:auto; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+  .pn a { display:flex; gap:1.25rem; align-items:center; padding:1.75rem 0; }
+  .pn a + a { border-left:1px solid var(--line); padding-left:2rem; justify-content:flex-end; text-align:right; }
+  .pn b { display:block; font-size:1.25rem; line-height:1.2; font-weight:600; margin-top:.35rem; }
+  .pn a:hover .ar { background:var(--green); color:var(--sand); }
+  .related { padding:4.5rem 0 6rem; }
+  .related .head { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:1.75rem; }
+  .related h2 { font-size:clamp(1.8rem, 3vw, 2.6rem); margin:0; font-weight:600; }
+  .three { display:grid; grid-template-columns:repeat(3, 1fr); grid-template-rows:auto; gap:1.5rem; }
+
+  /* ================= ARTICLE 2: split hero ================= */
+  .a2-hero { display:grid; grid-template-columns:1fr 1fr; grid-template-rows:auto; gap:3rem; padding:3rem 0 0; align-items:stretch; }
+  .a2-hero .txt { display:flex; flex-direction:column; justify-content:space-between; gap:3rem; padding:1rem 0 1rem; }
+  .a2-hero .h1 { font-size:clamp(2.4rem, 4.4vw, 4.4rem); }
+  .a2-hero .lead { font-size:1.15rem; line-height:1.6; opacity:.8; margin:1.5rem 0 0; max-width:34rem; }
+  .a2-hero .im { min-height:clamp(26rem, 40vw, 38rem); border-radius:1.5rem; overflow:hidden; } .a2-hero .im img { width:100%; height:100%; object-fit:cover; }
+  .a2-foot { display:flex; justify-content:space-between; align-items:center; gap:1rem; padding-top:1.5rem; border-top:1px solid var(--line); flex-wrap:wrap; }
+  .a2-body { padding:5rem 0 4rem; display:grid; grid-template-columns:1fr minmax(0, 46rem) 1fr; grid-template-rows:auto; }
+  .a2-body > div { grid-column:2; }
+  .strip { display:flex; gap:.75rem; overflow-x:auto; scroll-snap-type:x mandatory; padding:0 2rem 1rem; scrollbar-width:thin; }
+  .strip button { flex:0 0 auto; height:clamp(16rem, 26vw, 24rem); aspect-ratio:3/2; border-radius:1rem; overflow:hidden; scroll-snap-align:start; cursor:zoom-in; }
+  .strip button img { width:100%; height:100%; object-fit:cover; }
+
+  /* ================= ARTICLE 3: cover ================= */
+  .a3-cover { position:relative; height:min(86svh, 54rem); min-height:32rem; color:#fff; overflow:hidden; }
+  .a3-cover > img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .a3-cover::after { content:""; position:absolute; inset:0; background:linear-gradient(0deg, rgba(11,43,38,.94) 0%, rgba(11,43,38,.5) 42%, rgba(11,43,38,.1) 70%, rgba(11,43,38,.5) 100%); }
+  .a3-cover .wrap { position:relative; z-index:1; height:100%; display:flex; flex-direction:column; justify-content:space-between; padding-top:136px; padding-bottom:3rem; }
+  .a3-cover .back .ar { border-color:rgba(255,255,255,.45); } .a3-cover .back:hover .ar { background:#fff; color:var(--green); }
+  .a3-cover .h1 { font-size:clamp(2.8rem, 6.5vw, 6rem); max-width:16ch; }
+  .a3-cover .author span { opacity:.75; }
+  .a3-lead { padding:5rem 0 3rem; }
+  .a3-lead p { font-family:Griffiths, serif; font-size:clamp(1.6rem, 2.8vw, 2.6rem); line-height:1.3; max-width:30em; margin:0; }
+  .a3-body { display:grid; grid-template-columns:1fr minmax(0, 44rem) 1fr; grid-template-rows:auto; padding-bottom:4rem; }
+  .a3-body > div { grid-column:2; }
+  .mosaic { display:grid; grid-template-columns:repeat(6, 1fr); grid-auto-rows:clamp(12rem, 18vw, 18rem); gap:.75rem; padding-bottom:4rem; }
+  .mosaic button { grid-column:span 2; border-radius:1rem; overflow:hidden; cursor:zoom-in; position:relative; }
+  .mosaic button:nth-child(5n+1) { grid-column:span 4; grid-row:span 2; }
+  .mosaic button img { width:100%; height:100%; object-fit:cover; transition:transform .8s; } .mosaic button:hover img { transform:scale(1.04); }
+  .mosaic.few button, .mosaic.few button:nth-child(5n+1) { grid-column:span 3; grid-row:span 2; }
+  .mosaic.n3 button, .mosaic.n3 button:nth-child(5n+1) { grid-column:span 2; }
+  .mosaic .plus { position:absolute; inset:0; background:rgba(11,43,38,.7); color:var(--sand); display:grid; place-items:center; font-size:1.4rem; font-weight:600; }
+
+  /* lightbox */
+  .lbx { position:fixed; inset:0; z-index:100; background:rgba(11,43,38,.96); display:none; align-items:center; justify-content:center; color:var(--sand); }
+  .lbx.on { display:flex; }
+  .lbx img { max-width:min(88vw, 1400px); max-height:80vh; border-radius:1rem; object-fit:contain; }
+  .lbx button { position:absolute; border:1px solid rgba(227,229,219,.4); width:3.25rem; height:3.25rem; border-radius:50%; display:grid; place-items:center; color:var(--sand); }
+  .lbx button:hover { background:var(--sand); color:var(--green); }
+  .lbx .p { left:1.5rem; top:50%; transform:translateY(-50%); } .lbx .n { right:1.5rem; top:50%; transform:translateY(-50%); } .lbx .x { right:1.5rem; top:1.5rem; }
+  .lbx .c { position:absolute; bottom:1.5rem; left:50%; transform:translateX(-50%); font-size:.8rem; letter-spacing:.18em; }
+
+  /* mock switcher + phone frame */
+  .bar { position:fixed; left:50%; transform:translateX(-50%); bottom:1rem; z-index:90; display:flex; gap:.4rem; align-items:center; background:#fff; border-radius:99px; padding:.3rem; box-shadow:0 10px 30px rgba(0,0,0,.22); font:13px/1 system-ui, sans-serif; color:var(--green); max-width:calc(100vw - 1rem); }
+  .bar .grp { display:flex; gap:.15rem; } .bar .sep { width:1px; align-self:stretch; background:#ddd; margin:.2rem; }
+  .bar button { padding:.65rem .9rem; border-radius:99px; white-space:nowrap; }
+  .bar button.is-on { background:var(--green); color:#fff; }
+  .bar select { font:inherit; border:1px solid #ddd; border-radius:99px; padding:.5rem .6rem; max-width:13rem; color:var(--green); background:#fff; }
+  body.framed > :not(.bar):not(.phone) { display:none !important; }
+  .phone { display:none; }
+  body.framed { background:#c9ccc0; }
+  body.framed .phone { display:block; width:390px; height:min(844px, calc(100vh - 7rem)); margin:1.5rem auto; border:10px solid #111; border-radius:2.6rem; overflow:hidden; background:var(--sand); box-shadow:0 30px 60px rgba(0,0,0,.3); }
+  .phone iframe { width:100%; height:100%; border:0; }
+  body.embed .bar, body.embed .note { display:none; }
+
+  @media (max-width:991px) {
+    .la-top { grid-template-columns:1fr; } .la-side { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; } .la-side a { border:0; padding:0; grid-template-columns:1fr; } .la-side .im { aspect-ratio:4/3; }
+    .la-grid, .three { grid-template-columns:1fr 1fr; } .three > :nth-child(3) { display:none; }
+    .la-insight { grid-template-columns:1fr; padding:2.25rem; gap:2rem; }
+    .lb-year { grid-template-columns:1fr; gap:1rem; } .lb-year > h2 { position:static; }
+    .lb-row { grid-template-columns:8rem 1fr 2.6rem; } .lb-row .d, .lb-row .c { display:none; } .lb-row .im { grid-row:1; }
+    .lc-hero { grid-template-columns:1fr; } .lc-feat { grid-template-columns:1fr 1fr; grid-template-rows:28rem 20rem; height:auto; } .lc-feat > :first-child { grid-column:1 / -1; grid-row:auto; }
+    .lc-grid { grid-template-columns:repeat(3, 1fr); }
+    .a1-head, .a1-body { grid-template-columns:1fr; gap:2rem; } .a1-head .spacer { display:none; }
+    .rail { position:static; order:2; flex-direction:row; flex-wrap:wrap; justify-content:space-between; align-items:center; padding-top:1.5rem; border-top:1px solid var(--line); }
+    .a2-hero { grid-template-columns:1fr; } .a2-hero .im { min-height:0; aspect-ratio:4/3; order:-1; } .a2-hero .txt { gap:2rem; padding:0; }
+  }
+  @media (max-width:767px) {
+    .wrap { padding:0 1rem; }
+    .nav { height:76px; } .nav span { display:none; }
+    .h1 { font-size:clamp(2.6rem, 12vw, 3.6rem); }
+    .la-hero, .lb-hero, .lc-hero { padding-top:2.5rem; }
+    .la-lead { min-height:30rem; } .la-lead h3 { font-size:2rem; }
+    .la-side { grid-template-columns:1fr; } .la-side a { grid-template-columns:6.5rem 1fr; } .la-side .im { aspect-ratio:1; }
+    .la-bar, .lb-bar { flex-direction:column; align-items:flex-start; }
+    .chips { flex-wrap:wrap; } .chip { white-space:nowrap; padding:.5rem .8rem; }
+    .la-grid, .three, .lc-grid { grid-template-columns:1fr; gap:2.25rem; } .three > :nth-child(3) { display:block; }
+    .la-insight { margin-left:-1rem; margin-right:-1rem; border-radius:0; padding:2.5rem 1rem; } .la-insight .rows a { grid-template-columns:1fr auto; gap:.3rem 1rem; } .la-insight .rows .d { grid-column:1; } .la-insight .rows b { grid-column:1; } .la-insight .rows .ar { grid-row:1 / span 2; grid-column:2; }
+    .lb-year > h2 { font-size:2rem; }
+    .lb-row { grid-template-columns:6.5rem 1fr; gap:1rem; align-items:start; } .lb-row .im { height:5.5rem; } .lb-row .ar { display:none; } .lb-row h3 { font-size:1.05rem; } .lb-row p { -webkit-line-clamp:2; font-size:.85rem; }
+    .lc-feat { grid-template-columns:1fr; grid-template-rows:auto; } .lc-feat .card { min-height:22rem; } .lc-feat > :first-child .card, .lc-feat > .card:first-child { min-height:28rem; }
+    .lc-grid .post { display:grid; grid-template-columns:6.5rem 1fr; gap:1rem; } .lc-grid .post .im { grid-row:1 / span 3; } .lc-grid { gap:1.5rem; }
+    .a1-head { padding-top:2rem; } .a1-img { aspect-ratio:4/3; border-radius:1rem; } .a1-body { padding-top:2.5rem; }
+    .gal { grid-template-columns:1fr 1fr; }
+    .pn { grid-template-columns:1fr; } .pn a + a { border-left:0; border-top:1px solid var(--line); padding-left:0; }
+    .a2-body, .a3-body { display:block; padding-top:3rem; }
+    .strip { padding:0 1rem 1rem; } .strip button { height:14rem; }
+    .a3-cover { height:auto; min-height:82svh; } .a3-cover .wrap { padding-top:100px; min-height:82svh; } .a3-cover .h1 { font-size:clamp(2.3rem, 10vw, 3.2rem); }
+    .a3-lead { padding:3rem 0 2rem; }
+    .mosaic { grid-template-columns:1fr 1fr; grid-auto-rows:9rem; } .mosaic button { grid-column:span 1; } .mosaic button:nth-child(5n+1) { grid-column:1 / -1; grid-row:span 2; }
+    .mosaic.few button, .mosaic.few button:nth-child(5n+1), .mosaic.n3 button { grid-column:span 1; grid-row:span 1; } .mosaic.few button:first-child { grid-column:1 / -1; grid-row:span 2; }
+    .lbx .p, .lbx .n { top:auto; bottom:1rem; transform:none; } .lbx .c { bottom:2.1rem; }
+    .bar { left:.5rem; right:.5rem; transform:none; overflow-x:auto; }
+  }
+</style>
+</head>
+<body>
+<header class="nav" id="nav"><div class="wrap"><b>REGENTA</b><span>ABOUT US &nbsp;&nbsp; BUILT BY REGENTA &nbsp;&nbsp; CASE STUDIES &nbsp;&nbsp; NEWS &nbsp;&nbsp; CONTACT US</span></div></header>
+<div class="note" id="note"><div class="wrap"></div></div>
+<main id="page"></main>
+<div class="phone"><iframe title="Phone preview"></iframe></div>
+
+<div class="bar">
+  <div class="grp" id="views">
+    <button data-v="LA">News A</button><button data-v="LB">News B</button><button data-v="LC">News C</button>
+    <span class="sep"></span>
+    <button data-v="A1">Article 1</button><button data-v="A2">Article 2</button><button data-v="A3">Article 3</button>
+  </div>
+  <select id="pick" aria-label="Article"></select>
+  <span class="sep"></span>
+  <button id="dev">Phone</button>
+</div>
+
+<script>
+const N = window.NEWS;
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const AR = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h10M8 3l4 4-4 4"/></svg>';
+const AL = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7H2M6 3 2 7l4 4"/></svg>';
+const CATS = ['Market insight', 'Events & awards', 'Developments', 'Team & company'];
+const NOTES = {
+  LA: '<b>News A · Front page.</b> The latest story large with the next three beside it, a green "Market insight" band that pulls out the research breakfasts, budget and policy pieces (what developers and landowners come for), then everything else in a 3-column grid with a category filter and "Load more" instead of pages.',
+  LB: '<b>News B · Index by year.</b> Same as the new case studies listing: big title, a category filter, then one row per story grouped under sticky year headings. Fastest to scan 49 stories; the thumbnails keep it from feeling like a table.',
+  LC: '<b>News C · Magazine.</b> Three featured stories as big photo cards (the CMS "Featured?" switch), then tabs by category over a 4-column grid of smaller posts. Busiest of the three, closest to a news site.',
+  A1: '<b>Article 1 · Reading column.</b> Title and summary set large, one wide photo, then the text in a reading column with a sticky rail (author, date, share, related services). The gallery sits under the text as a grid that opens the lightbox. Previous/next story, then 3 more.',
+  A2: '<b>Article 2 · Split hero.</b> Title, summary and author on the left, photo on the right, so the story starts above the fold. Text centred below, gallery as a swipeable strip. Simplest to build.',
+  A3: '<b>Article 3 · Cover.</b> Full-bleed photo with the title on it, the summary as a large quote, then the text, then the gallery as a mosaic. Best for event write-ups with lots of photos; weaker for budget and policy pieces with one stock image.',
+};
+const img = (p) => p.thumb || p.main || p.gallery[0];
+const hero = (p) => p.main || p.thumb || p.gallery[0];
+const pic = (src, cls = '') => src ? `<img src="${src}" alt="" class="${cls}">` : '';
+const tagC = (p) => `<span class="tag">${esc(p.cat)}</span>`;
+const short = (s, n = 180) => { s = String(s || '').replace(/\s+/g, ' ').trim(); return s.length > n ? s.slice(0, n).replace(/\s\S*$/, '') + '…' : s; };
+const art = (i) => `href="#" data-go="${i}"`;
+const author = (p, light) => p.author ? `<div class="author"><img src="${p.author.photo}" alt=""><div><b>${esc(p.author.name)}</b><span>${esc(p.author.title)}</span></div></div>` : '';
+const back = () => `<a class="back" href="#" data-list><span class="ar">${AL}</span>All news</a>`;
+
+const card = (p, i, cls = '') => `<a class="card ${cls}" ${art(i)}>${pic(img(p))}<div class="body on-dark"><div class="meta"><span class="tag">${esc(p.cat)}</span><span>${esc(p.date)}</span></div><h3>${esc(p.name)}</h3>${cls.includes('big') ? `<p class="clamp2">${esc(short(p.summary, 220))}</p>` : ''}</div></a>`;
+const post = (p, i) => `<a class="post" ${art(i)}><div class="im">${img(p) ? pic(img(p)) : '<div class="noimg" style="height:100%">REGENTA</div>'}</div><div class="meta">${tagC(p)}<span class="d">${esc(p.date)}</span></div><h3>${esc(p.name)}</h3><p class="clamp3">${esc(short(p.summary))}</p></a>`;
+
+// ---------- listings ----------
+let cat = '', shown = 9;
+const filt = () => N.map((p, i) => [p, i]).filter(([p]) => !cat || p.cat === cat);
+const chipsHTML = () => `<div class="chips">${['', ...CATS].map((c) => `<button class="chip ${c === cat ? 'on' : ''}" data-cat="${c}">${c || 'All'}</button>`).join('')}</div>`;
+
+const LA = () => {
+  const [lead, ...rest] = N.map((p, i) => [p, i]);
+  const side = rest.slice(0, 3);
+  const ins = N.map((p, i) => [p, i]).filter(([p, i]) => i > 3 && p.cat === 'Market insight').slice(0, 4);
+  const list = filt().filter(([, i]) => i > 3 && !ins.some(([, j]) => j === i));
+  return `<div class="wrap">
+    <section class="la-hero"><div><p class="eb">News</p><h1 class="h1">Latest <span class="g">news</span></h1></div><p class="lede">Market insight, launches, events and what the team has been up to.</p></section>
+    <div class="la-top">${card(lead[0], lead[1], 'big la-lead')}<div class="la-side">${side.map(([p, i]) => `<a ${art(i)}><div class="im">${pic(img(p))}</div><div><div class="meta">${tagC(p)}<span class="d">${esc(p.date)}</span></div><h3>${esc(p.name)}</h3></div></a>`).join('')}</div></div>
+    <section class="la-insight"><div><p class="eb" style="opacity:.6">For developers and landowners</p><h2>Market insight</h2><p class="lede" style="opacity:.7">Our research breakfasts, budget analysis and policy updates.</p></div>
+      <div class="rows">${ins.map(([p, i]) => `<a ${art(i)}><span class="d">${esc(p.date)}</span><b>${esc(p.name)}</b><span class="ar">${AR}</span></a>`).join('')}</div></section>
+    <div class="la-bar">${chipsHTML()}<span class="count">${list.length} stories</span></div>
+    <div class="la-grid">${list.slice(0, shown).map(([p, i]) => post(p, i)).join('')}</div>
+    ${list.length > shown ? '<button class="more-btn" data-more>Load more stories</button>' : ''}
+    <div style="height:6rem"></div></div><footer class="foot">FOOTER</footer>`;
+};
+
+const LB = () => {
+  const list = filt(), years = [...new Set(list.map(([p]) => p.iso.slice(0, 4)))];
+  return `<div class="wrap">
+    <section class="lb-hero"><p class="eb">News</p><h1 class="h1">Latest <span class="g">news</span></h1><p class="lede">Market insight, launches, events and what the team has been up to.</p></section>
+    <div class="lb-bar">${chipsHTML()}<span class="count">${list.length} stories</span></div>
+    <div class="lb-list">${years.map((y) => `<div class="lb-year"><h2>${y}</h2><div>${list.filter(([p]) => p.iso.startsWith(y)).map(([p, i]) => `
+      <a class="lb-row" ${art(i)}><span class="d">${esc(p.date.replace(/ \d{4}$/, ''))}</span><div class="im">${img(p) ? pic(img(p)) : '<div class="noimg" style="height:100%;font-size:.7rem">REGENTA</div>'}</div><div><h3>${esc(p.name)}</h3><p class="clamp2">${esc(short(p.summary, 200))}</p></div><span class="c">${tagC(p)}</span><span class="ar">${AR}</span></a>`).join('')}</div></div>`).join('')}</div>
+  </div><footer class="foot">FOOTER</footer>`;
+};
+
+const LC = () => {
+  const feat = N.map((p, i) => [p, i]).filter(([p]) => p.featured).slice(0, 3);
+  const f = feat.length === 3 ? feat : N.map((p, i) => [p, i]).slice(0, 3);
+  const list = filt().filter(([, i]) => !f.some(([, j]) => j === i));
+  const n = (c) => N.filter((p, i) => (!c || p.cat === c) && !f.some(([, j]) => j === i)).length;
+  return `<div class="wrap">
+    <section class="lc-hero"><div><p class="eb">News</p><h1 class="h1">Latest <span class="g">news</span></h1></div><p class="lede" style="margin:0">Market insight, launches, events and what the team has been up to.</p></section>
+    <div class="lc-feat">${f.map(([p, i], k) => card(p, i, k ? '' : 'big')).join('')}</div>
+    <div class="lc-tabs">${['', ...CATS].map((c) => `<button class="${c === cat ? 'on' : ''}" data-cat="${c}">${c || 'All news'}<span>${n(c)}</span></button>`).join('')}</div>
+    <div class="lc-grid">${list.slice(0, shown + 3).map(([p, i]) => post(p, i)).join('')}</div>
+    ${list.length > shown + 3 ? '<button class="more-btn" data-more>Load more stories</button>' : ''}
+    <div style="height:6rem"></div></div><footer class="foot">FOOTER</footer>`;
+};
+
+// ---------- articles ----------
+const ytEmbed = (u) => { const m = String(u).match(/(?:v=|youtu\.be\/|embed\/)([\w-]{11})/); return m ? `<div class="video"><iframe src="https://www.youtube.com/embed/${m[1]}" allowfullscreen title="Video"></iframe></div>` : ''; };
+const galGrid = (p, max = 8) => {
+  if (!p.gallery.length) return '';
+  const g = p.gallery, extra = g.length - max;
+  return `<div class="gal-head"><h2>Photos</h2><span>${g.length} photos</span></div><div class="gal">${g.slice(0, max).map((s, k) => `<button data-lb="${k}">${pic(s)}${k === max - 1 && extra > 0 ? `<span class="plus">+${extra}</span>` : ''}</button>`).join('')}</div>`;
+};
+const prevNext = (i) => {
+  const pv = N[i - 1], nx = N[i + 1];
+  return `<div class="pn">${nx ? `<a ${art(i + 1)}><span class="ar">${AL}</span><div><p class="eb">Previous story</p><b>${esc(nx.name)}</b></div></a>` : '<span></span>'}${pv ? `<a ${art(i - 1)}><div><p class="eb">Next story</p><b>${esc(pv.name)}</b></div><span class="ar">${AR}</span></a>` : ''}</div>`;
+};
+const related = (p, i) => {
+  const same = N.map((q, j) => [q, j]).filter(([q, j]) => j !== i && q.cat === p.cat);
+  const pick = (same.length >= 3 ? same : N.map((q, j) => [q, j]).filter(([, j]) => j !== i)).slice(0, 3);
+  return `<section class="related"><div class="head"><h2>More ${esc(p.cat.toLowerCase())}</h2>${back()}</div><div class="three">${pick.map(([q, j]) => post(q, j)).join('')}</div></section>`;
+};
+const rail = (p) => `<aside class="rail">
+  ${p.author ? `<div><p class="cap">Written by</p>${author(p)}</div>` : ''}
+  <div><p class="cap">Published</p><div style="font-size:.95rem">${esc(p.date)}</div></div>
+  ${p.services.length ? `<div><p class="cap">Related services</p><div class="meta">${p.services.map((s) => `<span class="tag">${esc(s)}</span>`).join('')}</div></div>` : ''}
+  <div><p class="cap">Share</p><div class="share"><a href="#" aria-label="Share on LinkedIn">in</a><a href="#" aria-label="Share by email">@</a><a href="#" aria-label="Copy link">⧉</a></div></div>
+  ${back()}
+</aside>`;
+
+const A1 = (p, i) => `<div class="wrap">
+  <section class="a1-head"><div class="spacer"></div><div><div class="meta">${tagC(p)}<span class="d">${esc(p.date)}</span></div><h1 class="h1">${esc(p.name)}</h1>${p.summary ? `<p class="lead">${esc(short(p.summary, 320))}</p>` : ''}</div></section>
+  ${hero(p) ? `<div class="a1-img">${pic(hero(p))}</div>` : ''}
+  <section class="a1-body">${rail(p)}<div>${p.video ? ytEmbed(p.video) : ''}<div class="rt">${p.body}</div>${galGrid(p)}</div></section>
+  ${prevNext(i)}${related(p, i)}</div><footer class="foot">FOOTER</footer>`;
+
+const A2 = (p, i) => `<div class="wrap">
+  <section class="a2-hero"><div class="txt"><div>${back()}<div class="meta" style="margin-top:2.5rem">${tagC(p)}<span class="d">${esc(p.date)}</span></div><h1 class="h1">${esc(p.name)}</h1>${p.summary ? `<p class="lead">${esc(short(p.summary, 260))}</p>` : ''}</div>
+    <div class="a2-foot">${author(p) || '<span></span>'}<div class="share"><a href="#" aria-label="Share on LinkedIn">in</a><a href="#" aria-label="Share by email">@</a><a href="#" aria-label="Copy link">⧉</a></div></div></div>
+    <div class="im">${hero(p) ? pic(hero(p)) : '<div class="noimg" style="height:100%">REGENTA</div>'}</div></section>
+  <section class="a2-body"><div>${p.video ? ytEmbed(p.video) : ''}<div class="rt">${p.body}</div></div></section></div>
+  ${p.gallery.length ? `<div class="wrap"><div class="gal-head" style="margin-top:0"><h2>Photos</h2><span>${p.gallery.length} photos · swipe</span></div></div><div class="strip">${p.gallery.map((s, k) => `<button data-lb="${k}">${pic(s)}</button>`).join('')}</div>` : ''}
+  <div class="wrap" style="margin-top:3rem">${prevNext(i)}${related(p, i)}</div><footer class="foot">FOOTER</footer>`;
+
+const A3 = (p, i) => {
+  const g = p.gallery, max = 7;
+  return `<section class="a3-cover">${hero(p) ? pic(hero(p)) : ''}<div class="wrap"><div>${back()}</div><div class="on-dark"><div class="meta">${tagC(p)}<span>${esc(p.date)}</span></div><h1 class="h1">${esc(p.name)}</h1>${p.author ? `<div style="margin-top:1.75rem">${author(p)}</div>` : ''}</div></div></section>
+  <div class="wrap">${p.summary ? `<section class="a3-lead"><p>${esc(short(p.summary, 300))}</p></section>` : '<div style="height:4rem"></div>'}
+  <section class="a3-body"><div>${p.video ? ytEmbed(p.video) : ''}<div class="rt">${p.body}</div></div></section>
+  ${g.length ? `<div class="mosaic ${g.length < 5 ? 'few n' + g.length : ''}">${g.slice(0, max).map((s, k) => `<button data-lb="${k}">${pic(s)}${k === max - 1 && g.length > max ? `<span class="plus">+${g.length - max}</span>` : ''}</button>`).join('')}</div>` : ''}
+  ${prevNext(i)}${related(p, i)}</div><footer class="foot">FOOTER</footer>`;
+};
+
+const V = { LA, LB, LC, A1, A2, A3 };
+
+// lightbox
+const lbx = document.createElement('div'); lbx.className = 'lbx';
+lbx.innerHTML = `<img alt=""><button class="p" aria-label="Previous">${AL}</button><button class="n" aria-label="Next">${AR}</button><button class="x" aria-label="Close">✕</button><span class="c"></span>`;
+document.body.appendChild(lbx);
+let G = [], gi = 0;
+const show = () => { lbx.querySelector('img').src = G[gi]; lbx.querySelector('.c').textContent = `${gi + 1} / ${G.length}`; };
+const stepL = (d) => { gi = (gi + d + G.length) % G.length; show(); };
+lbx.querySelector('.p').onclick = () => stepL(-1); lbx.querySelector('.n').onclick = () => stepL(1);
+lbx.querySelector('.x').onclick = () => lbx.classList.remove('on');
+lbx.addEventListener('click', (e) => { if (e.target === lbx) lbx.classList.remove('on'); });
+addEventListener('keydown', (e) => { if (!lbx.classList.contains('on')) return; if (e.key === 'Escape') lbx.classList.remove('on'); if (e.key === 'ArrowLeft') stepL(-1); if (e.key === 'ArrowRight') stepL(1); });
+
+// state: #<view>-<article index>[-p]
+const embed = location.search.includes('embed');
+if (embed) document.body.classList.add('embed');
+let view = 'LA', idx = 0, phone = false, lastList = 'LA', lastArt = 'A1';
+const m = location.hash.match(/#(L[ABC]|A[123])(?:-(\d+))?(-p)?/); if (m) { view = m[1]; idx = +(m[2] || 0); phone = !!m[3]; }
+const pick = document.getElementById('pick');
+// a few articles worth comparing: no gallery, 4/12/20 photos, video, no author
+const SAMPLE = ['q3-market-insight-breakfast-briefing', 'autumn-budget-announcement-2026', 'housing-outlook-2026', 'regenta-attended-and-sponsored-their-22nd-london-homeshow', 'regenta-rebrand-event---searcys-at-the-gherkin', 'sitesales-rebrand-to-regenta', 'christmas-quiz-2024'];
+N.forEach((p, i) => { const o = document.createElement('option'); o.value = i; o.textContent = (SAMPLE.includes(p.slug) ? '★ ' : '') + p.name + (p.gallery.length ? ` (${p.gallery.length} photos)` : ''); pick.appendChild(o); });
+
+function render() {
+  const isArt = view[0] === 'A';
+  if (isArt) lastArt = view; else lastList = view;
+  document.getElementById('nav').classList.toggle('over', view === 'A3');
+  document.querySelector('#note .wrap').innerHTML = NOTES[view];
+  document.getElementById('page').innerHTML = isArt ? V[view](N[idx], idx) : V[view]();
+  document.querySelectorAll('[data-v]').forEach((b) => b.classList.toggle('is-on', b.dataset.v === view));
+  pick.value = idx; pick.style.display = isArt ? '' : 'none';
+  document.getElementById('dev').classList.toggle('is-on', phone);
+  document.body.classList.toggle('framed', phone && !embed);
+  const h = `#${view}-${idx}`;
+  if (phone && !embed) { const fr = document.querySelector('.phone iframe'); const src = `news.html?embed${h}`; if (!fr.src.endsWith(src)) fr.src = src; }
+  if (!embed) history.replaceState(null, '', h + (phone ? '-p' : ''));
+}
+document.addEventListener('click', (e) => {
+  const v = e.target.closest('[data-v]'); if (v) { view = v.dataset.v; shown = 9; render(); scrollTo(0, 0); return; }
+  const go = e.target.closest('[data-go]'); if (go) { e.preventDefault(); idx = +go.dataset.go; view = lastArt; render(); scrollTo(0, 0); return; }
+  if (e.target.closest('[data-list]')) { e.preventDefault(); view = lastList; render(); scrollTo(0, 0); return; }
+  const c = e.target.closest('[data-cat]'); if (c) { cat = c.dataset.cat; shown = 9; const y = scrollY; render(); scrollTo(0, y); return; }
+  if (e.target.closest('[data-more]')) { shown += 9; const y = scrollY; render(); scrollTo(0, y); return; }
+  const l = e.target.closest('[data-lb]'); if (l) { G = N[idx].gallery; gi = +l.dataset.lb; show(); lbx.classList.add('on'); }
+});
+pick.onchange = () => { idx = +pick.value; render(); scrollTo(0, 0); };
+document.getElementById('dev').onclick = () => { phone = !phone; render(); };
+render();
+</script>
+</body>
+</html>
