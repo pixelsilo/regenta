@@ -79,7 +79,7 @@
   .b-row .h { font-size:1.5rem; font-weight:600; text-align:right; } .b-row .h small { display:block; font-size:.7rem; font-weight:400; opacity:.55; }
   .b-row .ar { width:2.6rem; height:2.6rem; border-radius:50%; border:1px solid var(--line); display:grid; place-items:center; transition:background .25s, color .25s; }
   .b-row:hover .ar { background:var(--green); color:var(--sand); }
-  .b-row .th { display:none; }
+  .b-row .th { display:none; } .b-row .m, .b-row .th .tg, .b-row .th .go2 { display:none; }
   .b-peek { position:fixed; width:22rem; height:15rem; border-radius:1rem; overflow:hidden; pointer-events:none; z-index:40; opacity:0; transform:scale(.92); transition:opacity .25s, transform .25s; box-shadow:0 20px 50px rgba(0,0,0,.25); }
   .b-peek.on { opacity:1; transform:none; }
   .b-peek img { width:100%; height:100%; object-fit:cover; }
@@ -132,7 +132,18 @@
     .b-big .b-row .th { grid-row:1; grid-column:1 / -1; width:100%; height:auto; aspect-ratio:16 / 10; border-radius:1rem; margin-bottom:.6rem; }
     .b-big .b-row .t { grid-row:2; grid-column:1; font-size:1.45rem; }
     .b-big .b-row .c { grid-row:3; grid-column:1; margin-top:0; }
-    .b-big .b-row .h { display:block; grid-row:2 / span 2; grid-column:2; align-self:start; }
+    .b-big .b-row { grid-template-columns:1fr; }
+    .b-big .b-row .h { display:none; }
+    .b-big .b-row .th { position:relative; }
+    .b-big .b-row .th .tg { display:block; position:absolute; left:.8rem; top:.8rem; background:rgba(11,43,38,.75); color:var(--sand); border-radius:99px; padding:.4rem .75rem; font-size:.72rem; }
+    .b-big .b-row .th .go2 { display:grid; position:absolute; right:.8rem; bottom:.8rem; width:2.4rem; height:2.4rem; border-radius:50%; background:var(--sand); color:var(--green); place-items:center; }
+    .b-big .b-row .c { font-size:1rem; } .b-big .b-row .c small { display:none; }
+    .b-big .b-row .m { display:block; grid-row:4; grid-column:1; margin-top:.9rem; }
+    .b-big .b-row .m .st { display:inline-flex; flex-direction:column; margin-right:1.5rem; font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; opacity:.8; }
+    .b-big .b-row .m .st b { font-size:1.35rem; letter-spacing:0; text-transform:none; font-weight:600; line-height:1.1; }
+    .b-big .b-row .m .sv { display:flex; flex-wrap:wrap; gap:.3rem; margin-top:.9rem; }
+    .b-big .b-row .m .sv span { font-size:.72rem; border:1px solid var(--line); border-radius:99px; padding:.35rem .65rem; }
+    .b-big .b-row .m .sm { display:block; margin-top:.8rem; font-size:.92rem; line-height:1.5; opacity:.75; }
   }
 </style>
 </head>
@@ -204,11 +215,14 @@ const peek = document.getElementById('b-peek');
 const drawB = (s) => {
   const list = CS.filter((c) => !s || c.services.includes(s));
   document.getElementById('b-list').innerHTML = list.map((c, i) => `<a class="b-row" href="#" data-img="${esc(c.thumb)}">
-    <span class="n">${String(i + 1).padStart(2, '0')}</span><span class="th"><img src="${esc(c.thumb)}" alt=""></span>
+    <span class="n">${String(i + 1).padStart(2, '0')}</span><span class="th"><img src="${esc(c.thumb)}" alt="">${c.tenure ? `<span class="tg">${esc(c.tenure)}</span>` : ''}<span class="go2">${ARROW}</span></span>
     <span class="t">${esc(c.name)}${c.sub ? `<small>${esc(c.sub)}</small>` : ''}</span>
     <span class="c">${esc(c.client || '—')}<small>${esc(c.tenure)}</small></span>
     <span class="s">${c.services.slice(0, 3).map((v) => `<span>${esc(v)}</span>`).join('')}${c.services.length > 3 ? `<span>+${c.services.length - 3}</span>` : ''}</span>
-    <span class="h">${c.homes ? `${esc(c.homes)}<small>homes</small>` : ''}</span><span class="ar">${ARROW}</span></a>`).join('');
+    <span class="h">${c.homes ? `${esc(c.homes)}<small>homes</small>` : ''}</span>
+    <span class="m">${[[c.homes, 'homes'], [(c.launched.match(/\d{4}/) || [''])[0], 'launched']].filter(([v]) => v).map(([v, l]) => `<span class="st"><b>${esc(v)}</b>${l}</span>`).join('')}
+      ${c.services.length ? `<span class="sv">${c.services.map((v) => `<span>${esc(v)}</span>`).join('')}</span>` : ''}
+      ${c.summary ? `<span class="sm">${esc(clip(c.summary, 140))}</span>` : ''}</span><span class="ar">${ARROW}</span></a>`).join('');
   document.getElementById('b-count').textContent = `${list.length} case ${list.length === 1 ? 'study' : 'studies'}`;
 };
 chips(document.getElementById('b-chips'), SERVICES, drawB); drawB('');
