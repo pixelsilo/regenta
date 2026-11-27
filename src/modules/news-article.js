@@ -58,7 +58,7 @@ function related(root) {
 const SHARE_LABEL = { linkedin: 'Share on LinkedIn', email: 'Share by email', copy: 'Copy link' };
 
 function share(root) {
-  const url = location.href.split('#')[0];
+  const url = location.origin + location.pathname; // the clean address: no tracking tags or #anchors
   const title = text(root.querySelector('h1')) || document.title;
   const tip = document.querySelector('[data-nw-tip]');
   const tipText = tip?.querySelector('.button-text') || tip;
