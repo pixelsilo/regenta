@@ -18,11 +18,13 @@ export default function newsList(root) {
   const grid = root.querySelector('.nw-grid');
   if (!grid) return;
 
-  const featured = new Set([...root.querySelectorAll('.nw-feat a[href]')].map((a) => a.pathname));
+  // Story pages only: a card whose link isn't set yet (href="#") must not hide every story
+  const story = (a) => a && a.getAttribute('href') !== '#' && a.pathname !== location.pathname;
+  const featured = new Set([...root.querySelectorAll('.nw-feat a[href]')].filter(story).map((a) => a.pathname));
   const items = [];
   const add = (els) => els.forEach((el) => {
     const a = el.querySelector('a[href]');
-    if (a && featured.has(a.pathname)) { el.remove(); return; } // already in the featured cards
+    if (story(a) && featured.has(a.pathname)) { el.remove(); return; } // already in the featured cards
     items.push({ el, cat: text(el.querySelector('.csl-tag')) });
   });
   add([...grid.children]);
