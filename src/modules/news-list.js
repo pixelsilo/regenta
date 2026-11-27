@@ -2,6 +2,7 @@
 // Everything is built and styled in Webflow; this filters the stories by category, shows them a page at a time
 // and pulls in stories from Webflow's later pages, so the filter covers every story.
 //
+//   a[data-nw-slug]           card links: href set to /news/<slug> (lib/item-links.js)
 //   .nw-feat a[href]          the featured cards (Collection List filtered to "Featured?"); skipped in the grid
 //   .nw-grid > .w-dyn-item    one per story (100 per Webflow page); its category is the text of its .csl-tag
 //   [data-nw-filter="<cat>"]  category pills ('' = all), .is-active; .nw-chip_n is each pill's count
@@ -10,6 +11,8 @@
 //   .w-pagination-wrapper     Webflow's own pagination: left in the page for search engines and as the no-script
 //                             fallback. The script fetches the next pages' stories, then hides it.
 
+import linkItems from '../lib/item-links.js';
+
 const PAGE = 12;
 const text = (el) => (el?.textContent || '').trim();
 const plural = (n) => `${n} ${n === 1 ? 'story' : 'stories'}`;
@@ -17,6 +20,7 @@ const plural = (n) => `${n} ${n === 1 ? 'story' : 'stories'}`;
 export default function newsList(root) {
   const grid = root.querySelector('.nw-grid');
   if (!grid) return;
+  linkItems(root, 'data-nw-slug', '/news');
 
   // Story pages only: a card whose link isn't set yet (href="#") must not hide every story
   const story = (a) => a && a.getAttribute('href') !== '#' && a.pathname !== location.pathname;
@@ -75,6 +79,7 @@ export default function newsList(root) {
         const g = doc.querySelector('[data-module="news-list"] .nw-grid');
         if (!g) break;
         const els = [...g.children].map((el) => document.importNode(el, true));
+        els.forEach((el) => linkItems(el, 'data-nw-slug', '/news'));
         grid.append(...els);
         add(els);
         render();

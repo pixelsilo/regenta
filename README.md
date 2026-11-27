@@ -227,6 +227,31 @@ Mock: `mocks/case-studies-list.html` (B2). The old "Latest case study" hero list
 - **Nav:** the page's Navigation instance is now navbar-white on, navbar-faded off (the dark hero it faded over is gone).
 - **Set in the Designer (the API can't):** conditional visibility so empty fields don't leave labels behind: homes stat when *Stats Grid - Number of Units* is set, launched stat when *Stats Grid - Launch Date* is set, both tenure elements (photo chip and the line under the client) when *Stats Grid - Tenures* is set, client line when *Developer* is set.
 
+## News page and articles (`/news` layout C, article layout 1, `v3.21.2`)
+
+Mock: `mocks/news.html` (News C, Article 1). News has a new **Category** option field (Market insight, Events & awards, Developments, Team & company), filled in for every story on 27 Nov 2026.
+
+**News page** (root `.nw-section[data-module="news-list"]`, inside a `1440-container`):
+- Hero reuses the listing classes (`ps-eyebrow`, `csl-h1` "Latest *news*", `csl-lede`).
+- **Featured:** Collection List `.nw-feat` (grid 2fr 1fr, first item spans both rows; `.nw-feat_item`), newest first, limit 3. Cards `.nw-card` (Thumbnail, `.nw-card_shade`, category `.nw-card_tag`, date, `.nw-card_title`).
+- **Filter:** pills `.csl-chip[data-nw-filter]` (`.is-active`) with counts `.nw-chip_n`; `[data-nw-count]`. Pills wrap on phones (no side-scrolling).
+- **Grid:** Collection List `.nw-grid` (4 / 3 / 1 columns), every story newest first, **100 per page with pagination on**. Cards `.nw-post` (Thumbnail, `.csl-tag` category, `.nw-date`, `.nw-post_title`, `.nw-post_sum`); on phones a thumbnail row.
+- **Load more:** `[data-nw-more]` shows 12 more. The script hides Webflow's pagination and, past 100 stories, fetches each next page and adds its stories to the grid, so the filter and counts cover everything. Without the script the pagination links still work (and search engines follow them).
+- **Script:** `src/modules/news-list.js`. Featured stories are skipped in the grid (by link).
+- **Card links:** the API can't link a card to "Current News", so every card link (`.nw-card`, `.nw-post`, here and on the template) has `data-nw-slug` bound to Slug and `src/lib/item-links.js` sets `/news/<slug>`. If someone sets the link to Current News in the Designer, the script leaves it.
+
+**Article** (News Template, root `.nw-art[data-module="news-article"]`):
+- `.nw-art_head` (spacer column + category, date, `.nw-art_h1`, `.nw-art_lead` = Post Summary in Griffiths), `.nw-art_img` (Main Image, 21:9, 4:3 on phones).
+- `.nw-art_body`: sticky `.nw-rail` (Written by: the existing author block restyled `.nw-author`; Published; Share `[data-nw-share="linkedin|email|copy"]`; All news) and the content column (the existing Video and `article-rich-text`, then the gallery `[data-nw-gal]`: heading, `[data-nw-gal-count]`, the existing Gallery list restyled `.nw-gal` / `.nw-gal_item`). Rail drops under the text on tablet and phone.
+- **Gallery lightbox:** ours (`.cs-lb`, same markup and classes as the case study template). Webflow's lightbox wrappers and the Finsweet slider are gone. `src/lib/lightbox.js` is shared by both.
+- **Previous / next:** `.nw-pn` links `[data-nw-prev]` / `[data-nw-next]`, filled from the hidden list `[data-nw-all]` (every story, newest first, `.nw-post` cards).
+- **More news:** `[data-nw-related]`, a 3-card list (newest three, the Designer preview). Webflow can't filter by "same option as this item", so the script swaps in three stories from this story's category (from the hidden list) and renames the heading ("More market insight"). The old `news-strip` instance is off the template (the component itself is untouched).
+- **Script:** `src/modules/news-article.js`.
+
+**Set in the Designer (the API can't):**
+- Featured list filter **Featured? is On** (the API's filter call is rejected).
+- Conditional visibility: `.nw-art_img` when *Main Image* is set; the "Written by" wrapper when *Author* is set; the Video when *Video Link* is set.
+
 ## Footer (one CSS rule)
 
 The footer is the `footer` component in Webflow (on every page). **Option C (26 Nov 2026, #57, staging only):** mocked in `mocks/footer-c.html`. `footer_main` is a two-column grid: the first column is the width of a quarter of the row minus gaps, then a 7rem gutter, then `footer_links` (three equal columns, 3rem gap). The first column is `footer_brand`, a sand panel (radius 1.5rem) sized to its content: logo, "Talk to us" eyebrow, phone and email (`footer_large`, 1.35rem, weight 500, an underline draws in on hover), address, and socials as 2.6rem outlined circles (`footer_social-link`; hover fills green and lifts 3px). Column titles are `footer_col-title` (link size, 45% opacity). Links (`footer_link`; the services list is a collection list with `footer_cms-list`) fade from 85% to full on hover and show an arrow that slides in after the text. The arrow is the only footer CSS outside the Designer (Webflow can't style `::after`): it sits in the `code-v2` css embed. The hero line paragraph is hidden, not deleted. Panel stacks above the three columns on tablet; one column on phones. The pre-option-C structure is the unused component "footer (backup 26 Nov 2026)"; it shares the classes, so it shows the new styling on the old layout.

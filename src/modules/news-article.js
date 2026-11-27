@@ -10,6 +10,7 @@
 //   [data-nw-share="linkedin" | "email" | "copy"]
 
 import lightbox from '../lib/lightbox.js';
+import linkItems from '../lib/item-links.js';
 
 const text = (el) => (el?.textContent || '').trim();
 
@@ -91,6 +92,7 @@ function share(root) {
 }
 
 export default function newsArticle(root) {
+  linkItems(root, 'data-nw-slug', '/news');
   gallery(root);
   related(root);
   prevNext(root);
