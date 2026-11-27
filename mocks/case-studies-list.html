@@ -84,6 +84,8 @@
   .b-peek.on { opacity:1; transform:none; }
   .b-peek img { width:100%; height:100%; object-fit:cover; }
   .b-list { padding-bottom:6rem; }
+  .fbtn { display:none; }
+  .sheet { display:none; }
 
   /* ---------- C: mosaic ---------- */
   .c-hero { padding:5rem 0 3rem; display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; flex-wrap:wrap; }
@@ -118,6 +120,26 @@
     .a-feature { height:30rem; }
     .a-bar, .b-bar { flex-direction:column; align-items:flex-start; position:static; }
     .chips { flex-wrap:nowrap; overflow-x:auto; max-width:100%; padding-bottom:.25rem; }
+    #b-chips { display:none; }
+    .b-bar { flex-direction:row; align-items:center; position:sticky; top:0; z-index:6; background:var(--sand); padding:.75rem 0; }
+    .fbtn { display:flex; flex:1; align-items:center; justify-content:space-between; border:1px solid rgba(11,43,38,.25); border-radius:99px; padding:.6rem 1.1rem; text-align:left; }
+    .fbtn small { display:block; font-size:.62rem; letter-spacing:.18em; text-transform:uppercase; opacity:.55; }
+    .fbtn > span { min-width:0; } .fbtn b { display:block; font-weight:500; font-size:.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .fbtn i { font-style:normal; font-size:.8rem; opacity:.6; }
+    .b-bar .count { white-space:nowrap; }
+    .sheet { display:block; position:fixed; inset:0; z-index:60; visibility:hidden; }
+    .sheet.on { visibility:visible; }
+    .sheet_bg { position:absolute; inset:0; background:rgba(11,43,38,.45); opacity:0; transition:opacity .25s; }
+    .sheet.on .sheet_bg { opacity:1; }
+    .sheet_panel { position:absolute; left:0; right:0; bottom:0; background:var(--sand); border-radius:1.25rem 1.25rem 0 0; padding:.6rem 1rem 1.5rem; transform:translateY(100%); transition:transform .3s cubic-bezier(.3,.7,.2,1); }
+    .sheet.on .sheet_panel { transform:none; }
+    .sheet_grip { width:2.5rem; height:4px; border-radius:4px; background:rgba(11,43,38,.2); margin:0 auto .75rem; }
+    .sheet_head { display:flex; justify-content:space-between; align-items:center; padding:.25rem .25rem .75rem; font-size:1.1rem; }
+    .sheet_head button { width:2.4rem; height:2.4rem; border-radius:50%; border:1px solid var(--line); }
+    .sheet_list button { display:flex; width:100%; justify-content:space-between; align-items:center; padding:1rem .25rem; border-top:1px solid var(--line); font-size:1.05rem; }
+    .sheet_list button span { font-size:.8rem; opacity:.55; }
+    .sheet_list button[aria-pressed="true"] { font-weight:600; }
+    .sheet_list button[aria-pressed="true"] span { font-size:1rem; opacity:1; }
     .chip { white-space:nowrap; }
     .a-grid, .c-grid { grid-template-columns:1fr; grid-auto-rows:24rem; }
     .c-grid > :nth-child(5n+1) { grid-column:span 1; }
@@ -162,10 +184,14 @@
 
 <section class="v" data-v="b"><div class="wrap">
   <div class="b-hero"><div class="eb">Case studies</div><h1 class="h1">Our <span class="g">work</span></h1><p class="lede">Every scheme we've sold and marketed, with who it was for, the tenure and how many homes.</p></div>
-  <div class="b-bar"><div class="chips" id="b-chips"></div><div class="count" id="b-count"></div></div>
+  <div class="b-bar"><div class="chips" id="b-chips"></div>
+    <button class="fbtn" type="button" id="b-fbtn" aria-haspopup="dialog"><span><small>Service</small><b id="b-fval">All services</b></span><i>&#9662;</i></button>
+    <div class="count" id="b-count"></div></div>
   <div class="b-head"><span>No.</span><span>Scheme</span><span>Client</span><span>Services</span><span style="text-align:right">Homes</span><span></span></div>
   <div class="b-list" id="b-list"></div>
-</div><div class="b-peek" id="b-peek"><img alt=""></div></section>
+</div><div class="b-peek" id="b-peek"><img alt=""></div>
+<div class="sheet" id="b-sheet" role="dialog" aria-modal="true" aria-label="Filter by service"><div class="sheet_bg" data-close></div>
+  <div class="sheet_panel"><div class="sheet_grip"></div><div class="sheet_head"><b>Filter by service</b><button type="button" data-close aria-label="Close">&#10005;</button></div><div class="sheet_list" id="b-opts"></div></div></div></section>
 
 <section class="v" data-v="c"><div class="wrap">
   <div class="c-hero"><div><div class="eb">Case studies</div><h1 class="h1">How we <span class="g">make a difference</span></h1></div><p class="lede" style="margin:0">Schemes we've sold and marketed for councils, housing associations and developers.</p></div>
@@ -198,6 +224,7 @@ function chips(el, list, onPick) {
   const draw = () => { el.innerHTML = ['', ...list].map((s) => `<button class="chip" type="button" aria-pressed="${s === cur}" data-s="${esc(s)}">${s || 'All'}</button>`).join(''); };
   el.addEventListener('click', (e) => { const b = e.target.closest('.chip'); if (!b) return; cur = b.dataset.s; draw(); onPick(cur); });
   draw();
+  return (v) => { cur = v; draw(); onPick(cur); };
 }
 
 // A
@@ -225,7 +252,23 @@ const drawB = (s) => {
       ${c.summary ? `<span class="sm">${esc(clip(c.summary, 140))}</span>` : ''}</span><span class="ar">${ARROW}</span></a>`).join('');
   document.getElementById('b-count').textContent = `${list.length} case ${list.length === 1 ? 'study' : 'studies'}`;
 };
-chips(document.getElementById('b-chips'), SERVICES, drawB); drawB('');
+const sheet = document.getElementById('b-sheet');
+let bCur = '';
+const drawOpts = () => {
+  document.getElementById('b-opts').innerHTML = ['', ...SERVICES].map((v) => {
+    const n = CS.filter((c) => !v || c.services.includes(v)).length;
+    return `<button type="button" data-s="${esc(v)}" aria-pressed="${v === bCur}">${v || 'All services'} <span>${v === bCur ? '✓' : n}</span></button>`;
+  }).join('');
+  document.getElementById('b-fval').textContent = bCur || 'All services';
+};
+const setB = chips(document.getElementById('b-chips'), SERVICES, (v) => { bCur = v; drawB(v); drawOpts(); });
+drawB(''); drawOpts();
+document.getElementById('b-fbtn').addEventListener('click', () => sheet.classList.add('on'));
+sheet.addEventListener('click', (e) => {
+  const o = e.target.closest('#b-opts button');
+  if (o) { setB(o.dataset.s); sheet.classList.remove('on'); return; }
+  if (e.target.closest('[data-close]')) sheet.classList.remove('on');
+});
 document.getElementById('b-list').addEventListener('mousemove', (e) => {
   const row = e.target.closest('.b-row');
   if (!row || innerWidth < 992) { peek.classList.remove('on'); return; }
