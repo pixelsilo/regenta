@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mock: Find your home filters | Regenta (#57)</title>
+<script src="https://use.typekit.net/ptn3etu.js"></script>
+<script>try{Typekit.load();}catch(e){}</script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="property-search-data.js"></script>
+<style>
+  /* Mock only. Three layouts for /property-search with the real 25 developments. The filter logic is the
+     live page's: tenure and location are exact matches, bedrooms is "at least", price is a range whose ends
+     mean "no limit", and an option that would show nothing is greyed out (with counts). The map here is
+     Leaflet; the real page keeps Google Maps. */
+  :root { --green:#0b2b26; --green2:#173833; --sand:#e3e5db; --sand2:#eef0e8; --line:rgba(11,43,38,.15); --line-l:rgba(227,229,219,.25); }
+  * { box-sizing:border-box; }
+  html, body { margin:0; }
+  body { background:var(--sand); color:var(--green); font-family:area-normal, area, "Area Normal", system-ui, sans-serif; }
+  a { color:inherit; text-decoration:none; }
+  button { font:inherit; color:inherit; background:none; border:0; padding:0; cursor:pointer; }
+  img { display:block; max-width:100%; }
+  .wrap { max-width:1440px; margin:0 auto; padding:0 2rem; }
+  .g { font-family:Griffiths, serif; font-weight:400; }
+  .eb { font-size:.66rem; letter-spacing:.2em; text-transform:uppercase; opacity:.55; margin:0 0 .6rem; }
+
+  /* nav stand-in */
+  .nav { position:sticky; top:0; z-index:30; background:var(--green); color:var(--sand); height:84px; display:flex; align-items:center; }
+  .nav .wrap { width:100%; display:flex; justify-content:space-between; align-items:center; font-size:.62rem; letter-spacing:.2em; }
+  .nav b { font-size:1.5rem; letter-spacing:.08em; font-weight:500; }
+  .note { background:#fff8; border-bottom:1px solid var(--line); font:13px/1.5 system-ui, sans-serif; padding:.7rem 0; }
+
+  /* hero */
+  .hero { padding:2.25rem 0 1.25rem; display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; flex-wrap:wrap; }
+  .hero h1 { margin:0; font-size:clamp(2.4rem, 4.6vw, 4.2rem); line-height:1; font-weight:600; }
+  .hero p { margin:.8rem 0 0; max-width:40rem; opacity:.75; line-height:1.5; font-size:.98rem; }
+
+  /* shared bits */
+  .count { font-size:.88rem; } .count b { font-weight:600; }
+  .clear { font-size:.82rem; text-decoration:underline; text-underline-offset:.2em; opacity:.7; }
+  .clear:hover { opacity:1; }
+  .seg { display:inline-flex; border:1px solid var(--green); border-radius:99px; padding:3px; gap:2px; background:var(--sand); }
+  .seg button { padding:.55rem 1rem; border-radius:99px; font-size:.85rem; display:flex; gap:.45rem; align-items:center; }
+  .seg button.on { background:var(--green); color:var(--sand); }
+  .seg svg { width:14px; height:14px; }
+  .chip { display:inline-flex; align-items:center; gap:.45rem; border:1px solid rgba(11,43,38,.25); border-radius:99px; padding:.6rem .95rem; font-size:.86rem; line-height:1; background:transparent; transition:background .2s, color .2s, border-color .2s; }
+  .chip small { font-size:.72rem; opacity:.55; }
+  .chip:hover:not(:disabled) { border-color:var(--green); }
+  .chip.on { background:var(--green); color:var(--sand); border-color:var(--green); }
+  .chip.on small { opacity:.7; }
+  .chip:disabled { opacity:.35; cursor:not-allowed; }
+  .chips { display:flex; flex-wrap:wrap; gap:.4rem; }
+  .beds { display:grid; grid-template-columns:repeat(6, 1fr); border:1px solid rgba(11,43,38,.25); border-radius:.8rem; overflow:hidden; }
+  .beds button { padding:.75rem 0; font-size:.86rem; border-left:1px solid var(--line); }
+  .beds button:first-child { border-left:0; }
+  .beds button.on { background:var(--green); color:var(--sand); }
+  .beds button:disabled { opacity:.35; cursor:not-allowed; }
+  .locs { display:flex; flex-direction:column; }
+  .locs button { display:flex; justify-content:space-between; align-items:center; padding:.7rem .15rem; border-top:1px solid var(--line); font-size:.92rem; text-align:left; }
+  .locs button:first-child { border-top:0; }
+  .locs button small { font-size:.75rem; opacity:.55; }
+  .locs button .tick { width:1.1rem; height:1.1rem; border-radius:50%; border:1px solid rgba(11,43,38,.35); display:inline-grid; place-items:center; margin-right:.7rem; flex:none; }
+  .locs button.on .tick { background:var(--green); border-color:var(--green); }
+  .locs button.on .tick::after { content:""; width:.4rem; height:.4rem; border-radius:50%; background:var(--sand); }
+  .locs button:disabled { opacity:.35; cursor:not-allowed; }
+  .locs button span { display:flex; align-items:center; }
+  .fsec + .fsec { margin-top:1.6rem; padding-top:1.4rem; border-top:1px solid var(--line); }
+  .fsec h3 { margin:0 0 .8rem; font-size:.7rem; letter-spacing:.18em; text-transform:uppercase; font-weight:600; opacity:.6; display:flex; justify-content:space-between; }
+  .fsec h3 button { font-size:.72rem; letter-spacing:0; text-transform:none; text-decoration:underline; opacity:.8; font-weight:400; }
+  /* dual range */
+  .price-out { display:flex; justify-content:space-between; font-size:.95rem; font-weight:600; margin-bottom:.6rem; }
+  .range { position:relative; height:28px; }
+  .range .rail { position:absolute; left:0; right:0; top:13px; height:2px; background:rgba(11,43,38,.2); border-radius:2px; }
+  .range .fill { position:absolute; top:13px; height:2px; background:var(--green); }
+  .range input { position:absolute; inset:0; width:100%; margin:0; background:none; pointer-events:none; -webkit-appearance:none; appearance:none; height:28px; }
+  .range input::-webkit-slider-thumb { -webkit-appearance:none; pointer-events:auto; width:22px; height:22px; border-radius:50%; background:var(--sand); border:2px solid var(--green); cursor:grab; }
+  .range input::-moz-range-thumb { pointer-events:auto; width:18px; height:18px; border-radius:50%; background:var(--sand); border:2px solid var(--green); cursor:grab; }
+  .presets { display:flex; flex-wrap:wrap; gap:.35rem; margin-top:.9rem; }
+  .presets .chip { padding:.45rem .7rem; font-size:.78rem; }
+
+  /* cards */
+  .card { display:flex; flex-direction:column; gap:.85rem; }
+  .card .im { position:relative; aspect-ratio:16/11; border-radius:1rem; overflow:hidden; background:#cfd3c6; }
+  .card .im img { width:100%; height:100%; object-fit:cover; transition:transform 1s cubic-bezier(.2,.7,.2,1); }
+  .card:hover .im img { transform:scale(1.04); }
+  .card .tags { position:absolute; left:.7rem; top:.7rem; display:flex; flex-wrap:wrap; gap:.3rem; }
+  .card .tags span { background:rgba(11,43,38,.78); color:var(--sand); border-radius:99px; padding:.35rem .6rem; font-size:.68rem; }
+  .card h3 { margin:0; font-size:1.3rem; line-height:1.15; font-weight:600; }
+  .card .loc { font-size:.82rem; opacity:.6; margin-top:.25rem; }
+  .card p { margin:0; font-size:.9rem; line-height:1.5; opacity:.75; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .card .foot { display:flex; justify-content:space-between; align-items:center; padding-top:.75rem; border-top:1px solid var(--line); font-size:.88rem; }
+  .card .foot .bd { display:flex; gap:.45rem; align-items:center; opacity:.8; }
+  .card .foot .bd svg { width:18px; height:18px; }
+  .card .foot .pr b { font-weight:600; }
+  .card.row { display:grid; grid-template-columns:11rem 1fr; gap:1.1rem; padding:1rem 0; border-bottom:1px solid var(--line); }
+  .card.row .im { aspect-ratio:4/3; border-radius:.8rem; }
+  .card.row .tags { display:none; }
+  .card.row .body { display:flex; flex-direction:column; gap:.45rem; min-width:0; }
+  .card.row h3 { font-size:1.1rem; }
+  .card.row p { -webkit-line-clamp:2; font-size:.85rem; }
+  .card.row .foot { border-top:0; padding-top:0; margin-top:auto; }
+  .card.is-hl .im { box-shadow:0 0 0 3px var(--green); }
+  .grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:2.5rem 1.5rem; padding:1.5rem 0 5rem; }
+  .empty { padding:4rem 0; text-align:center; opacity:.7; }
+  .empty button { text-decoration:underline; }
+
+  /* map */
+  .map { background:#dfe2d8; }
+  .leaflet-container { font:inherit; background:#dfe2d8; }
+  .leaflet-tile-pane { filter:grayscale(1) sepia(.25) contrast(.92) brightness(1.04); }
+  .pin { background:var(--green); color:var(--sand); border-radius:99px; padding:.32rem .55rem; font-size:.72rem; font-weight:600; white-space:nowrap; box-shadow:0 4px 12px rgba(0,0,0,.25); transform:translate(-50%, -50%); display:inline-block; border:2px solid var(--sand); transition:transform .15s; }
+  .pin.on { background:var(--sand); color:var(--green); border-color:var(--green); transform:translate(-50%, -50%) scale(1.12); z-index:5; }
+  .leaflet-div-icon { background:none; border:0; }
+  .mapcard { position:absolute; z-index:500; width:min(20rem, calc(100% - 2rem)); background:var(--sand); border-radius:1rem; overflow:hidden; box-shadow:0 18px 40px rgba(0,0,0,.3); }
+  .mapcard .im { aspect-ratio:16/9; } .mapcard .im img { width:100%; height:100%; object-fit:cover; }
+  .mapcard .b { padding:1rem; display:flex; flex-direction:column; gap:.4rem; }
+  .mapcard h3 { margin:0; font-size:1.1rem; } .mapcard .x { position:absolute; right:.6rem; top:.6rem; width:2rem; height:2rem; border-radius:50%; background:var(--sand); display:grid; place-items:center; }
+
+  /* ============ A: pill bar + popovers / phone sheet ============ */
+  .A-bar { position:sticky; top:84px; z-index:20; background:var(--sand); border-bottom:1px solid var(--line); }
+  .A-bar .wrap { display:flex; align-items:center; gap:.5rem; height:72px; }
+  .A-pill { position:relative; }
+  .A-pill > button { display:flex; align-items:center; gap:.55rem; border:1px solid rgba(11,43,38,.25); border-radius:99px; padding:.7rem 1rem; font-size:.88rem; background:var(--sand); }
+  .A-pill > button:hover { border-color:var(--green); }
+  .A-pill > button.set { background:var(--green); color:var(--sand); border-color:var(--green); }
+  .A-pill > button svg { width:12px; height:12px; opacity:.7; transition:transform .2s; }
+  .A-pill.open > button svg { transform:rotate(180deg); }
+  .A-pop { position:absolute; top:calc(100% + .6rem); left:0; width:22rem; background:var(--sand2); border-radius:1rem; box-shadow:0 18px 50px rgba(11,43,38,.22); padding:1.25rem; display:none; z-index:25; }
+  .A-pill.open .A-pop { display:block; }
+  .A-pop .done { margin-top:1.2rem; display:flex; justify-content:space-between; align-items:center; }
+  .A-pop .done button.go { background:var(--green); color:var(--sand); border-radius:99px; padding:.7rem 1.1rem; font-size:.84rem; }
+  .A-bar .sp { flex:1; }
+  .A-map { display:grid; grid-template-columns:minmax(0, 30rem) 1fr; height:calc(100vh - 156px); border-top:0; }
+  .A-map .list { overflow:auto; padding:0 1.5rem 2rem 2rem; }
+  .A-map .map { position:relative; }
+  .A-phonebar { display:none; }
+
+  /* ============ B: sidebar ============ */
+  .B-layout { display:grid; grid-template-columns:19rem minmax(0, 1fr); gap:2.5rem; align-items:start; padding-top:1rem; }
+  .B-side { position:sticky; top:104px; max-height:calc(100vh - 124px); overflow:auto; background:var(--sand2); border-radius:1.25rem; padding:1.4rem 1.3rem; }
+  .B-side .head { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; }
+  .B-side .head b { font-size:1.05rem; }
+  .B-top { display:flex; justify-content:space-between; align-items:center; padding:.25rem 0 0; }
+  .B-layout .grid { grid-template-columns:repeat(2, 1fr); }
+  .B-active { display:flex; flex-wrap:wrap; gap:.35rem; margin-top:.9rem; }
+  .B-active button { display:inline-flex; gap:.4rem; align-items:center; background:var(--green); color:var(--sand); border-radius:99px; padding:.45rem .7rem; font-size:.78rem; }
+  .B-mapwrap { position:sticky; top:104px; height:calc(100vh - 124px); border-radius:1.25rem; overflow:hidden; margin-top:1rem; }
+  .B-mapwrap .map { position:absolute; inset:0; }
+  .B-float { display:none; }
+
+  /* ============ C: split, summary line ============ */
+  .C-sum { position:sticky; top:84px; z-index:20; background:var(--green); color:var(--sand); }
+  .C-sum .wrap { height:68px; display:flex; align-items:center; gap:1rem; }
+  .C-sum .line { flex:1; display:flex; align-items:center; gap:.9rem; min-width:0; border:1px solid var(--line-l); border-radius:99px; padding:.65rem .65rem .65rem 1.2rem; text-align:left; transition:background .2s; }
+  .C-sum .line:hover { background:rgba(227,229,219,.06); }
+  .C-sum .line svg { width:16px; height:16px; flex:none; opacity:.8; }
+  .C-sum .line .t { flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:.92rem; }
+  .C-sum .line .t i { font-style:normal; opacity:.55; margin:0 .45rem; }
+  .C-sum .line .edit { background:var(--sand); color:var(--green); border-radius:99px; padding:.5rem .9rem; font-size:.8rem; flex:none; }
+  .C-sum .seg { border-color:var(--sand); background:var(--green); } .C-sum .seg button.on { background:var(--sand); color:var(--green); } .C-sum .seg button { color:var(--sand); }
+  .C-split { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); }
+  .C-split.list-only { grid-template-columns:1fr; }
+  .C-list { padding:0 2rem 4rem; }
+  .C-split.list-only .C-list .grid { grid-template-columns:repeat(3, 1fr); }
+  .C-list .grid { grid-template-columns:repeat(2, 1fr); gap:2rem 1.25rem; }
+  .C-mapcol { position:sticky; top:152px; height:calc(100vh - 152px); }
+  .C-mapcol .map { position:absolute; inset:0; }
+  .C-head { display:flex; justify-content:space-between; align-items:baseline; padding:1.5rem 0 .25rem; }
+  .C-panel { position:fixed; inset:0; z-index:60; display:none; }
+  .C-panel.on { display:block; }
+  .C-panel .bg { position:absolute; inset:0; background:rgba(11,43,38,.5); }
+  .C-panel .box { position:absolute; left:50%; top:110px; transform:translateX(-50%); width:min(56rem, calc(100% - 2rem)); max-height:calc(100vh - 140px); overflow:auto; background:var(--sand2); border-radius:1.25rem; padding:1.75rem; display:grid; grid-template-columns:1fr 1fr; gap:0 2.5rem; }
+  .C-panel .box .fsec { margin:0; padding:0 0 1.5rem; border:0; }
+  .C-panel .foot { grid-column:1 / -1; display:flex; justify-content:space-between; align-items:center; padding-top:1.25rem; border-top:1px solid var(--line); }
+  .C-panel .x { width:2.4rem; height:2.4rem; border-radius:50%; border:1px solid var(--line); display:grid; place-items:center; }
+
+  /* phone sheet (A, B) and full panels */
+  .sheet { position:fixed; inset:0; z-index:60; visibility:hidden; }
+  .sheet.on { visibility:visible; }
+  .sheet .bg { position:absolute; inset:0; background:rgba(11,43,38,.45); opacity:0; transition:opacity .25s; }
+  .sheet.on .bg { opacity:1; }
+  .sheet .panel { position:absolute; left:0; right:0; bottom:0; max-height:88vh; display:flex; flex-direction:column; background:var(--sand2); border-radius:1.25rem 1.25rem 0 0; transform:translateY(100%); transition:transform .32s cubic-bezier(.3,.7,.2,1); }
+  .sheet.on .panel { transform:none; }
+  .sheet .grip { width:2.6rem; height:4px; border-radius:4px; background:rgba(11,43,38,.2); margin:.6rem auto .2rem; flex:none; }
+  .sheet .h { display:flex; justify-content:space-between; align-items:center; padding:.5rem 1.1rem .9rem; border-bottom:1px solid var(--line); flex:none; }
+  .sheet .h b { font-size:1.1rem; }
+  .sheet .body { overflow:auto; padding:1.2rem 1.1rem; flex:1; }
+  .sheet .f { display:flex; gap:.6rem; align-items:center; padding:.9rem 1.1rem calc(.9rem + env(safe-area-inset-bottom)); border-top:1px solid var(--line); flex:none; }
+  .sheet .f .go { flex:1; background:var(--green); color:var(--sand); border-radius:99px; padding:1rem; font-size:.95rem; text-align:center; }
+  .sheet.full .panel { top:0; max-height:none; border-radius:0; }
+  .x { width:2.3rem; height:2.3rem; border-radius:50%; border:1px solid var(--line); display:grid; place-items:center; }
+  .x svg { width:12px; height:12px; }
+
+  /* switcher + phone frame */
+  .bar { position:fixed; left:50%; transform:translateX(-50%); bottom:1rem; z-index:90; display:flex; gap:.35rem; align-items:center; background:#fff; border-radius:99px; padding:.3rem; box-shadow:0 10px 30px rgba(0,0,0,.22); font:13px/1 system-ui, sans-serif; color:var(--green); }
+  .bar button { padding:.65rem .9rem; border-radius:99px; white-space:nowrap; }
+  .bar button.is-on { background:var(--green); color:#fff; }
+  .bar .sep { width:1px; align-self:stretch; background:#ddd; margin:.2rem; }
+  body.framed > :not(.bar):not(.phone) { display:none !important; }
+  .phone { display:none; }
+  body.framed { background:#c9ccc0; }
+  body.framed .phone { display:block; width:390px; height:min(844px, calc(100vh - 7rem)); margin:1.5rem auto; border:10px solid #111; border-radius:2.6rem; overflow:hidden; background:var(--sand); box-shadow:0 30px 60px rgba(0,0,0,.3); }
+  .phone iframe { width:100%; height:100%; border:0; }
+  body.embed .bar, body.embed .note { display:none; }
+
+  /* ============ phones ============ */
+  @media (max-width:767px) {
+    .wrap { padding:0 1rem; }
+    .nav { height:64px; } .nav span { display:none; }
+    .hero { padding:1.5rem 0 1rem; } .hero p { font-size:.9rem; }
+    .grid, .B-layout .grid, .C-list .grid, .C-split.list-only .C-list .grid { grid-template-columns:1fr; gap:2rem; padding-bottom:6rem; }
+    /* A: one slim sticky row */
+    .A-bar { display:none; }
+    .A-phonebar { display:block; position:sticky; top:64px; z-index:20; background:var(--sand); border-bottom:1px solid var(--line); }
+    .A-phonebar .wrap { height:60px; display:flex; align-items:center; gap:.5rem; }
+    .A-phonebar .fbtn { flex:1; display:flex; align-items:center; justify-content:space-between; border:1px solid rgba(11,43,38,.3); border-radius:99px; padding:.7rem 1rem; font-size:.9rem; }
+    .A-phonebar .fbtn svg { width:16px; height:16px; flex:none; }
+    .A-phonebar .fbtn .n { background:var(--green); color:var(--sand); border-radius:99px; min-width:1.4rem; height:1.4rem; display:inline-grid; place-items:center; font-size:.72rem; padding:0 .4rem; }
+    .A-phonebar .seg button { padding:.55rem .75rem; }
+    .A-map { display:block; height:auto; }
+    .A-map .map { height:calc(100svh - 124px); }
+    .A-map .list { display:none; }
+    /* B: no bar, floating pill */
+    .B-layout { display:block; }
+    .B-side, .B-mapwrap { display:none; }
+    .B-float { display:flex; position:fixed; left:50%; bottom:1.1rem; transform:translateX(-50%); z-index:40; background:var(--green); color:var(--sand); border-radius:99px; box-shadow:0 12px 30px rgba(0,0,0,.3); overflow:hidden; }
+    .B-float button { padding:.95rem 1.2rem; display:flex; gap:.5rem; align-items:center; font-size:.92rem; }
+    .B-float button + button { border-left:1px solid var(--line-l); }
+    .B-float svg { width:16px; height:16px; }
+    .B-float .n { background:var(--sand); color:var(--green); border-radius:99px; min-width:1.3rem; height:1.3rem; display:inline-grid; place-items:center; font-size:.7rem; }
+    .B-phonemap { position:fixed; inset:64px 0 0; z-index:35; }
+    /* C: summary line, map behind a button */
+    .C-sum .wrap { height:60px; } .C-sum { top:64px; }
+    .C-sum .seg { display:none; }
+    .C-sum .line { padding:.55rem .55rem .55rem 1rem; } .C-sum .line .t { font-size:.85rem; }
+    .C-split { display:block; }
+    .C-mapcol { display:none; }
+    .C-mapcol.phone-on { display:block; position:fixed; inset:124px 0 0; z-index:35; height:auto; }
+    .C-list { padding:0 1rem 6rem; }
+    .C-float { position:fixed; left:50%; bottom:1.1rem; transform:translateX(-50%); z-index:40; background:var(--green); color:var(--sand); border-radius:99px; padding:.95rem 1.3rem; display:flex; gap:.5rem; align-items:center; box-shadow:0 12px 30px rgba(0,0,0,.3); font-size:.92rem; }
+    .C-float svg { width:16px; height:16px; }
+    .C-panel .box { left:0; right:0; top:0; bottom:0; transform:none; width:auto; max-height:none; border-radius:0; display:block; padding:1.25rem 1rem 6rem; }
+    .C-panel .box .fsec { padding-bottom:1.5rem; margin-bottom:1.5rem; border-bottom:1px solid var(--line); }
+    .C-panel .foot { position:fixed; left:0; right:0; bottom:0; background:var(--sand2); padding:.9rem 1rem; }
+    .mapcard { left:1rem !important; right:1rem; bottom:1rem; top:auto !important; width:auto; }
+    .bar { left:.5rem; right:.5rem; transform:none; overflow-x:auto; }
+  }
+  @media (min-width:768px) { .C-float { display:none; } }
+  @media (min-width:768px) and (max-width:991px) {
+    .grid { grid-template-columns:repeat(2, 1fr); }
+    .B-layout { grid-template-columns:16rem minmax(0, 1fr); gap:1.5rem; } .B-layout .grid { grid-template-columns:1fr; }
+    .C-list .grid { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+<header class="nav"><div class="wrap"><b>REGENTA</b><span>FAQS &nbsp;&nbsp; CALCULATORS &nbsp;&nbsp; PURCHASER STORIES &nbsp;&nbsp; CONTACT US</span></div></header>
+<div class="note"><div class="wrap" id="note"></div></div>
+<main id="page"></main>
+<div class="phone"><iframe title="Phone preview"></iframe></div>
+<div class="bar">
+  <button data-o="A">A · Filter pills</button><button data-o="B">B · Side panel</button><button data-o="C">C · List + map</button>
+  <span class="sep"></span><button id="dev">Phone</button>
+</div>
+
+<script>
+const DEVS = window.DEVS;
+const TENURES = ['Shared Ownership', 'Private Sale Homes', 'Re-Sale Homes'];
+const REGIONS = ['South London', 'East London', 'West London', 'Essex', 'North London', 'North West London', 'Greater London'];
+const MAXP = 1000000, STEP = 5000;
+const NOTES = {
+  A: '<b>A · Filter pills.</b> The green band becomes a slim sand bar: one pill per filter, each opening a small panel (tenure and location with counts, bedrooms as 1+ to 5+, price slider with quick ranges). A set pill turns green and shows its value. Map view: list on the left, map on the right. <b>Phone:</b> one slim row (Filters + List/Map) instead of the stacked bar; Filters opens a bottom sheet with everything and "Show 12 homes".',
+  B: '<b>B · Side panel.</b> All filters always open in a panel on the left that stays in view; results in two columns, active filters as removable chips above them. Map view swaps the cards for the map beside the same panel. <b>Phone:</b> no sticky bar at all; a floating "Filters | Map" pill at the bottom opens the filters as a bottom sheet or the map full screen.',
+  C: '<b>C · List + map.</b> Map always beside the list on desktop (Hide map gives the full grid). The filters collapse into one summary line ("Shared Ownership · 2+ beds · Any price · All areas") that opens a panel with all of them. <b>Phone:</b> the summary line is the only sticky thing; a floating Map button shows the map with the matching homes.',
+};
+const ICON = {
+  chev: '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 4.5 6 8l3.5-3.5"/></svg>',
+  x: '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7"/></svg>',
+  list: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 4h12M2 8h12M2 12h12"/></svg>',
+  map: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M1.5 3.5 5.5 2l5 1.5 4-1.5v10.5l-4 1.5-5-1.5-4 1.5z"/><path d="M5.5 2v10.5M10.5 3.5V14"/></svg>',
+  filt: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 4h12M4.5 8h7M7 12h2"/></svg>',
+  bed: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18V7M3 14h18v4M21 14v-2.5A2.5 2.5 0 0 0 18.5 9H11v5M6.5 11.5a1.5 1.5 0 1 0 0-.01"/></svg>',
+  search: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3.5 3.5"/></svg>',
+};
+
+// ---------- filter logic (same rules as global/property-filter.js) ----------
+const S = { tenure: '', region: '', beds: 0, pmin: 0, pmax: MAXP };
+const matches = (d, s = S) => {
+  if (s.tenure && !d.tenure.includes(s.tenure)) return false;
+  if (s.region && d.region !== s.region) return false;
+  if (s.beds && !(d.minBeds >= s.beds)) return false;
+  const priced = s.pmin > 0 || s.pmax < MAXP;
+  if (priced) {
+    if (d.price == null) return false;
+    if (s.pmin > 0 && d.price < s.pmin) return false;
+    if (s.pmax < MAXP && d.price > s.pmax) return false; // the top end means "no limit"
+  }
+  return true;
+};
+const results = () => DEVS.filter((d) => matches(d));
+const countWith = (patch) => DEVS.filter((d) => matches(d, { ...S, ...patch })).length;
+const nSet = () => (S.tenure ? 1 : 0) + (S.region ? 1 : 0) + (S.beds ? 1 : 0) + (S.pmin > 0 || S.pmax < MAXP ? 1 : 0);
+const k = (n) => n >= 1000000 ? `£${(n / 1e6).toFixed(n % 1e6 ? 2 : 0).replace(/\.?0+$/, '')}m` : `£${Math.round(n / 1000)}k`;
+const money = (n) => '£' + n.toLocaleString('en-GB');
+const priceLabel = () => (S.pmin === 0 && S.pmax === MAXP) ? 'Any price' : `${S.pmin ? money(S.pmin) : '£0'} – ${S.pmax < MAXP ? money(S.pmax) : money(MAXP) + '+'}`;
+const homes = (n) => `${n} ${n === 1 ? 'development' : 'developments'}`;
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+// ---------- filter UI pieces ----------
+const secTenure = () => `<div class="fsec"><h3>Tenure ${S.tenure ? '<button data-reset="tenure">Reset</button>' : ''}</h3><div class="chips">${['', ...TENURES].map((t) => { const n = countWith({ tenure: t }); return `<button class="chip ${S.tenure === t ? 'on' : ''}" data-set="tenure" data-val="${esc(t)}" ${n || t === S.tenure ? '' : 'disabled'}>${t || 'All'} <small>${n}</small></button>`; }).join('')}</div></div>`;
+const secBeds = () => `<div class="fsec"><h3>Bedrooms ${S.beds ? '<button data-reset="beds">Reset</button>' : ''}</h3><div class="beds">${[0, 1, 2, 3, 4, 5].map((b) => { const n = countWith({ beds: b }); return `<button class="${S.beds === b ? 'on' : ''}" data-set="beds" data-val="${b}" ${n || b === S.beds ? '' : 'disabled'} title="${n} developments">${b ? b + '+' : 'Any'}</button>`; }).join('')}</div></div>`;
+const secLoc = () => `<div class="fsec"><h3>Location ${S.region ? '<button data-reset="region">Reset</button>' : ''}</h3><div class="locs">${['', ...REGIONS].map((r) => { const n = countWith({ region: r }); return `<button class="${S.region === r ? 'on' : ''}" data-set="region" data-val="${esc(r)}" ${n || r === S.region ? '' : 'disabled'}><span><i class="tick"></i>${r || 'All areas'}</span><small>${n}</small></button>`; }).join('')}</div></div>`;
+const PRESETS = [[0, 100000, 'Under £100k'], [100000, 250000, '£100k – £250k'], [250000, 500000, '£250k – £500k'], [500000, MAXP, '£500k+']];
+const secPrice = () => `<div class="fsec"><h3>Price ${S.pmin || S.pmax < MAXP ? '<button data-reset="price">Reset</button>' : ''}</h3>
+  <div class="price-out"><span data-pmin>${S.pmin ? money(S.pmin) : '£0'}</span><span data-pmax>${S.pmax < MAXP ? money(S.pmax) : money(MAXP) + '+'}</span></div>
+  <div class="range"><div class="rail"></div><div class="fill" data-fill style="left:${S.pmin / MAXP * 100}%;right:${100 - S.pmax / MAXP * 100}%"></div>
+    <input type="range" min="0" max="${MAXP}" step="${STEP}" value="${S.pmin}" data-range="min" aria-label="Minimum price">
+    <input type="range" min="0" max="${MAXP}" step="${STEP}" value="${S.pmax}" data-range="max" aria-label="Maximum price"></div>
+  <div class="presets">${PRESETS.map(([a, b, l]) => `<button class="chip ${S.pmin === a && S.pmax === b ? 'on' : ''}" data-preset="${a},${b}">${l}</button>`).join('')}</div></div>`;
+const allSecs = () => secTenure() + secBeds() + secLoc() + secPrice();
+
+const seg = (cls = '') => `<div class="seg ${cls}"><button class="${view === 'list' ? 'on' : ''}" data-view="list">${ICON.list}List</button><button class="${view === 'map' ? 'on' : ''}" data-view="map">${ICON.map}Map</button></div>`;
+const tagsOf = (d) => d.tenure.map((t) => `<span>${esc(t.replace(' Homes', ''))}</span>`).join('');
+const priceOf = (d) => d.price ? `From <b>${money(d.price)}</b>` : '<b>Coming soon</b>';
+const card = (d, row) => `<a class="card ${row ? 'row' : ''}" href="#" data-slug="${d.slug}"><div class="im"><img src="${d.img}" alt="" loading="lazy"><div class="tags">${tagsOf(d)}</div></div><div class="body"><div><h3>${esc(d.name)}</h3><div class="loc">${esc(d.region)}</div></div><p>${esc(d.desc)}</p><div class="foot"><span class="bd">${ICON.bed}${esc(d.bedsText || (d.minBeds ? d.minBeds + ' bed' : '–'))}</span><span class="pr">${priceOf(d)}</span></div></div></a>`;
+const cardsHTML = (row) => { const r = results(); return r.length ? r.map((d) => card(d, row)).join('') : `<div class="empty">No developments match those filters. <button data-clear>Clear filters</button></div>`; };
+
+// ---------- layouts ----------
+let opt = 'A', view = 'list', sheet = false, pop = '', panel = false, phoneMap = false;
+const isPhone = () => matchMedia('(max-width:767px)').matches;
+const hero = (extra = '') => `<div class="wrap"><section class="hero"><div><h1>Find your <span class="g">home</span></h1><p>New homes across London and the South East, for Shared Ownership and private sale. Contact a development's sales team to book a viewing.</p></div>${extra}</section></div>`;
+const sheetHTML = () => `<div class="sheet ${sheet ? 'on' : ''}" data-sheet><div class="bg" data-close></div><div class="panel"><div class="grip"></div><div class="h"><b>Filters</b><button class="x" data-close aria-label="Close">${ICON.x}</button></div><div class="body" data-slot="sheet">${allSecs()}</div><div class="f"><button class="clear" data-clear>Clear all</button><button class="go" data-close data-slot="go">Show ${homes(results().length)}</button></div></div></div>`;
+
+const LAYOUT = {
+  A: () => {
+    const pills = [['tenure', 'Tenure', S.tenure, secTenure], ['beds', 'Bedrooms', S.beds ? `${S.beds}+ beds` : '', secBeds], ['region', 'Location', S.region, secLoc], ['price', 'Price', S.pmin || S.pmax < MAXP ? priceLabel() : '', secPrice]];
+    return `${hero()}
+    <div class="A-bar"><div class="wrap" data-slot="Apills">${pills.map(([key, label, val, sec]) => `<div class="A-pill ${pop === key ? 'open' : ''}"><button class="${val ? 'set' : ''}" data-pop="${key}">${esc(val || label)} ${ICON.chev}</button><div class="A-pop">${sec()}<div class="done"><button class="clear" data-reset="${key}">Reset</button><button class="go" data-pop="">Show ${homes(results().length)}</button></div></div></div>`).join('')}
+      ${nSet() ? '<button class="clear" data-clear>Clear all</button>' : ''}<span class="sp"></span><span class="count"><b data-slot="n">${results().length}</b> developments</span>${seg()}</div></div>
+    <div class="A-phonebar"><div class="wrap"><button class="fbtn" data-open>${ICON.filt}<span style="flex:1;text-align:left;margin-left:.6rem">Filters</span>${nSet() ? `<span class="n">${nSet()}</span>` : `<span style="opacity:.6;font-size:.82rem" data-slot="n2">${results().length} homes</span>`}</button>${seg()}</div></div>
+    ${view === 'list' ? `<div class="wrap"><div class="grid" data-slot="cards">${cardsHTML()}</div></div>` : `<div class="A-map"><div class="list" data-slot="rows">${cardsHTML(true)}</div><div class="map" data-map></div></div>`}
+    ${sheetHTML()}`;
+  },
+  B: () => `${hero()}
+    <div class="wrap"><div class="B-layout"><aside class="B-side"><div class="head"><b>Filters</b>${nSet() ? '<button class="clear" data-clear>Clear all</button>' : ''}</div><div data-slot="side">${allSecs()}</div></aside>
+      <div><div class="B-top"><span class="count"><b data-slot="n">${results().length}</b> developments</span>${seg()}</div>
+        <div class="B-active">${activeChips()}</div>
+        ${view === 'list' ? `<div class="grid" data-slot="cards">${cardsHTML()}</div>` : `<div class="B-mapwrap"><div class="map" data-map></div></div>`}</div></div></div>
+    <div class="B-float"><button data-open>${ICON.filt}Filters ${nSet() ? `<span class="n">${nSet()}</span>` : ''}</button><button data-phonemap>${phoneMap ? ICON.list + 'List' : ICON.map + 'Map'}</button></div>
+    ${phoneMap && isPhone() ? '<div class="B-phonemap"><div class="map" data-map style="position:absolute;inset:0"></div></div>' : ''}
+    ${sheetHTML()}`,
+  C: () => `${hero()}
+    <div class="C-sum"><div class="wrap"><button class="line" data-panel>${ICON.search}<span class="t">${summary()}</span><span class="edit">Edit filters</span></button><div class="seg"><button class="${view === 'map' ? 'on' : ''}" data-view="map">${ICON.map}Show map</button><button class="${view === 'list' ? 'on' : ''}" data-view="list">${ICON.list}Hide map</button></div></div></div>
+    <div class="C-split ${view === 'list' ? 'list-only' : ''}"><div class="C-list"><div class="C-head"><span class="count"><b data-slot="n">${results().length}</b> developments</span>${nSet() ? '<button class="clear" data-clear>Clear filters</button>' : ''}</div><div class="grid" data-slot="cards">${cardsHTML()}</div></div>
+      <div class="C-mapcol ${phoneMap ? 'phone-on' : ''}" ${view === 'list' && !isPhone() ? 'hidden' : ''}><div class="map" data-map></div></div></div>
+    <button class="C-float" data-phonemap>${phoneMap ? ICON.list + 'Show list' : ICON.map + 'Show map'}</button>
+    <div class="C-panel ${panel ? 'on' : ''}"><div class="bg" data-close></div><div class="box"><div style="grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem"><b style="font-size:1.2rem">Filters</b><button class="x" data-close aria-label="Close">${ICON.x}</button></div><div data-slot="pc1">${secTenure() + secBeds()}</div><div data-slot="pc2">${secLoc() + secPrice()}</div><div class="foot"><button class="clear" data-clear>Clear all</button><button class="chip on" style="padding:.85rem 1.3rem" data-close data-slot="go">Show ${homes(results().length)}</button></div></div></div>`,
+};
+const summary = () => { const parts = [S.tenure || 'All tenures', S.beds ? `${S.beds}+ beds` : 'Any beds', priceLabel(), S.region || 'All areas']; return parts.map(esc).join('<i>·</i>'); };
+const activeChips = () => [S.tenure && ['tenure', S.tenure], S.beds && ['beds', `${S.beds}+ beds`], S.region && ['region', S.region], (S.pmin || S.pmax < MAXP) && ['price', priceLabel()]].filter(Boolean).map(([kk, l]) => `<button data-reset="${kk}">${esc(l)} ${ICON.x.replace('<svg', '<svg width="10" height="10"')}</button>`).join('');
+
+// ---------- map ----------
+let map = null, layer = null, focus = '';
+function drawMap() {
+  const el = document.querySelector('[data-map]');
+  if (!el || !window.L) { map = null; return; }
+  if (!map || map.getContainer() !== el) {
+    map = L.map(el, { zoomControl: true, scrollWheelZoom: true, attributionControl: false });
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map);
+    layer = L.layerGroup().addTo(map);
+    map.on('click', () => { focus = ''; showCard(); });
+  }
+  layer.clearLayers();
+  const pts = results().filter((d) => d.lat);
+  pts.forEach((d) => {
+    const m = L.marker([d.lat, d.lng], { icon: L.divIcon({ className: '', html: `<span class="pin ${focus === d.slug ? 'on' : ''}">${d.price ? k(d.price) : 'Soon'}</span>`, iconSize: [0, 0] }) }).addTo(layer);
+    m.on('click', (e) => { L.DomEvent.stopPropagation(e); focus = d.slug; drawMap(); showCard(); });
+  });
+  if (pts.length) map.fitBounds(L.latLngBounds(pts.map((d) => [d.lat, d.lng])).pad(0.15), { maxZoom: 14, animate: false });
+  setTimeout(() => map && map.invalidateSize(), 50);
+}
+function showCard() {
+  document.querySelectorAll('.mapcard').forEach((c) => c.remove());
+  document.querySelectorAll('.card.is-hl').forEach((c) => c.classList.remove('is-hl'));
+  const d = DEVS.find((x) => x.slug === focus);
+  if (!d || !map) return;
+  document.querySelector(`.card[data-slug="${d.slug}"]`)?.classList.add('is-hl');
+  const box = map.getContainer();
+  const c = document.createElement('div'); c.className = 'mapcard';
+  c.innerHTML = `<div class="im"><img src="${d.img}" alt=""></div><button class="x" data-unfocus aria-label="Close">${ICON.x}</button><div class="b"><h3>${esc(d.name)}</h3><div style="font-size:.82rem;opacity:.6">${esc(d.region)} · ${esc(d.tenure.join(', '))}</div><div class="foot" style="display:flex;justify-content:space-between;font-size:.88rem;padding-top:.5rem"><span>${esc(d.bedsText)} bed</span><span>${priceOf(d)}</span></div></div>`;
+  const p = map.latLngToContainerPoint([d.lat, d.lng]);
+  c.style.left = Math.min(Math.max(16, p.x - 160), box.clientWidth - 336) + 'px';
+  c.style.top = Math.max(16, p.y - 330) + 'px';
+  box.appendChild(c);
+}
+
+// ---------- render ----------
+function render() {
+  document.getElementById('note').innerHTML = NOTES[opt];
+  document.getElementById('page').innerHTML = LAYOUT[opt]();
+  document.querySelectorAll('[data-o]').forEach((b) => b.classList.toggle('is-on', b.dataset.o === opt));
+  drawMap(); showCard();
+  document.body.style.overflow = sheet || panel ? 'hidden' : '';
+  const fr = document.querySelector('.phone iframe');
+  if (document.body.classList.contains('framed') && !fr.src.endsWith(`#${opt}-${view}`)) fr.src = `property-search.html?embed#${opt}-${view}`;
+}
+// Live update while a price slider is dragged: only the numbers, cards and pins, not the controls
+function liveResults() {
+  document.querySelectorAll('[data-pmin]').forEach((e) => { e.textContent = S.pmin ? money(S.pmin) : '£0'; });
+  document.querySelectorAll('[data-pmax]').forEach((e) => { e.textContent = S.pmax < MAXP ? money(S.pmax) : money(MAXP) + '+'; });
+  document.querySelectorAll('[data-fill]').forEach((e) => { e.style.left = S.pmin / MAXP * 100 + '%'; e.style.right = 100 - S.pmax / MAXP * 100 + '%'; });
+  document.querySelectorAll('[data-slot="n"]').forEach((e) => { e.textContent = results().length; });
+  document.querySelectorAll('[data-slot="go"]').forEach((e) => { e.textContent = `Show ${homes(results().length)}`; });
+  document.querySelectorAll('[data-slot="cards"]').forEach((e) => { e.innerHTML = cardsHTML(); });
+  document.querySelectorAll('[data-slot="rows"]').forEach((e) => { e.innerHTML = cardsHTML(true); });
+  if (map) drawMap();
+}
+
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('button, a'); if (!t) { if (pop && !e.target.closest('.A-pop')) { pop = ''; render(); } return; }
+  if (t.matches('a.card')) { e.preventDefault(); focus = t.dataset.slug; if (map) { drawMap(); showCard(); } return; }
+  if (t.dataset.o) { opt = t.dataset.o; pop = ''; sheet = panel = phoneMap = false; render(); scrollTo(0, 0); return; }
+  if (t.id === 'dev') { togglePhone(); return; }
+  if (t.dataset.set) { const v = t.dataset.val; S[t.dataset.set] = t.dataset.set === 'beds' ? +v : v; render(); return; }
+  if (t.dataset.reset != null) { const r = t.dataset.reset; if (r === 'price') { S.pmin = 0; S.pmax = MAXP; } else if (r) S[r] = r === 'beds' ? 0 : ''; render(); return; }
+  if (t.dataset.preset) { const [a, b] = t.dataset.preset.split(',').map(Number); S.pmin = a; S.pmax = b; render(); return; }
+  if (t.hasAttribute('data-clear')) { Object.assign(S, { tenure: '', region: '', beds: 0, pmin: 0, pmax: MAXP }); render(); return; }
+  if (t.dataset.view) { view = t.dataset.view; focus = ''; render(); return; }
+  if (t.hasAttribute('data-pop')) { e.stopPropagation(); pop = pop === t.dataset.pop ? '' : t.dataset.pop; render(); return; }
+  if (t.hasAttribute('data-open')) { sheet = true; render(); return; }
+  if (t.hasAttribute('data-panel')) { panel = true; render(); return; }
+  if (t.hasAttribute('data-close')) { sheet = panel = false; render(); return; }
+  if (t.hasAttribute('data-phonemap')) { phoneMap = !phoneMap; focus = ''; render(); return; }
+  if (t.hasAttribute('data-unfocus')) { focus = ''; drawMap(); showCard(); }
+});
+document.addEventListener('input', (e) => {
+  const r = e.target.closest('[data-range]'); if (!r) return;
+  const v = +r.value;
+  if (r.dataset.range === 'min') { S.pmin = Math.min(v, S.pmax - STEP); r.value = S.pmin; } else { S.pmax = Math.max(v, S.pmin + STEP); r.value = S.pmax; }
+  liveResults();
+});
+document.addEventListener('change', (e) => { if (e.target.closest('[data-range]')) render(); });
+addEventListener('keydown', (e) => { if (e.key === 'Escape') { pop = ''; sheet = panel = false; render(); } });
+let wasPhone = isPhone(); addEventListener('resize', () => { if (isPhone() !== wasPhone) { wasPhone = isPhone(); render(); } });
+
+// phone frame / state in the hash: #A-list[-p]
+const embed = location.search.includes('embed'); if (embed) document.body.classList.add('embed');
+const m = location.hash.match(/#([ABC])(?:-(list|map))?(-p)?/); if (m) { opt = m[1]; view = m[2] || 'list'; }
+function togglePhone() { const on = !document.body.classList.contains('framed'); document.body.classList.toggle('framed', on); document.getElementById('dev').classList.toggle('is-on', on); if (on) document.querySelector('.phone iframe').src = `property-search.html?embed#${opt}-${view}`; }
+render();
+if (m && m[3] && !embed) togglePhone();
+</script>
+</body>
+</html>
