@@ -64,15 +64,18 @@ function copyButtons() {
 }
 
 function formAnchor() {
-  document.addEventListener('click', (event) => {
+  // Capture phase on window, and stop the event: Webflow's own same-page anchor scroll (delegated on
+  // document) would otherwise run after this and put the form's top edge under the navbar.
+  window.addEventListener('click', (event) => {
     const link = event.target.closest('a[href="#contact-form"]');
     const form = document.getElementById('contact-form');
     if (!link || !form) return;
     event.preventDefault();
+    event.stopPropagation();
     const top = form.getBoundingClientRect().top + window.scrollY - compactNavHeight() - GAP;
     window.scrollTo({ top, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     history.replaceState(null, '', '#contact-form');
-  });
+  }, true);
 }
 
 export default function contactPages() {
