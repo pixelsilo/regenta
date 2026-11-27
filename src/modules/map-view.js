@@ -127,7 +127,8 @@ function pinLabel(el) {
   if (el.querySelector('[data-map-price-alt]')?.textContent.trim()) return 'Soon';
   const n = parseFloat((el.querySelector('[data-map-price-from] [data-price]')?.textContent || '').replace(/[^\d.]/g, ''));
   if (!Number.isFinite(n) || n <= 0) return 'Soon';
-  return n >= 1e6 ? `£${+(n / 1e6).toFixed(2)}m` : `£${Math.round(n / 1000)}k`;
+  if (n >= 1e6) return `£${+(n / 1e6).toFixed(2)}m`;
+  return n < 1e5 ? `£${+(n / 1000).toFixed(1)}k` : `£${Math.round(n / 1000)}k`; // £36.5k, £445k
 }
 
 function number(value) {
@@ -243,6 +244,13 @@ export default function mapView(root) {
     const lock = section.classList.contains('is-map') && root.classList.contains('is-panel') && !DESKTOP.matches;
     if (lock) window.scrollTo(0, 0);
     document.body.style.overflow = lock ? 'hidden' : '';
+    // The sections after this one (Featured developments, footer) would otherwise paint over the
+    // map: it sits in a container that is its own stacking context. They can't be seen anyway.
+    let next = root.closest('.section_property-search')?.nextElementSibling;
+    while (next) {
+      next.style.display = lock ? 'none' : '';
+      next = next.nextElementSibling;
+    }
   }
   DESKTOP.addEventListener?.('change', lockPhone);
 
