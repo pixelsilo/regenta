@@ -172,7 +172,17 @@ export default function mapView(root) {
       hero.getBoundingClientRect(); // apply before turning the transition back on
       hero.style.transition = '';
     }
+    lockPhone();
   }
+
+  // Phones, side-panel layout: the map is a full-screen layer under the nav and filter bar, so the
+  // page behind it mustn't scroll (it would carry the bar away and shrink the nav over the map).
+  function lockPhone() {
+    const lock = section.classList.contains('is-map') && root.classList.contains('is-panel') && !DESKTOP.matches;
+    if (lock) window.scrollTo(0, 0);
+    document.body.style.overflow = lock ? 'hidden' : '';
+  }
+  DESKTOP.addEventListener?.('change', lockPhone);
 
   // Desktop/tablet: in map mode the flex layout sizes the map, so no height is set here. While
   // the map is hidden (stashed) it gets the size it will have in map mode: the window less the
