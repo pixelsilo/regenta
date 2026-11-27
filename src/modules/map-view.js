@@ -253,13 +253,17 @@ export default function mapView(root) {
     root.style.paddingTop = `${Math.round(band.getBoundingClientRect().bottom)}px`;
   };
   let locked = false;
-  if (navEl && 'ResizeObserver' in window) new ResizeObserver(placeMap).observe(navEl);
+  // Re-measure as the nav resizes and while the heading folds away (the bar moves up with it)
+  if ('ResizeObserver' in window) {
+    const ro = new ResizeObserver(placeMap);
+    [navEl, hero, band].forEach((el) => el && ro.observe(el));
+  }
   function lockPhone() {
     const lock = section.classList.contains('is-map') && phonePanel();
     locked = lock;
     document.body.style.overflow = lock ? 'hidden' : '';
     document.documentElement.toggleAttribute('data-nav-hold', lock); // global/nav.js leaves the nav alone
-    if (lock) placeMap();
+    if (lock) { placeMap(); requestAnimationFrame(placeMap); setTimeout(placeMap, FOLD_MS); }
     else root.style.paddingTop = '';
     // The sections after this one (Featured developments, footer) would otherwise paint over the
     // map: it sits in a container that is its own stacking context. They can't be seen anyway.
