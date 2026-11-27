@@ -45,7 +45,8 @@ export default function featuredDevelopments() {
     // Touch screens have no hover: a tap on the card opens or closes it (description, fade moving up)
     // instead of following the link. Only the button goes to the development.
     list.addEventListener('click', (event) => {
-      if (!TOUCH.matches) return;
+      // Mini tiles (.fd2_cl.is-mini, Contact Buyers) only show the logo or name: a tap just opens the page
+      if (!TOUCH.matches || list.classList.contains('is-mini')) return;
       const card = event.target.closest('a.fd2_slide');
       if (!card || event.target.closest('.fd2_button')) return;
       event.preventDefault();
