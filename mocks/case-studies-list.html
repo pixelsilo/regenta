@@ -127,6 +127,12 @@
     .b-row .ar { display:none; }
     .c-tabs { overflow-x:auto; }
     .c-tabs button { white-space:nowrap; }
+    /* B2: same list, but on phones each row leads with a full-width photo */
+    .b-big .b-row { grid-template-columns:1fr auto; gap:.35rem 1rem; padding:1.25rem 0 1.5rem; }
+    .b-big .b-row .th { grid-row:1; grid-column:1 / -1; width:100%; height:auto; aspect-ratio:16 / 10; border-radius:1rem; margin-bottom:.6rem; }
+    .b-big .b-row .t { grid-row:2; grid-column:1; font-size:1.45rem; }
+    .b-big .b-row .c { grid-row:3; grid-column:1; margin-top:0; }
+    .b-big .b-row .h { display:block; grid-row:2 / span 2; grid-column:2; align-self:start; }
   }
 </style>
 </head>
@@ -159,6 +165,7 @@
 <div class="switch" role="group" aria-label="Layout">
   <button type="button" data-to="a" aria-pressed="true">A &middot; Featured + grid</button>
   <button type="button" data-to="b" aria-pressed="false">B &middot; Index list</button>
+  <button type="button" data-to="b" data-big aria-pressed="false">B2 &middot; Big photos on phone</button>
   <button type="button" data-to="c" aria-pressed="false">C &middot; Mosaic</button>
 </div>
 
@@ -201,7 +208,7 @@ const drawB = (s) => {
     <span class="t">${esc(c.name)}${c.sub ? `<small>${esc(c.sub)}</small>` : ''}</span>
     <span class="c">${esc(c.client || '—')}<small>${esc(c.tenure)}</small></span>
     <span class="s">${c.services.slice(0, 3).map((v) => `<span>${esc(v)}</span>`).join('')}${c.services.length > 3 ? `<span>+${c.services.length - 3}</span>` : ''}</span>
-    <span class="h">${esc(c.homes || '—')}<small>homes</small></span><span class="ar">${ARROW}</span></a>`).join('');
+    <span class="h">${c.homes ? `${esc(c.homes)}<small>homes</small>` : ''}</span><span class="ar">${ARROW}</span></a>`).join('');
   document.getElementById('b-count').textContent = `${list.length} case ${list.length === 1 ? 'study' : 'studies'}`;
 };
 chips(document.getElementById('b-chips'), SERVICES, drawB); drawB('');
@@ -231,6 +238,7 @@ document.querySelector('.switch').addEventListener('click', (e) => {
   const b = e.target.closest('button'); if (!b) return;
   document.querySelectorAll('.switch button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
   document.querySelectorAll('section.v').forEach((s) => s.classList.toggle('on', s.dataset.v === b.dataset.to));
+  document.body.classList.toggle('b-big', b.hasAttribute('data-big'));
   scrollTo(0, 0);
 });
 </script>
