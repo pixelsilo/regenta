@@ -159,7 +159,10 @@ export default function filterPanel() {
     }
     barClears.forEach((el) => { el.style.visibility = list.length ? '' : 'hidden'; });
     badges.forEach((el) => {
-      el.textContent = String(list.length);
+      // The number sits in a .button-text span so Area's capitals centre in the circle.
+      let num = el.querySelector('.button-text');
+      if (!num) { num = document.createElement('span'); num.className = 'button-text'; el.replaceChildren(num); }
+      num.textContent = String(list.length);
       el.style.display = list.length ? '' : 'none';
     });
   }
