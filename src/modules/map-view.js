@@ -164,10 +164,20 @@ export default function mapView(root) {
   const hero = document.querySelector('[data-search-hero]');
   const FOLD_MS = 380; // a little over the fold transition set in Webflow (350ms)
 
+  // Side-panel layout: once the List / Map switch has been used, the heading stays folded away for
+  // the rest of the visit, in both views, so switching never moves the page about.
+  let foldedForGood = false;
   function setMode(isMap, { animate = true } = {}) {
+    if (isMap && root.classList.contains('is-panel')) foldedForGood = true;
+    const fold = isMap || foldedForGood;
+    // Folding while scrolled down: no animation, and keep what's on screen where it is.
+    const before = fold && hero && !hero.classList.contains('is-collapsed') && window.scrollY > 0
+      ? hero.offsetHeight : null;
+    if (before !== null) animate = false;
     if (hero && !animate) hero.style.transition = 'none';
     section.classList.toggle('is-map', isMap);
-    hero?.classList.toggle('is-collapsed', isMap);
+    hero?.classList.toggle('is-collapsed', fold);
+    if (before !== null && !isMap) window.scrollBy(0, hero.offsetHeight - before);
     if (hero && !animate) {
       hero.getBoundingClientRect(); // apply before turning the transition back on
       hero.style.transition = '';
@@ -477,6 +487,7 @@ export default function mapView(root) {
   toggles.forEach((button) => {
     button.addEventListener('click', (event) => {
       event.preventDefault();
+      if (root.classList.contains('is-panel')) foldedForGood = true;
       setView(button.getAttribute('data-map-view-toggle'));
     });
   });
