@@ -1,12 +1,52 @@
 // Navigation: mobile menu toggle and the navbar background fade-in once the page scrolls.
 // Was: an HtmlEmbed ("navbar-animation") inside the navigation component (snippets/embeds/global-nav.html).
+
+// Phone menu tabs: Homes / Services. Both link sets ([data-nm-set]) are built in the Navbar component;
+// the sliding pill is .nm_seg_knob (.is-right for Services), the active tab .nm_seg_btn.is-active and
+// the shown set .nm_set.is-on, all styled in Webflow. [data-nm-buyer] is only rendered when the
+// component's Buyer links property is on, so the menu opens on Homes on buyer pages.
+function menuTabs(menu) {
+  const panel = menu?.querySelector('[data-nm-panel]');
+  if (!panel) return null;
+  const buttons = [...panel.querySelectorAll('[data-nm-tab]')];
+  const sets = [...panel.querySelectorAll('[data-nm-set]')];
+  const knob = panel.querySelector('.nm_seg_knob');
+  const marker = panel.querySelector('[data-nm-buyer]');
+  const home = marker && !marker.classList.contains('w-condition-invisible') ? 'homes' : 'services';
+  sets.forEach((set) => { set.id ||= `nm-set-${set.getAttribute('data-nm-set')}`; });
+  const show = (key) => {
+    buttons.forEach((b) => {
+      const on = b.getAttribute('data-nm-tab') === key;
+      b.classList.toggle('is-active', on);
+      b.setAttribute('aria-selected', String(on));
+      b.tabIndex = on ? 0 : -1;
+      b.setAttribute('aria-controls', `nm-set-${b.getAttribute('data-nm-tab')}`);
+    });
+    sets.forEach((s) => s.classList.toggle('is-on', s.getAttribute('data-nm-set') === key));
+    knob?.classList.toggle('is-right', key === 'services');
+  };
+  buttons.forEach((b) => {
+    b.addEventListener('click', () => show(b.getAttribute('data-nm-tab')));
+    b.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      const next = buttons[(buttons.indexOf(b) + 1) % buttons.length];
+      next.focus();
+      show(next.getAttribute('data-nm-tab'));
+    });
+  });
+  show(home);
+  return { reset: () => show(home) };
+}
+
 export default function nav() {
   const toggle = document.querySelector('.toggle-button');
   const menu = document.querySelector('.navbar-mobile');
+  const tabs = menuTabs(menu);
   if (toggle && menu) {
     toggle.addEventListener('click', () => {
       const open = menu.classList.toggle('open');
       document.body.style.overflow = open ? 'hidden' : '';
+      if (open) tabs?.reset(); // always opens on the side of the page you're on
     });
   }
 
