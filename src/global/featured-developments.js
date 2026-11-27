@@ -2,7 +2,8 @@
 // Each card is the development's brand colour (the CMS colour bound on .fd_logo-div, now the card's
 // backdrop) with its photo fading into it. Webflow can't pick a text colour from a bound background,
 // so this does: dark brand colours get .is-dark on the card (sand text) and on the bed icon. It also
-// runs the card hover (description slides up, arrow fills) through .is-hover combos in Webflow.
+// runs the card hover (photo zooms, description slides up, arrow fills) through .is-hover combos in
+// Webflow; the photo zoom used to be a Webflow interaction scoped to the old component.
 import cardHover from '../lib/card-hover.js';
 
 const DARK = 0.35; // relative luminance below which text switches to sand
@@ -27,5 +28,5 @@ export default function featuredDevelopments() {
     card.classList.toggle('is-dark', dark);
     card.querySelectorAll('.li-icon').forEach((icon) => icon.classList.toggle('is-dark', dark));
   });
-  lists.forEach((list) => cardHover(list, 'a.fd2_slide', '.fd2_more, .fd2_ar'));
+  lists.forEach((list) => cardHover(list, 'a.fd2_slide', '.fd2_more, .fd2_ar, .fd_image'));
 }
