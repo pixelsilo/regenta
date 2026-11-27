@@ -173,11 +173,19 @@ export default function mapView(root) {
     // Folding while scrolled down: no animation, and keep what's on screen where it is.
     const before = fold && hero && !hero.classList.contains('is-collapsed') && window.scrollY > 0
       ? hero.offsetHeight : null;
-    if (before !== null) animate = false;
+    if (before !== null) {
+      animate = false;
+      // We keep the page still ourselves below (Safari has no scroll anchoring); switch Chrome's
+      // off for this change so it isn't done twice.
+      document.documentElement.style.overflowAnchor = 'none';
+    }
     if (hero && !animate) hero.style.transition = 'none';
     section.classList.toggle('is-map', isMap);
     hero?.classList.toggle('is-collapsed', fold);
-    if (before !== null && !isMap) window.scrollBy(0, hero.offsetHeight - before);
+    if (before !== null) {
+      if (!isMap) window.scrollBy(0, hero.offsetHeight - before);
+      requestAnimationFrame(() => { document.documentElement.style.overflowAnchor = ''; });
+    }
     if (hero && !animate) {
       hero.getBoundingClientRect(); // apply before turning the transition back on
       hero.style.transition = '';
