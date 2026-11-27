@@ -247,13 +247,13 @@ export default function mapView(root) {
   function phonePanel() {
     return root.classList.contains('is-panel') && !DESKTOP.matches;
   }
-  const navbar = document.querySelector('.navbar');
+  const navEl = document.querySelector('.navbar');
   const placeMap = () => {
     if (!locked || !band) return;
     root.style.paddingTop = `${Math.round(band.getBoundingClientRect().bottom)}px`;
   };
   let locked = false;
-  if (navbar && 'ResizeObserver' in window) new ResizeObserver(placeMap).observe(navbar);
+  if (navEl && 'ResizeObserver' in window) new ResizeObserver(placeMap).observe(navEl);
   function lockPhone() {
     const lock = section.classList.contains('is-map') && phonePanel();
     locked = lock;
