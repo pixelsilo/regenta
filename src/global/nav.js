@@ -71,7 +71,13 @@ export default function nav() {
     const set = (on) => {
       if (on === compact) return;
       compact = on;
-      els.forEach((el) => el.classList.toggle('is-compact', on));
+      els.forEach((el) => {
+        el.classList.toggle('is-compact', on);
+        // An old Webflow interaction also writes the height inline (shrinks on scroll down, grows only
+        // on a real scroll up). After a jump to the top (map view on phones) that inline 3rem kept the
+        // nav short with a gap under it: clear it so the class decides.
+        el.style.height = '';
+      });
     };
     const onScroll = () => {
       if (menu && menu.classList.contains('open')) return;
