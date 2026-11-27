@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mock: Featured developments strip | Regenta (#57)</title>
+<script src="https://use.typekit.net/ptn3etu.js"></script>
+<script>try{Typekit.load();}catch(e){}</script>
+<script src="featured-data.js"></script>
+<style>
+  /* Mock only. Three branded layouts for the "Featured developments" strip, filled with the three real
+     featured developments from staging: photo, logo, the logo panel colour and the button colour
+     (both already CMS colour fields), address, description, bedrooms and price. */
+  :root { --green:#0b2b26; --green2:#173833; --sand:#e3e5db; --sand2:#eef0e8; --line:rgba(11,43,38,.15); }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--sand); color:var(--green); font-family:area-normal, area, "Area Normal", system-ui, sans-serif; }
+  a { color:inherit; text-decoration:none; }
+  button { font:inherit; color:inherit; background:none; border:0; padding:0; cursor:pointer; }
+  img { display:block; max-width:100%; }
+  .wrap { max-width:1440px; margin:0 auto; padding:0 2rem; }
+  .g { font-family:Griffiths, serif; font-weight:400; }
+  .h2 { font-size:clamp(2.2rem, 4.4vw, 3.6rem); line-height:1; margin:0; font-weight:600; letter-spacing:-.01em; }
+  .head { display:flex; justify-content:space-between; align-items:end; gap:1.5rem; margin-bottom:2rem; }
+  .all { display:inline-flex; align-items:center; gap:.6rem; font-size:.9rem; white-space:nowrap; }
+  .ar { width:2.4rem; height:2.4rem; border-radius:50%; border:1px solid var(--line); display:grid; place-items:center; flex:none; transition:background .25s, color .25s, border-color .25s; }
+  .ar svg { width:.8rem; height:.8rem; }
+  .all:hover .ar { background:var(--green); color:var(--sand); border-color:var(--green); }
+  .bed { width:1.05rem; height:1.05rem; flex:none; }
+  .spec { display:flex; align-items:center; gap:.45rem; }
+  .price b { font-weight:600; }
+  .clamp2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .clamp3 { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+  section.strip { padding:6rem 0; }
+  .A-addr, .B-addr, .C-addr { line-height:1.45; }
+
+  /* switcher (mock only) */
+  .bar { position:sticky; top:0; z-index:50; background:var(--green); color:var(--sand); }
+  .bar .wrap { display:flex; flex-wrap:wrap; gap:.4rem; align-items:center; padding-top:.6rem; padding-bottom:.6rem; }
+  .bar button { border:1px solid rgba(227,229,219,.35); border-radius:99px; padding:.5rem .9rem; font-size:.8rem; }
+  .bar button.on { background:var(--sand); color:var(--green); }
+  .bar p { margin:0 0 0 auto; font-size:.78rem; opacity:.75; max-width:46rem; }
+
+  /* ===== A · Brand tag ===== photo card, logo on its brand colour as a tag over the photo, details below
+     on the page (no white box), brand colour line that grows on hover */
+  .A { display:grid; grid-template-columns:repeat(3, 1fr); gap:1.5rem; }
+  .A-card { display:flex; flex-direction:column; gap:1.1rem; }
+  .A-im { position:relative; aspect-ratio:4/3.3; border-radius:1.25rem; overflow:hidden; }
+  .A-im img { width:100%; height:100%; object-fit:cover; transition:transform 1s cubic-bezier(.2,.7,.2,1); }
+  .A-card:hover .A-im img { transform:scale(1.05); }
+  .A-logo { position:absolute; left:1rem; bottom:1rem; width:8.5rem; height:5.2rem; border-radius:.9rem; display:grid; place-items:center; padding:.8rem 1rem; box-shadow:0 10px 30px rgba(0,0,0,.25); }
+  .A-logo img { max-width:100%; max-height:100%; object-fit:contain; }
+  .A-ten { position:absolute; left:1rem; top:1rem; background:rgba(11,43,38,.78); color:var(--sand); border-radius:99px; padding:.4rem .7rem; font-size:.7rem; backdrop-filter:blur(6px); }
+  .A-body { display:flex; flex-direction:column; gap:.55rem; }
+  .A-name { display:flex; justify-content:space-between; align-items:center; gap:1rem; }
+  .A-name h3 { margin:0; font-size:1.35rem; font-weight:600; line-height:1.15; }
+  .A-card:hover .A-name .ar { background:var(--c2); color:#fff; border-color:var(--c2); }
+  .A-addr { font-size:.82rem; opacity:.6; }
+  .A-desc { font-size:.92rem; line-height:1.5; opacity:.8; margin:0; }
+  .A-foot { display:flex; justify-content:space-between; align-items:center; font-size:.9rem; padding-top:.85rem; margin-top:.25rem; position:relative; border-top:1px solid var(--line); }
+  .A-foot::before { content:""; position:absolute; left:0; top:-1px; height:2px; width:2.5rem; background:var(--c2); transition:width .6s cubic-bezier(.2,.7,.2,1); }
+  .A-card:hover .A-foot::before { width:100%; }
+
+  /* ===== B · Brand poster ===== tall photo card that fades into the development's colour, logo on the
+     colour, details slide up on hover */
+  .B { display:grid; grid-template-columns:repeat(3, 1fr); gap:1.5rem; }
+  .B-card { position:relative; aspect-ratio:3/4.15; border-radius:1.5rem; overflow:hidden; color:var(--on); background:var(--c1); isolation:isolate; }
+  .B-card > img { position:absolute; inset:0; width:100%; height:72%; object-fit:cover; z-index:-2; transition:transform 1.1s cubic-bezier(.2,.7,.2,1); }
+  .B-card:hover > img { transform:scale(1.05); }
+  .B-card::before { content:""; position:absolute; left:0; right:0; top:34%; height:40%; background:linear-gradient(to bottom, transparent, var(--c1) 85%); z-index:-1; }
+  .B-ten { position:absolute; left:1.2rem; top:1.2rem; background:rgba(11,43,38,.72); color:var(--sand); border-radius:99px; padding:.42rem .75rem; font-size:.7rem; backdrop-filter:blur(6px); }
+  .B-in { position:absolute; left:0; right:0; bottom:0; padding:1.6rem; display:flex; flex-direction:column; gap:.9rem; }
+  .B-logo { height:4.6rem; display:flex; align-items:center; }
+  .B-logo img { max-height:100%; max-width:13rem; object-fit:contain; }
+  .B-addr { font-size:.85rem; opacity:.8; }
+  .B-more { display:grid; grid-template-rows:0fr; transition:grid-template-rows .55s cubic-bezier(.2,.7,.2,1); }
+  .B-more > div { min-height:0; overflow:hidden; }
+  .B-card:hover .B-more { grid-template-rows:1fr; }
+  .B-more p { margin:0 0 .2rem; font-size:.9rem; line-height:1.5; opacity:.85; }
+  .B-foot { display:flex; justify-content:space-between; align-items:center; gap:1rem; padding-top:.9rem; border-top:1px solid color-mix(in srgb, var(--on) 25%, transparent); font-size:.9rem; }
+  .B-cta { display:flex; align-items:center; justify-content:space-between; background:var(--c2); color:#fff; border-radius:99px; padding:.55rem .6rem .55rem 1.1rem; font-size:.88rem; }
+  .B-cta .ar { width:2rem; height:2rem; border-color:rgba(255,255,255,.4); }
+  .B-card:hover .B-cta .ar { background:#fff; color:var(--c2); }
+  .B-cta .dv { display:none; }
+  @media (max-width:767px) { .B-cta .dv { display:inline; } }
+
+  /* ===== C · Spotlight ===== one development at a time: big photo, brand panel with logo and details,
+     the three names as tabs underneath (auto-advances) */
+  .C-stage { display:grid; grid-template-columns:1.35fr 1fr; border-radius:1.75rem; overflow:hidden; min-height:34rem; background:var(--c1); color:var(--on); transition:background .6s, color .6s; }
+  .C-im { position:relative; overflow:hidden; }
+  .C-im img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; transform:scale(1.04); transition:opacity .7s, transform 1.4s cubic-bezier(.2,.7,.2,1); }
+  .C-im img.on { opacity:1; transform:scale(1); }
+  .C-panel { padding:3rem; display:flex; flex-direction:column; gap:1.1rem; justify-content:center; }
+  .C-logo { height:6rem; display:flex; align-items:center; }
+  .C-logo img { max-height:100%; max-width:15rem; object-fit:contain; }
+  .C-ten { align-self:flex-start; border:1px solid color-mix(in srgb, var(--on) 35%, transparent); border-radius:99px; padding:.4rem .75rem; font-size:.72rem; }
+  .C-name { margin:0; font-size:2rem; font-weight:600; line-height:1.05; }
+  .C-addr { font-size:.88rem; opacity:.75; }
+  .C-desc { margin:0; font-size:1rem; line-height:1.55; opacity:.85; max-width:30rem; }
+  .C-specs { display:flex; gap:1.5rem; font-size:.95rem; padding-top:1rem; border-top:1px solid color-mix(in srgb, var(--on) 22%, transparent); }
+  .C-cta { align-self:flex-start; display:inline-flex; align-items:center; gap:.8rem; background:var(--c2); color:#fff; border-radius:99px; padding:.6rem .6rem .6rem 1.3rem; font-size:.92rem; margin-top:.4rem; }
+  .C-cta .ar { width:2.2rem; height:2.2rem; border-color:rgba(255,255,255,.4); }
+  .C-cta:hover .ar { background:#fff; color:var(--c2); }
+  .C-fade { transition:opacity .35s; }
+  .C-fade.out { opacity:0; }
+  .C-tabs { display:grid; grid-template-columns:repeat(3, 1fr); gap:1.5rem; margin-top:1.25rem; }
+  .C-tab { text-align:left; display:flex; flex-direction:column; gap:.6rem; padding-top:.9rem; position:relative; }
+  .C-tab::before { content:""; position:absolute; left:0; right:0; top:0; height:2px; background:var(--line); }
+  .C-tab i { position:absolute; left:0; top:0; height:2px; width:0; background:var(--green); }
+  .C-tab.on i { animation:fill 6s linear forwards; }
+  .C-stage:hover ~ .C-tabs .C-tab.on i, .C-tabs:hover .C-tab.on i { animation-play-state:paused; }
+  @keyframes fill { to { width:100%; } }
+  .C-tab b { font-size:1.05rem; font-weight:600; opacity:.45; transition:opacity .25s; }
+  .C-tab span { font-size:.8rem; opacity:.45; }
+  .C-tab.on b, .C-tab:hover b { opacity:1; }
+
+  /* phones */
+  @media (max-width:767px) {
+    .wrap { padding:0 1rem; }
+    section.strip { padding:4rem 0; }
+    .head { flex-direction:column; align-items:flex-start; margin-bottom:1.5rem; }
+    .A, .B { display:flex; overflow-x:auto; scroll-snap-type:x mandatory; scroll-padding:0 1rem; gap:.9rem; margin:0 -1rem; padding:0 1rem 1rem; scrollbar-width:none; }
+    .B-card > img { height:60%; }
+    .B-card::before { top:28%; height:34%; }
+    .B-cta .n { display:none; }
+    .A::-webkit-scrollbar, .B::-webkit-scrollbar { display:none; }
+    .A-card, .B-card { flex:0 0 84%; scroll-snap-align:start; }
+    .B-more { grid-template-rows:1fr; }
+    .B-more p { display:none; }
+    .C-stage { grid-template-columns:1fr; min-height:0; }
+    .C-im { aspect-ratio:4/3; }
+    .C-panel { padding:1.5rem; }
+    .C-logo { height:4.2rem; }
+    .C-name { font-size:1.5rem; }
+    .C-desc { display:none; }
+    .C-tabs { display:flex; overflow-x:auto; gap:1rem; }
+    .C-tab { flex:0 0 60%; }
+  }
+</style>
+</head>
+<body>
+<div class="bar"><div class="wrap">
+  <button data-o="A">A · Brand tag</button><button data-o="B">B · Brand poster</button><button data-o="C">C · Spotlight</button>
+  <p id="note"></p>
+</div></div>
+<section class="strip"><div class="wrap">
+  <div class="head">
+    <h2 class="h2">Featured <span class="g">developments</span></h2>
+    <a class="all" href="#">View all developments <span class="ar"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9 9 3M4 3h5v5"/></svg></span></a>
+  </div>
+  <div id="slot"></div>
+</div></section>
+<script>
+const NOTES = {
+  A: '<b>A · Brand tag.</b> Clean photo cards like News and Case studies. The logo sits on its brand colour as a tag over the photo; details sit on the page, not in a white box. The brand button colour shows as a line that grows on hover and fills the arrow.',
+  B: '<b>B · Brand poster.</b> Tall cards that fade from the photo into the development\'s brand colour, with the logo on it. Address, bedrooms and price always show; the description slides up on hover. Button colour for the CTA.',
+  C: '<b>C · Spotlight.</b> One development at a time, big: photo on the left, its brand panel on the right with logo, details and CTA. The three names sit underneath as tabs with a progress line; it moves on every 6 seconds and pauses on hover.',
+};
+const D = window.FEATURED;
+const ARROW = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9 9 3M4 3h5v5"/></svg>';
+const BED = '<svg class="bed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 18V7M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="1.6"/></svg>';
+const TENURE = { 'East Wick and Sweetwater': 'Private sale', 'The Aura': 'Shared Ownership', 'Riverside West': 'Private sale' }; // from the CMS Tenure field
+const esc = (s) => String(s || '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+// Logo panel colour (CMS) or white; text colour that reads on it; button colour (CMS)
+const lum = (rgb) => { const m = (rgb || '').match(/\d+/g); if (!m) return 1; const [r, g, b] = m.map((v) => { v /= 255; return v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4; }); return .2126 * r + .7152 * g + .0722 * b; };
+const brand = (d) => { const c1 = d.logoBg || 'rgb(255, 255, 255)'; return { c1, c2: d.btnBg || '#0b2b26', on: lum(c1) > .35 ? '#0b2b26' : '#ffffff' }; };
+const vars = (d) => { const b = brand(d); return `--c1:${b.c1};--c2:${b.c2};--on:${b.on}`; };
+const specs = (d) => `<span class="spec">${BED}${esc(d.beds)}</span><span class="price">${esc(d.price).replace(/(£[\d,]+)/, '<b>$1</b>')}</span>`;
+
+function A() {
+  return `<div class="A">${D.map((d) => `<a class="A-card" href="#" style="${vars(d)}">
+    <div class="A-im"><img src="${d.img}" alt=""><span class="A-ten">${TENURE[d.name] || ''}</span>
+      <span class="A-logo" style="background:${brand(d).c1}"><img src="${d.logo}" alt="${esc(d.name)}"></span></div>
+    <div class="A-body">
+      <div class="A-name"><h3>${esc(d.name)}</h3><span class="ar">${ARROW}</span></div>
+      <div class="A-addr">${esc(d.address)}</div>
+      <p class="A-desc clamp2">${esc(d.desc)}</p>
+      <div class="A-foot">${specs(d)}</div>
+    </div></a>`).join('')}</div>`;
+}
+function B() {
+  return `<div class="B">${D.map((d) => `<a class="B-card" href="#" style="${vars(d)}">
+    <img src="${d.img}" alt=""><span class="B-ten">${TENURE[d.name] || ''}</span>
+    <div class="B-in">
+      <div class="B-logo"><img src="${d.logo}" alt="${esc(d.name)}"></div>
+      <div class="B-addr">${esc(d.address)}</div>
+      <div class="B-more"><div><p class="clamp3">${esc(d.desc)}</p></div></div>
+      <div class="B-foot">${specs(d)}</div>
+      <span class="B-cta"><span>View <span class="n">${esc(d.name)}</span><span class="dv">development</span></span> <span class="ar">${ARROW}</span></span>
+    </div></a>`).join('')}</div>`;
+}
+let cIdx = 0, cTimer = null;
+function C() {
+  const d = D[cIdx];
+  return `<div class="C-stage" style="${vars(d)}">
+      <div class="C-im">${D.map((x, i) => `<img src="${x.img}" alt="" class="${i === cIdx ? 'on' : ''}">`).join('')}</div>
+      <div class="C-panel C-fade">
+        <div class="C-logo"><img src="${d.logo}" alt=""></div>
+        <span class="C-ten">${TENURE[d.name] || ''}</span>
+        <h3 class="C-name">${esc(d.name)}</h3>
+        <div class="C-addr">${esc(d.address)}</div>
+        <p class="C-desc">${esc(d.desc)}</p>
+        <div class="C-specs">${specs(d)}</div>
+        <a class="C-cta" href="#">View development <span class="ar">${ARROW}</span></a>
+      </div></div>
+    <div class="C-tabs">${D.map((x, i) => `<button class="C-tab ${i === cIdx ? 'on' : ''}" data-i="${i}"><i></i><b>${esc(x.name)}</b><span>${esc(x.price)}</span></button>`).join('')}</div>`;
+}
+function cGo(i) {
+  cIdx = (i + D.length) % D.length;
+  const slot = document.getElementById('slot');
+  const panel = slot.querySelector('.C-fade');
+  panel.classList.add('out');
+  setTimeout(() => { slot.innerHTML = C(); bindC(); }, 300);
+}
+function bindC() {
+  const slot = document.getElementById('slot');
+  slot.querySelectorAll('.C-tab').forEach((t) => t.addEventListener('click', () => cGo(+t.dataset.i)));
+  const on = slot.querySelector('.C-tab.on i');
+  on?.addEventListener('animationend', () => cGo(cIdx + 1));
+}
+
+const R = { A, B, C };
+function show(o) {
+  document.querySelectorAll('.bar button').forEach((b) => b.classList.toggle('on', b.dataset.o === o));
+  document.getElementById('note').innerHTML = NOTES[o];
+  document.getElementById('slot').innerHTML = R[o]();
+  if (o === 'C') bindC();
+  history.replaceState(null, '', '#' + o);
+}
+document.querySelectorAll('.bar button').forEach((b) => b.addEventListener('click', () => show(b.dataset.o)));
+show((location.hash.slice(1) || 'A').toUpperCase());
+</script>
+</body>
+</html>
