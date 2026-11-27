@@ -31,13 +31,14 @@
 // The cards' photos are the CMS originals (several MB each, no responsive versions), so
 // they're held back until the map is first opened and then loaded at thumbnail size using
 // the responsive versions Webflow made for the same photo on the results cards.
-import { loadMaps, GREY, LONDON, PIN } from '../lib/maps.js';
+import { loadMaps, GREY, LONDON } from '../lib/maps.js';
+import cardHover from '../lib/card-hover.js';
 import { onVisible } from '../lib/filters.js';
 
 const DESKTOP = window.matchMedia('(min-width: 768px)');
 const MIN_HEIGHT = 480; // px, desktop map height floor
 const ONE_PIN_ZOOM = 13;
-const PIN_HEIGHT = 62; // px: the pin image is 51px tall; the card's pointer tip ends just above it
+const PIN_HEIGHT = 24; // px: from the location to the card's pointer tip, clear of the price pin (centred there)
 const CARD_MARGIN = 16; // px kept between an open card and the map's edges
 
 // The pin card drawn on the map: an OverlayView holding a copy of [data-map-popup]. All of
@@ -84,6 +85,49 @@ function makeCard(OverlayView, onClose) {
     }
   }
   return new Card();
+}
+
+// Price pins (v3.28.0): a small pill on the map with the development's starting price ("£445k",
+// "Soon"), styled in Webflow (.map-pin, .is-active, .is-hover). Centred on the location. Each is
+// an OverlayView with the bits of Marker that the rest of this file uses: setMap, getPosition,
+// addListener('click').
+function makePin(OverlayView, LatLng) {
+  return class Pin extends OverlayView {
+    constructor(lat, lng, label, title) {
+      super();
+      this.position = new LatLng(lat, lng);
+      this.el = document.createElement('button');
+      this.el.type = 'button';
+      this.el.className = 'map-pin';
+      this.el.setAttribute('aria-label', `${title}, ${label}`);
+      this.el.innerHTML = '<span class="button-text"></span>';
+      this.el.firstChild.textContent = label;
+      Object.assign(this.el.style, { position: 'absolute', translate: '-50% -50%' });
+      OverlayView.preventMapHitsAndGesturesFrom(this.el);
+    }
+    getPosition() { return this.position; }
+    addListener(type, fn) { this.el.addEventListener(type, fn); }
+    onAdd() { this.getPanes().overlayMouseTarget.appendChild(this.el); }
+    onRemove() { this.el.remove(); }
+    draw() {
+      const point = this.getProjection()?.fromLatLngToDivPixel(this.position);
+      if (!point) return;
+      this.el.style.left = `${point.x}px`;
+      this.el.style.top = `${point.y}px`;
+    }
+    set(cls, on) {
+      this.el.classList.toggle(cls, on);
+      this.el.style.zIndex = this.el.classList.contains('is-active') || this.el.classList.contains('is-hover') ? '5' : '';
+    }
+  };
+}
+
+// "£445k", "£1.2m"; "Soon" for a development with a price alternative (Coming soon) or no price
+function pinLabel(el) {
+  if (el.querySelector('[data-map-price-alt]')?.textContent.trim()) return 'Soon';
+  const n = parseFloat((el.querySelector('[data-map-price-from] [data-price]')?.textContent || '').replace(/[^\d.]/g, ''));
+  if (!Number.isFinite(n) || n <= 0) return 'Soon';
+  return n >= 1e6 ? `£${+(n / 1e6).toFixed(2)}m` : `£${Math.round(n / 1000)}k`;
 }
 
 function number(value) {
@@ -253,7 +297,8 @@ export default function mapView(root) {
 
   function init() {
     if (ready) return ready;
-    ready = loadMaps(key).then(({ Map: GMap, OverlayView, Marker }) => {
+    ready = loadMaps(key).then(({ Map: GMap, OverlayView, LatLng }) => {
+      const Pin = makePin(OverlayView, LatLng);
       gmap = new GMap(canvas, {
         center: LONDON,
         zoom: 10,
@@ -270,7 +315,7 @@ export default function mapView(root) {
 
       items.forEach((item) => {
         if (item.lat === null || item.lng === null) return; // no coordinates in the CMS
-        const marker = new Marker({ position: { lat: item.lat, lng: item.lng }, icon: PIN, title: item.name });
+        const marker = new Pin(item.lat, item.lng, pinLabel(item.el), item.name);
         marker.addListener('click', () => open(item, { pan: false }));
         markers.set(item.slug, marker);
       });
@@ -309,7 +354,10 @@ export default function mapView(root) {
 
   function setActive(item, { scroll = false } = {}) {
     active = item;
-    items.forEach((i) => i.card?.classList.toggle('is-active', i === item));
+    items.forEach((i) => {
+      i.card?.classList.toggle('is-active', i === item);
+      markers.get(i.slug)?.set('is-active', i === item);
+    });
     if (!item || !scroll || !sidebar) return;
     if (DESKTOP.matches) {
       const top = item.el.getBoundingClientRect().top - sidebar.getBoundingClientRect().top + sidebar.scrollTop - 16;
@@ -404,7 +452,7 @@ export default function mapView(root) {
       const src = img.getAttribute('data-hold-src');
       const srcset = srcsets.get(src);
       if (srcset) {
-        img.sizes = img.closest('[data-map-popup]') ? '256px' : '96px';
+        img.sizes = img.closest('[data-map-popup]') ? '256px' : '160px';
         img.srcset = srcset;
       }
       img.src = src;
@@ -500,8 +548,14 @@ export default function mapView(root) {
     });
   });
 
+  // List cards: photo zooms and name underlines on hover (.is-hover combos in Webflow), and the
+  // development's price pin lifts on the map.
+  cardHover(root, '[data-map-card]', '.li_thumb, .map-card_title');
   items.forEach((item) => {
     if (!item.card) return;
+    const lift = (on) => markers.get(item.slug)?.set('is-hover', on);
+    item.card.addEventListener('mouseenter', () => lift(true));
+    item.card.addEventListener('mouseleave', () => lift(false));
     item.card.addEventListener('click', () => open(item));
     item.card.addEventListener('keydown', (event) => {
       if (event.key !== 'Enter' && event.key !== ' ') return;
