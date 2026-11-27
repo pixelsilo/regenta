@@ -120,6 +120,9 @@ Price slider (`v3.1.0`): "Price" and the chosen range (`.range_label`, `.range_a
 - **Desktop:** clicking a pill opens the panel as a popover under it (`.ps-side.is-pop`, fixed, 22rem) showing only that pill's section; its footer reads "Reset" (that filter only) and "Show N developments". Closes on Escape, a click outside, the Show button or the pill again; it follows the pill if the page scrolls.
 - **Phones:** pills are hidden and a single Filters button (`.ps-fbtn[data-filter-sheet-open]`, badge `[data-filter-active-n]`) sits beside List / Map. It opens the whole panel as a bottom sheet (`.ps-side.is-open` plus `.ps-sheet_bg`), with Clear all and "Show N developments" at the bottom.
 - Results are three columns (`dev-collection-list`). The map view (`map-view.is-panel`) fills the window below the bar.
+- **Heading** (`v3.27.3`): "Find your home" shows on first load. The first press of List or Map folds it away for the rest of the visit, in both views, so switching never scrolls or moves the page. Folded, `.search-hero.is-panel.is-collapsed` has no top padding and 8rem bottom padding (6rem on phones), so the heading slides up under the nav and the bar sits just below the nav. Pressing List while scrolled down folds it without animation and keeps the list where it was (`map-view` scrolls by the difference itself, with Chrome's scroll anchoring off for that moment, since Safari has none).
+- `search-hero_inner` clips with `clip-path: inset(-2rem -2rem 0 -2rem)` instead of `overflow: hidden`: the tops of the heading's letters rise above its line box and were cut off.
+- Phones, map view: the map is a full-screen layer, so `map-view` stops the page behind it scrolling (`body` overflow), which would otherwise carry the bar away and shrink the nav over the map.
 
 ## Buyer / professional split (#57)
 
