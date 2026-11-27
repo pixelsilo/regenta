@@ -122,7 +122,13 @@ Price slider (`v3.1.0`): "Price" and the chosen range (`.range_label`, `.range_a
 - Results are three columns (`dev-collection-list`). The map view (`map-view.is-panel`) fills the window below the bar.
 - **Heading** (`v3.27.3`): "Find your home" shows on first load. The first press of List or Map folds it away for the rest of the visit, in both views, so switching never scrolls or moves the page. Folded, `.search-hero.is-panel.is-collapsed` has no top padding and 8rem bottom padding (6rem on phones), so the heading slides up under the nav and the bar sits just below the nav. Pressing List while scrolled down folds it without animation and keeps the list where it was (`map-view` scrolls by the difference itself, with Chrome's scroll anchoring off for that moment, since Safari has none).
 - `search-hero_inner` clips with `clip-path: inset(-2rem -2rem 0 -2rem)` instead of `overflow: hidden`: the tops of the heading's letters rise above its line box and were cut off.
-- Phones, map view: the map is a full-screen layer, so `map-view` stops the page behind it scrolling (`body` overflow), which would otherwise carry the bar away and shrink the nav over the map.
+- Phones, map view: the map is a full-screen layer, so `map-view` stops the page behind it scrolling (`body` overflow), which would otherwise carry the bar away and shrink the nav over the map. It also hides the sections after Property Search (Featured developments, footer) while the phone map is open: the map sits in a `1440-container`, which is its own stacking context, so those sections painted over it.
+
+**Map list and price pins** (`v3.28.0`, 27 Nov 2026, from the mock's map view):
+- The development list (`map-view_sidebar`, 27rem column, `map-view.is-panel`) has no boxes: each `map-card` is a 1rem-radius row with 0.9rem padding, an 8.5 × 6.4rem photo, the name at 1.05rem / 600 (was 900), a two-line description at 75% opacity, and beds / price. Hover tints the row (5% green), zooms the photo (`li_thumb.is-hover`) and underlines the name (`map-card_title.is-hover`), via `lib/card-hover.js`; the open development's row is `.is-active` (9% green).
+- The list's scrollbar is branded like the filter dropdowns (slim green pill), in the `code-v2` css embed, along with the filter panel's (`.ps-side_scroll`).
+- Pins are price tags (`.map-pin`, styled in Webflow; `.is-active` for the open one, `.is-hover` while its row is hovered): "£445k", "£87.5k" (one decimal under £100k), "£1.05m", or "Soon" for a development with a price alternative or no price. They're `OverlayView`s in `map-view.js` (`makePin`), not Google markers, centred on the location. The price comes from the map item's `[data-map-price-from] [data-price]`. (Their highlight method is `flag()`: naming it `set()` shadowed Google's `MVCObject.set` and stopped the pins appearing.)
+- Where developments sit close together in London the tags overlap at the default zoom.
 
 ## Buyer / professional split (#57)
 
