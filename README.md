@@ -227,14 +227,15 @@ Mock: `mocks/case-studies-list.html` (B2). The old "Latest case study" hero list
 - **Nav:** the page's Navigation instance is now navbar-white on, navbar-faded off (the dark hero it faded over is gone).
 - **Set in the Designer (the API can't):** conditional visibility so empty fields don't leave labels behind: homes stat when *Stats Grid - Number of Units* is set, launched stat when *Stats Grid - Launch Date* is set, both tenure elements (photo chip and the line under the client) when *Stats Grid - Tenures* is set, client line when *Developer* is set.
 
-## News page and articles (`/news` layout C, article layout 1, `v3.21.2`)
+## News page and articles (`/news` layout C, article layout 1, `v3.22.0`)
 
 Mock: `mocks/news.html` (News C, Article 1). News has a new **Category** option field (Market insight, Events & awards, Developments, Team & company), filled in for every story on 27 Nov 2026.
 
 **News page** (root `.nw-section[data-module="news-list"]`, inside a `1440-container`):
-- Hero reuses the listing classes (`ps-eyebrow`, `csl-h1` "Latest *news*", `csl-lede`).
+- Heading only: `csl-h1` "Latest *news*" in `.nw-hero` (no eyebrow or intro line, Luke 27 Nov 2026; the Case studies listing lost its eyebrow and intro too). The section is `section section-csl`, the same as Case studies, so both H1s sit the same distance under the nav (70px at desktop).
 - **Featured:** Collection List `.nw-feat` (grid 2fr 1fr, first item spans both rows; `.nw-feat_item`), newest first, limit 3. Cards `.nw-card` (Thumbnail, `.nw-card_shade`, category `.nw-card_tag`, date, `.nw-card_title`).
-- **Filter:** pills `.csl-chip[data-nw-filter]` (`.is-active`) with counts `.nw-chip_n`; `[data-nw-count]`. Pills wrap on phones (no side-scrolling).
+- **Hover:** `src/lib/card-hover.js` adds `.is-hover` on mouse hover or keyboard focus to the card and its parts; the looks are Webflow combos: `.nw-card_img` / `.nw-post_img` zoom 1.05, `.nw-post_title` underline, `.nw-card_shade` darker, and on the featured cards `.nw-card_sum` (Post Summary, hidden) opens under the title so the text rises.
+- **Filter:** pills `.csl-chip[data-nw-filter]` (`.is-active`) with counts `.nw-chip_n button-text` (centred like the label); `[data-nw-count]`. Pills wrap on phones (no side-scrolling).
 - **Grid:** Collection List `.nw-grid` (4 / 3 / 1 columns), every story newest first, **100 per page with pagination on**. Cards `.nw-post` (Thumbnail, `.csl-tag` category, `.nw-date`, `.nw-post_title`, `.nw-post_sum`); on phones a thumbnail row.
 - **Load more:** `[data-nw-more]` shows 12 more. The script hides Webflow's pagination and, past 100 stories, fetches each next page and adds its stories to the grid, so the filter and counts cover everything. Without the script the pagination links still work (and search engines follow them).
 - **Script:** `src/modules/news-list.js`. Featured stories are skipped in the grid (by link).
