@@ -12,6 +12,7 @@
 import lightbox from '../lib/lightbox.js';
 import linkItems from '../lib/item-links.js';
 import cardHover from '../lib/card-hover.js';
+import prevNext from '../lib/prev-next.js';
 
 const text = (el) => (el?.textContent || '').trim();
 
@@ -51,22 +52,6 @@ function related(root) {
   if (h && cat && same.length) h.textContent = `More ${cat.toLowerCase()}`;
 }
 
-function prevNext(root) {
-  const links = [...root.querySelectorAll('[data-nw-all] a[href]')];
-  const at = links.findIndex((a) => a.pathname === location.pathname);
-  const fill = (el, a) => {
-    if (!el) return;
-    if (!a) { el.style.display = 'none'; return; }
-    el.setAttribute('href', a.getAttribute('href'));
-    const t = el.querySelector('.nw-pn_title');
-    if (t) t.textContent = text(a.querySelector('.nw-post_title') || a);
-  };
-  // The list is newest first: the next (newer) story is the one before this one
-  fill(root.querySelector('[data-nw-next]'), at > 0 ? links[at - 1] : null);
-  fill(root.querySelector('[data-nw-prev]'), at >= 0 ? links[at + 1] : null);
-  if (at < 0) root.querySelectorAll('[data-nw-prev], [data-nw-next]').forEach((el) => { el.style.display = 'none'; });
-}
-
 function share(root) {
   const url = location.href.split('#')[0];
   const title = text(root.querySelector('h1')) || document.title;
@@ -97,6 +82,6 @@ export default function newsArticle(root) {
   cardHover(root, 'a.nw-post', '.nw-post_img, .nw-post_title');
   gallery(root);
   related(root);
-  prevNext(root);
+  prevNext(root, { all: '[data-nw-all]', prev: '[data-nw-prev]', next: '[data-nw-next]', title: '.nw-post_title' });
   share(root);
 }
