@@ -7,6 +7,14 @@
 import cardHover from '../lib/card-hover.js';
 
 const DARK = 0.35; // relative luminance below which text switches to sand
+const SAME = 48; // RGB distance under which the button and card colours count as the same
+
+function distance(a, b) {
+  const x = (a.match(/[\d.]+/g) || []).map(Number);
+  const y = (b.match(/[\d.]+/g) || []).map(Number);
+  if (x.length < 3 || y.length < 3) return Infinity;
+  return Math.hypot(x[0] - y[0], x[1] - y[1], x[2] - y[2]);
+}
 
 function luminance(color) {
   const m = color.match(/[\d.]+/g);
@@ -27,6 +35,9 @@ export default function featuredDevelopments() {
     const dark = luminance(getComputedStyle(brand).backgroundColor) < DARK;
     card.classList.toggle('is-dark', dark);
     card.querySelectorAll('.li-icon').forEach((icon) => icon.classList.toggle('is-dark', dark));
+    // A button colour that's (nearly) the card colour would vanish: outline it (.fd2_button.is-same)
+    const button = card.querySelector('.fd2_button');
+    if (button) button.classList.toggle('is-same', distance(getComputedStyle(brand).backgroundColor, getComputedStyle(button).backgroundColor) < SAME);
   });
   lists.forEach((list) => cardHover(list, 'a.fd2_slide', '.fd2_more, .fd2_ar, .fd_image'));
 }
