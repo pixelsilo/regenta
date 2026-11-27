@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mock: Case studies listing | Regenta (#57)</title>
+<script src="https://use.typekit.net/ptn3etu.js"></script>
+<script>try{Typekit.load();}catch(e){}</script>
+<style>
+  /* Mock only: three layouts for /case-studies, using the real case study content. */
+  :root { --green:#0b2b26; --green2:#173833; --sand:#e3e5db; --line:rgba(11,43,38,.15); }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--sand); font-family:area-normal, area, "Area Normal", system-ui, sans-serif; color:var(--green); }
+  a { color:inherit; text-decoration:none; }
+  button { font:inherit; color:inherit; background:none; border:0; padding:0; cursor:pointer; }
+  img { display:block; }
+  .g { font-family:Griffiths, "Times New Roman", serif; font-weight:400; font-style:italic; }
+  .wrap { max-width:1440px; margin:0 auto; padding:0 2rem; }
+
+  /* mock switcher */
+  .switch { position:fixed; z-index:50; left:50%; bottom:1.25rem; transform:translateX(-50%); display:flex; gap:.3rem; background:#fff; border-radius:99px; padding:.3rem; box-shadow:0 10px 30px rgba(0,0,0,.2); font-size:.85rem; }
+  .switch button { padding:.6rem 1rem; border-radius:99px; white-space:nowrap; }
+  .switch button[aria-pressed="true"] { background:var(--green); color:var(--sand); }
+
+  /* nav stand-in */
+  .nav { background:var(--green); color:var(--sand); height:112px; display:flex; align-items:center; }
+  .nav .wrap { width:100%; display:flex; justify-content:space-between; align-items:center; font-size:.62rem; letter-spacing:.2em; }
+  .nav b { font-size:1.6rem; letter-spacing:.08em; font-weight:500; }
+
+  /* shared bits */
+  .eb { font-size:.68rem; letter-spacing:.22em; text-transform:uppercase; opacity:.65; }
+  .h1 { font-size:clamp(2.6rem, 5vw, 4.6rem); line-height:1; margin:.8rem 0 0; font-weight:600; letter-spacing:-.01em; }
+  .lede { max-width:34rem; font-size:1.05rem; line-height:1.55; opacity:.8; margin:1.25rem 0 0; }
+  .chips { display:flex; flex-wrap:wrap; gap:.4rem; }
+  .chip { border:1px solid rgba(11,43,38,.25); border-radius:99px; padding:.55rem .95rem; font-size:.82rem; transition:background .2s, color .2s, border-color .2s; }
+  .chip[aria-pressed="true"] { background:var(--green); color:var(--sand); border-color:var(--green); }
+  .chip:hover { border-color:var(--green); }
+  .count { font-size:.85rem; opacity:.6; }
+
+  /* the ps-cs card (same as Professional Services) */
+  .card { position:relative; display:block; overflow:hidden; border-radius:1.25rem; background:var(--green); color:#fff; min-height:24rem; height:100%; }
+  .card img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform 1.2s cubic-bezier(.2,.7,.2,1); }
+  .card:hover img { transform:scale(1.04); }
+  .card .shade { position:absolute; inset:0; background:linear-gradient(0deg, rgba(11,43,38,.95) 0%, rgba(11,43,38,.6) 45%, rgba(11,43,38,.15) 80%, rgba(11,43,38,.05) 100%); }
+  .card .body { position:absolute; left:0; right:0; bottom:0; padding:1.75rem; }
+  .card .meta { display:flex; flex-wrap:wrap; gap:.4rem; margin-bottom:.9rem; }
+  .card .meta span { border:1px solid rgba(255,255,255,.45); border-radius:99px; padding:.35rem .75rem; font-size:.72rem; letter-spacing:.03em; }
+  .card h3 { margin:0; font-size:1.65rem; line-height:1.1; font-weight:700; }
+  .card p { margin:.7rem 0 0; font-size:.92rem; line-height:1.5; opacity:.9; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .card .go { position:absolute; top:1.25rem; right:1.25rem; width:2.6rem; height:2.6rem; border-radius:50%; background:var(--sand); color:var(--green); display:grid; place-items:center; opacity:0; transform:translate(-.5rem,.5rem); transition:opacity .35s, transform .35s; }
+  .card:hover .go { opacity:1; transform:none; }
+  .card.big h3 { font-size:clamp(2.2rem, 4vw, 3.6rem); }
+  .card.big .quote { position:absolute; right:2rem; bottom:2rem; max-width:30rem; border-left:2px solid rgba(255,255,255,.6); padding-left:1.25rem; font-size:1.1rem; line-height:1.5; display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden; }
+  .card.big .body { right:auto; max-width:52%; }
+
+  section.v { display:none; } section.v.on { display:block; }
+
+  /* ---------- A: featured + filter grid ---------- */
+  .a-hero { padding:5rem 0 3rem; display:grid; grid-template-columns:1.7fr 1fr; gap:3rem; align-items:end; }
+  .a-stats { display:flex; gap:2.5rem; justify-content:flex-end; }
+  .a-stats div b { display:block; font-size:2.6rem; font-weight:600; line-height:1; }
+  .a-stats div span { font-size:.8rem; opacity:.65; }
+  .a-feature { height:min(78vh, 42rem); margin-bottom:3rem; }
+  .a-bar { display:flex; justify-content:space-between; align-items:center; gap:1rem; padding:1.25rem 0; border-top:1px solid var(--line); margin-bottom:1.5rem; position:sticky; top:0; background:var(--sand); z-index:5; }
+  .a-grid { display:grid; grid-template-columns:repeat(3, 1fr); grid-auto-rows:28rem; gap:1.5rem; padding-bottom:6rem; }
+
+  /* ---------- B: index list ---------- */
+  .b-hero { padding:5rem 0 2.5rem; }
+  .b-hero .h1 { font-size:clamp(3rem, 7vw, 6.5rem); }
+  .b-bar { display:flex; justify-content:space-between; align-items:center; gap:1rem; padding:1.25rem 0; }
+  .b-head, .b-row { display:grid; grid-template-columns:3rem 1.6fr 1fr 1fr 5rem 3rem; gap:1.5rem; align-items:center; }
+  .b-head { font-size:.65rem; letter-spacing:.2em; text-transform:uppercase; opacity:.5; padding:.75rem 0; border-bottom:1px solid var(--line); }
+  .b-row { padding:1.5rem 0; border-bottom:1px solid var(--line); transition:padding .3s, background .3s; position:relative; }
+  .b-row .n { font-size:.8rem; opacity:.45; }
+  .b-row .t { font-size:1.75rem; line-height:1.15; font-weight:600; }
+  .b-row .t small { display:block; font-size:.85rem; font-weight:400; opacity:.6; margin-top:.3rem; }
+  .b-row .c { font-size:.95rem; } .b-row .c small { display:block; opacity:.6; font-size:.8rem; margin-top:.2rem; }
+  .b-row .s { display:flex; flex-wrap:wrap; gap:.3rem; } .b-row .s span { font-size:.7rem; border:1px solid var(--line); border-radius:99px; padding:.3rem .6rem; }
+  .b-row .h { font-size:1.5rem; font-weight:600; text-align:right; } .b-row .h small { display:block; font-size:.7rem; font-weight:400; opacity:.55; }
+  .b-row .ar { width:2.6rem; height:2.6rem; border-radius:50%; border:1px solid var(--line); display:grid; place-items:center; transition:background .25s, color .25s; }
+  .b-row:hover .ar { background:var(--green); color:var(--sand); }
+  .b-row .th { display:none; }
+  .b-peek { position:fixed; width:22rem; height:15rem; border-radius:1rem; overflow:hidden; pointer-events:none; z-index:40; opacity:0; transform:scale(.92); transition:opacity .25s, transform .25s; box-shadow:0 20px 50px rgba(0,0,0,.25); }
+  .b-peek.on { opacity:1; transform:none; }
+  .b-peek img { width:100%; height:100%; object-fit:cover; }
+  .b-list { padding-bottom:6rem; }
+
+  /* ---------- C: mosaic ---------- */
+  .c-hero { padding:5rem 0 3rem; display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; flex-wrap:wrap; }
+  .c-tabs { display:flex; gap:0; border-bottom:1px solid var(--line); margin-bottom:2rem; }
+  .c-tabs button { padding:1rem 1.25rem; font-size:.95rem; border-bottom:2px solid transparent; margin-bottom:-1px; opacity:.6; }
+  .c-tabs button[aria-pressed="true"] { border-color:var(--green); opacity:1; }
+  .c-grid { display:grid; grid-template-columns:repeat(6, 1fr); grid-auto-rows:22rem; grid-auto-flow:dense; gap:1.5rem; padding-bottom:6rem; }
+  .c-grid > * { grid-column:span 2; min-height:0; }
+  .c-grid > :nth-child(5n+1) { grid-column:span 4; grid-row:span 2; }
+  .c-grid > :nth-child(5n+4), .c-grid > :nth-child(5n+5) { grid-column:span 3; }
+  .c-grid > :nth-child(5n+1) h3 { font-size:2.6rem; }
+
+  @media (max-width:991px) {
+    .a-hero { grid-template-columns:1fr; } .a-stats { justify-content:flex-start; }
+    .a-grid { grid-template-columns:1fr 1fr; grid-auto-rows:24rem; }
+    .b-head { display:none; }
+    .b-row { grid-template-columns:7rem 1fr 3rem; }
+    .b-row .n, .b-row .s, .b-row .h { display:none; }
+    .b-row .c { grid-column:2; grid-row:2; margin-top:-1rem; }
+    .b-row .ar { grid-row:1 / span 2; grid-column:3; }
+    .b-row .th { display:block; grid-row:1 / span 2; width:7rem; height:5.5rem; border-radius:.75rem; overflow:hidden; } .b-row .th img { width:100%; height:100%; object-fit:cover; }
+    .c-grid { grid-template-columns:1fr 1fr; grid-auto-rows:22rem; }
+    .c-grid > *, .c-grid > :nth-child(5n+4), .c-grid > :nth-child(5n+5) { grid-column:span 1; }
+    .c-grid > :nth-child(5n+1) { grid-column:span 2; grid-row:span 1; }
+    .card.big .quote { display:none; } .card.big .body { max-width:none; right:0; }
+  }
+  @media (max-width:600px) {
+    .wrap { padding:0 1rem; }
+    .nav { height:76px; } .nav span { display:none; }
+    .a-hero, .b-hero, .c-hero { padding-top:3rem; }
+    .a-stats b { font-size:2rem !important; }
+    .a-feature { height:30rem; }
+    .a-bar, .b-bar { flex-direction:column; align-items:flex-start; position:static; }
+    .chips { flex-wrap:nowrap; overflow-x:auto; max-width:100%; padding-bottom:.25rem; }
+    .chip { white-space:nowrap; }
+    .a-grid, .c-grid { grid-template-columns:1fr; grid-auto-rows:24rem; }
+    .c-grid > :nth-child(5n+1) { grid-column:span 1; }
+    .b-row { grid-template-columns:5.5rem 1fr; gap:1rem; }
+    .b-row .th { width:5.5rem; height:5.5rem; }
+    .b-row .t { font-size:1.25rem; }
+    .b-row .ar { display:none; }
+    .c-tabs { overflow-x:auto; }
+    .c-tabs button { white-space:nowrap; }
+  }
+</style>
+</head>
+<body>
+<header class="nav"><div class="wrap"><b>REGENTA</b><span>ABOUT US &nbsp; BUILT BY REGENTA &nbsp; CASE STUDIES &nbsp; NEWS &nbsp; CONTACT US</span></div></header>
+
+<section class="v on" data-v="a"><div class="wrap">
+  <div class="a-hero">
+    <div><div class="eb">Case studies</div><h1 class="h1">Homes we've <span class="g">helped sell</span></h1><p class="lede">Sales, marketing and consultancy for councils, housing associations and developers across London and the South East.</p></div>
+    <div class="a-stats" id="a-stats"></div>
+  </div>
+  <div class="a-feature" id="a-feature"></div>
+  <div class="a-bar"><div class="chips" id="a-chips"></div><div class="count" id="a-count"></div></div>
+  <div class="a-grid" id="a-grid"></div>
+</div></section>
+
+<section class="v" data-v="b"><div class="wrap">
+  <div class="b-hero"><div class="eb">Case studies</div><h1 class="h1">Our <span class="g">work</span></h1><p class="lede">Every scheme we've sold and marketed, with who it was for, the tenure and how many homes.</p></div>
+  <div class="b-bar"><div class="chips" id="b-chips"></div><div class="count" id="b-count"></div></div>
+  <div class="b-head"><span>No.</span><span>Scheme</span><span>Client</span><span>Services</span><span style="text-align:right">Homes</span><span></span></div>
+  <div class="b-list" id="b-list"></div>
+</div><div class="b-peek" id="b-peek"><img alt=""></div></section>
+
+<section class="v" data-v="c"><div class="wrap">
+  <div class="c-hero"><div><div class="eb">Case studies</div><h1 class="h1">How we <span class="g">make a difference</span></h1></div><p class="lede" style="margin:0">Schemes we've sold and marketed for councils, housing associations and developers.</p></div>
+  <div class="c-tabs" id="c-tabs"></div>
+  <div class="c-grid" id="c-grid"></div>
+</div></section>
+
+<div class="switch" role="group" aria-label="Layout">
+  <button type="button" data-to="a" aria-pressed="true">A &middot; Featured + grid</button>
+  <button type="button" data-to="b" aria-pressed="false">B &middot; Index list</button>
+  <button type="button" data-to="c" aria-pressed="false">C &middot; Mosaic</button>
+</div>
+
+<script src="case-studies-list-data.js"></script>
+<script>
+const CS = window.CS;
+const esc = (s) => String(s || '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const ARROW = '<svg width="12" height="12" viewBox="0 0 7 7" aria-hidden="true"><path d="M0.75 7L0 6.25 5.17 1.08H0.54V0H7V6.46H5.92V1.83L0.75 7Z" fill="currentColor"/></svg>';
+const clip = (s, n) => { s = (s || '').replace(/^["'‘“]|["'’”]$/g, ''); return s.length > n ? s.slice(0, n).replace(/\s+\S*$/, '') + '…' : s; };
+const card = (c, big) => `<a class="card${big ? ' big' : ''}" href="#"><img src="${esc(c.thumb)}" alt=""><div class="shade"></div>
+  <div class="body"><div class="meta">${[c.tenure, c.client].filter(Boolean).map((m) => `<span>${esc(m)}</span>`).join('')}</div><h3>${esc(c.name)}</h3>${big ? '' : `<p>${esc(c.summary)}</p>`}</div>
+  ${big ? `<p class="quote">${esc(clip(c.summary, 260))}</p>` : ''}<span class="go">${ARROW}</span></a>`;
+const SERVICES = ['Sales', 'Marketing', 'Development Consultancy', 'Market Intelligence', 'Customer Care', 'Scheme Optimisation'];
+const homes = CS.reduce((n, c) => n + (parseInt(c.homes, 10) || 0), 0);
+const clients = new Set(CS.map((c) => c.client).filter(Boolean)).size;
+
+function chips(el, list, onPick) {
+  let cur = '';
+  const draw = () => { el.innerHTML = ['', ...list].map((s) => `<button class="chip" type="button" aria-pressed="${s === cur}" data-s="${esc(s)}">${s || 'All'}</button>`).join(''); };
+  el.addEventListener('click', (e) => { const b = e.target.closest('.chip'); if (!b) return; cur = b.dataset.s; draw(); onPick(cur); });
+  draw();
+}
+
+// A
+document.getElementById('a-stats').innerHTML = `<div><b>${CS.length}</b><span>schemes</span></div><div><b>${homes.toLocaleString()}+</b><span>homes</span></div><div><b>${clients}</b><span>clients</span></div>`;
+document.getElementById('a-feature').innerHTML = card(CS[0], true);
+const drawA = (s) => {
+  const list = CS.slice(1).filter((c) => !s || c.services.includes(s));
+  document.getElementById('a-grid').innerHTML = list.map((c) => card(c)).join('');
+  document.getElementById('a-count').textContent = `${list.length} case ${list.length === 1 ? 'study' : 'studies'}`;
+};
+chips(document.getElementById('a-chips'), SERVICES, drawA); drawA('');
+
+// B
+const peek = document.getElementById('b-peek');
+const drawB = (s) => {
+  const list = CS.filter((c) => !s || c.services.includes(s));
+  document.getElementById('b-list').innerHTML = list.map((c, i) => `<a class="b-row" href="#" data-img="${esc(c.thumb)}">
+    <span class="n">${String(i + 1).padStart(2, '0')}</span><span class="th"><img src="${esc(c.thumb)}" alt=""></span>
+    <span class="t">${esc(c.name)}${c.sub ? `<small>${esc(c.sub)}</small>` : ''}</span>
+    <span class="c">${esc(c.client || '—')}<small>${esc(c.tenure)}</small></span>
+    <span class="s">${c.services.slice(0, 3).map((v) => `<span>${esc(v)}</span>`).join('')}${c.services.length > 3 ? `<span>+${c.services.length - 3}</span>` : ''}</span>
+    <span class="h">${esc(c.homes || '—')}<small>homes</small></span><span class="ar">${ARROW}</span></a>`).join('');
+  document.getElementById('b-count').textContent = `${list.length} case ${list.length === 1 ? 'study' : 'studies'}`;
+};
+chips(document.getElementById('b-chips'), SERVICES, drawB); drawB('');
+document.getElementById('b-list').addEventListener('mousemove', (e) => {
+  const row = e.target.closest('.b-row');
+  if (!row || innerWidth < 992) { peek.classList.remove('on'); return; }
+  peek.querySelector('img').src = row.dataset.img;
+  peek.style.left = Math.min(e.clientX + 24, innerWidth - 380) + 'px';
+  peek.style.top = (e.clientY - 120) + 'px';
+  peek.classList.add('on');
+});
+document.getElementById('b-list').addEventListener('mouseleave', () => peek.classList.remove('on'));
+
+// C
+const TENURES = [['', 'All work'], ['Shared Ownership', 'Shared Ownership'], ['Private Sale', 'Private Sale']];
+let cTen = '';
+const drawC = () => {
+  document.getElementById('c-tabs').innerHTML = TENURES.map(([k, l]) => `<button type="button" aria-pressed="${k === cTen}" data-k="${esc(k)}">${l}</button>`).join('');
+  const list = CS.filter((c) => !cTen || (c.tenure || '').includes(cTen));
+  document.getElementById('c-grid').innerHTML = list.map((c) => card(c)).join('');
+};
+document.getElementById('c-tabs').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; cTen = b.dataset.k; drawC(); });
+drawC();
+
+// switcher
+document.querySelector('.switch').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  document.querySelectorAll('.switch button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  document.querySelectorAll('section.v').forEach((s) => s.classList.toggle('on', s.dataset.v === b.dataset.to));
+  scrollTo(0, 0);
+});
+</script>
+</body>
+</html>
