@@ -466,6 +466,26 @@ export default function mapView(root) {
       img.src = src;
       img.removeAttribute('data-hold-src');
     });
+    borrowLogos();
+  }
+
+  // The list cards' logo hover: copy each results card's photo overlay (the development's logo on
+  // its brand colour, or the dark arrow overlay; Webflow's conditions already picked which) into
+  // the matching map card's photo. Results cards run it with a Webflow interaction; here
+  // cardHover's .is-hover classes do (li_thumb-overlay / li_development-logo / li_thumb .is-hover).
+  function borrowLogos() {
+    items.forEach((item) => {
+      const wrap = item.card?.querySelector('.map-card_image-wrap');
+      const focus = item.slug && document.querySelector(`[data-filter-item] [data-map-focus="${CSS.escape(item.slug)}"]`);
+      const link = focus?.closest('[data-filter-item]')?.querySelector('.li_thumb-link');
+      if (!wrap || !link || wrap.querySelector('.li_thumb-overlay')) return;
+      link.querySelectorAll(':scope > .li_thumb-overlay:not(.w-condition-invisible)').forEach((overlay) => {
+        const copy = overlay.cloneNode(true);
+        copy.querySelectorAll('.li_development-logo').forEach((logo) => logo.removeAttribute('style')); // the interaction's inline state
+        copy.querySelectorAll('[id]').forEach((el) => el.removeAttribute('id'));
+        wrap.prepend(copy);
+      });
+    });
   }
 
   // --- filters ----------------------------------------------------------------
@@ -558,7 +578,7 @@ export default function mapView(root) {
 
   // List cards: photo zooms and name underlines on hover (.is-hover combos in Webflow), and the
   // development's price pin lifts on the map.
-  cardHover(root, '[data-map-card]', '.li_thumb, .map-card_title');
+  cardHover(root, '[data-map-card]', '.li_thumb, .map-card_title, .li_thumb-overlay, .li_development-logo');
   items.forEach((item) => {
     if (!item.card) return;
     const lift = (on) => markers.get(item.slug)?.flag('is-hover', on);
