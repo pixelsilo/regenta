@@ -11,6 +11,7 @@
 
 import lightbox from '../lib/lightbox.js';
 import linkItems from '../lib/item-links.js';
+import cardHover from '../lib/card-hover.js';
 
 const text = (el) => (el?.textContent || '').trim();
 
@@ -93,6 +94,7 @@ function share(root) {
 
 export default function newsArticle(root) {
   linkItems(root, 'data-nw-slug', '/news');
+  cardHover(root, 'a.nw-post', '.nw-post_img, .nw-post_title');
   gallery(root);
   related(root);
   prevNext(root);

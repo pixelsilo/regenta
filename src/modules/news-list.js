@@ -2,6 +2,8 @@
 // Everything is built and styled in Webflow; this filters the stories by category, shows them a page at a time
 // and pulls in stories from Webflow's later pages, so the filter covers every story.
 //
+//   hover: .is-hover on the card and its image, shade, summary and title (lib/card-hover.js); the featured
+//                             cards' .nw-card_sum opens on hover
 //   a[data-nw-slug]           card links: href set to /news/<slug> (lib/item-links.js)
 //   .nw-feat a[href]          the featured cards (Collection List filtered to "Featured?"); skipped in the grid
 //   .nw-grid > .w-dyn-item    one per story (100 per Webflow page); its category is the text of its .csl-tag
@@ -12,7 +14,10 @@
 //                             fallback. The script fetches the next pages' stories, then hides it.
 
 import linkItems from '../lib/item-links.js';
+import cardHover from '../lib/card-hover.js';
 
+const NEWS_CARDS = 'a.nw-card, a.nw-post';
+const NEWS_PARTS = '.nw-card_img, .nw-card_shade, .nw-card_sum, .nw-post_img, .nw-post_title';
 const PAGE = 12;
 const text = (el) => (el?.textContent || '').trim();
 const plural = (n) => `${n} ${n === 1 ? 'story' : 'stories'}`;
@@ -21,6 +26,7 @@ export default function newsList(root) {
   const grid = root.querySelector('.nw-grid');
   if (!grid) return;
   linkItems(root, 'data-nw-slug', '/news');
+  cardHover(root, NEWS_CARDS, NEWS_PARTS);
 
   // Story pages only: a card whose link isn't set yet (href="#") must not hide every story
   const story = (a) => a && a.getAttribute('href') !== '#' && a.pathname !== location.pathname;
