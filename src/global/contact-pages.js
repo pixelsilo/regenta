@@ -79,9 +79,9 @@ function formAnchor() {
 }
 
 export default function contactPages() {
-  const roots = document.querySelectorAll('.ct-hero, .bt-routes');
+  const roots = document.querySelectorAll('.ct-hero, .bt-routes, .ab-help');
   if (!roots.length) return;
-  roots.forEach((root) => cardHover(root, 'a.ct-quick_link, a.bt-row', '.ct-arrow'));
+  roots.forEach((root) => cardHover(root, 'a.ct-quick_link, a.bt-row, a.ab-help_card', '.ct-arrow'));
   copyButtons();
   formAnchor();
 }

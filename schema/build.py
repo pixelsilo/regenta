@@ -262,6 +262,29 @@ STATIC["6b0756197cae398ca3d4bb6c"] = graph(
     audience={"@type": "Audience", "audienceType": "Home buyers"},
 )
 
+STATIC["6b0acdda3f3e76eb9ad0e8ad"] = graph(
+    "/about-us", "About Us",
+    "Regenta sells new homes across London and the South East, from Shared Ownership to private sale, with sales teams on site at every development since 1988.",
+    "AboutPage", about={"@id": ORG}, mainEntity={"@id": ORG},
+    audience={"@type": "Audience", "audienceType": "Home buyers, including first-time buyers"},
+    relatedLink=[BASE + "/property-search", BASE + "/shared-ownership-faqs", BASE + "/purchaser-stories", BASE + "/built-by-regenta"],
+    nodes=[{
+        "@type": "HowTo",
+        "@id": BASE + "/about-us#buying-steps",
+        "name": "Buying a new home with Regenta, from first viewing to your keys",
+        "step": [
+            {"@type": "HowToStep", "position": i + 1, "name": n, "text": t}
+            for i, (n, t) in enumerate([
+                ("Find a home and book a viewing", "Browse the developments, then book a viewing through the development's page or by calling its sales team."),
+                ("Reserve", "A reservation fee secures the home while the legal work and your mortgage are arranged."),
+                ("Mortgage and solicitor", "You appoint a solicitor and arrange your mortgage."),
+                ("Exchange", "Both sides become legally committed. This is typically four to eight weeks after reserving."),
+                ("Completion and keys", "Usually one to four weeks after exchange. Then the home is yours."),
+            ])
+        ],
+    }],
+)
+
 STATIC["6b082d33995cb711db7e6b93"] = graph(
     "/purchaser-stories", "Purchaser stories",
     "What buyers say on Google and Trustpilot about finding and buying their new homes with Regenta, from first viewing to getting the keys.",
