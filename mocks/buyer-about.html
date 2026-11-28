@@ -135,12 +135,67 @@
   .c-quote blockquote { margin:0; font-family:Griffiths, serif; font-size:clamp(1.8rem, 3.2vw, 2.8rem); line-height:1.2; }
   .c-quote cite { display:block; margin-top:1.5rem; font-style:normal; opacity:.7; }
   @media (max-width: 900px) { .c-time, .c-journey { grid-template-columns:1fr; } .c-journey div { min-height:0; } .c-hero { min-height:80vh; } }
+
+  /* ===== D: places-led ===== */
+  .d-hero { padding-top:3rem; display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:end; }
+  .d-regions { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:2.5rem; }
+  .d-regions button { font:inherit; font-size:.95rem; border:1px solid var(--line-d); background:none; border-radius:99px; padding:.7rem 1.1rem; cursor:pointer; color:var(--green); transition:background-color .2s, color .2s; }
+  .d-regions button span { opacity:.55; margin-left:.35rem; }
+  .d-regions button:hover, .d-regions button.on { background:var(--green); color:var(--sand); border-color:var(--green); }
+  .d-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:.75rem; margin-top:1.25rem; }
+  .d-dev { position:relative; aspect-ratio:4/5; border-radius:1rem; overflow:hidden; text-decoration:none; color:var(--sand); }
+  .d-dev img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform .5s cubic-bezier(.23,1,.32,1); }
+  .d-dev:hover img { transform:scale(1.05); }
+  .d-dev::after { content:""; position:absolute; inset:0; background:linear-gradient(0deg, rgba(11,43,38,.9), rgba(11,43,38,0) 55%); }
+  .d-dev div { position:absolute; left:1rem; right:1rem; bottom:.9rem; z-index:1; }
+  .d-dev b { display:block; font-size:1.05rem; }
+  .d-dev span { font-size:.8rem; opacity:.8; }
+  .d-strip { display:grid; grid-template-columns:1.2fr 1fr 1fr; gap:1rem; }
+  @media (max-width: 900px) { .d-hero, .d-strip { grid-template-columns:1fr; gap:1.5rem; } .d-grid { grid-template-columns:1fr 1fr; } }
+
+  /* ===== E: two kinds of buyer ===== */
+  .e-hero { padding-top:3rem; text-align:center; max-width:52rem; margin:0 auto; }
+  .e-hero .lead { margin-left:auto; margin-right:auto; }
+  .e-paths { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:3.5rem; }
+  .e-path { border-radius:1.5rem; overflow:hidden; display:flex; flex-direction:column; background:var(--sand-2); }
+  .e-path.dark { background:var(--green); color:var(--sand); }
+  .e-path .photo { border-radius:0; aspect-ratio:16/9; }
+  .e-path .in { padding:2.25rem; display:flex; flex-direction:column; gap:1rem; flex:1; }
+  .e-path h2 { margin:0; font-size:2rem; line-height:1.05; }
+  .e-path ul { margin:0; padding:0; list-style:none; }
+  .e-path li { padding:.85rem 0; border-top:1px solid var(--line-d); display:flex; gap:.75rem; }
+  .e-path.dark li { border-color:var(--line); }
+  .e-path li::before { content:"\2713"; opacity:.6; }
+  .e-path .row { margin-top:auto; padding-top:.5rem; }
+  .e-band { display:grid; grid-template-columns:repeat(3, 1fr); gap:1rem; }
+  .e-band .card b { font-size:1.2rem; display:block; margin-bottom:.4rem; }
+  .e-band .card p { margin:0; opacity:.8; }
+  @media (max-width: 900px) { .e-paths, .e-band { grid-template-columns:1fr; } .e-path .in { padding:1.75rem 1.25rem; } }
+
+  /* ===== F: bento ===== */
+  .f-hero { padding-top:3rem; display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; flex-wrap:wrap; }
+  .f-bento { display:grid; grid-template-columns:repeat(4, 1fr); grid-auto-rows:15rem; gap:1rem; margin-top:2.5rem; }
+  .f-bento > * { border-radius:1.5rem; overflow:hidden; position:relative; padding:1.75rem; display:flex; flex-direction:column; justify-content:space-between; background:var(--sand-2); text-decoration:none; transition:transform .35s cubic-bezier(.23,1,.32,1); }
+  .f-bento > a:hover { transform:translateY(-4px); }
+  .f-bento .dark { background:var(--green); color:var(--sand); }
+  .f-bento .img { padding:0; }
+  .f-bento .img img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .f-bento .img::after { content:""; position:absolute; inset:0; background:linear-gradient(0deg, rgba(11,43,38,.85), rgba(11,43,38,0) 55%); }
+  .f-bento .img div { position:relative; z-index:1; margin-top:auto; padding:1.5rem; color:var(--sand); }
+  .f-bento b.big { font-size:3.4rem; line-height:1; font-weight:700; }
+  .f-bento p { margin:0; opacity:.8; }
+  .f-bento .t { font-size:1.35rem; font-weight:600; line-height:1.2; opacity:1; }
+  .f-w2 { grid-column:span 2; } .f-h2 { grid-row:span 2; }
+  .f-steps { list-style:none; padding:0; margin:.5rem 0 0; counter-reset:s; display:grid; gap:.5rem; }
+  .f-steps li { counter-increment:s; display:flex; gap:.75rem; font-size:.95rem; }
+  .f-steps li::before { content:counter(s); width:1.4rem; height:1.4rem; border-radius:50%; border:1px solid currentColor; display:grid; place-items:center; font-size:.7rem; flex:none; }
+  @media (max-width: 900px) { .f-bento { grid-template-columns:1fr 1fr; grid-auto-rows:auto; } .f-bento > * { min-height:12rem; } .f-w2 { grid-column:span 2; } .f-h2 { grid-row:auto; } }
 </style>
 </head>
 <body>
 
 <div class="sw">
-  <b>Option</b> <button data-o="a" class="on">A</button> <button data-o="b">B</button> <button data-o="c">C</button>
+  <b>Option</b> <button data-o="a" class="on">A</button> <button data-o="b">B</button> <button data-o="c">C</button> <button data-o="d">D</button> <button data-o="e">E</button> <button data-o="f">F</button>
   <span id="note"></span>
 </div>
 
@@ -275,10 +330,77 @@
   </div>
 </main>
 
+<!-- ================= D: places-led ================= -->
+<main class="opt" id="d"><div class="wrap">
+  <div class="d-hero">
+    <div><p class="eb">About us</p><h1 class="h1">New homes <span class="g">all over London</span></h1></div>
+    <p class="lead" style="margin:0">Regenta sells new homes for developers and housing associations, from Shared Ownership apartments to private sale houses. Since 1988, our sales teams have been on site helping buyers find the right one.</p>
+  </div>
+  <div class="d-regions" id="dRegions"></div>
+  <div class="d-grid" id="dGrid"></div>
+  <p class="muted" style="font-size:.85rem;margin-top:.75rem">On the real page, the areas and developments come live from the CMS.</p>
+</div>
+<section class="pad"><div class="wrap d-strip">
+  <div class="card dark" style="display:flex;flex-direction:column;justify-content:space-between;gap:2rem"><div><p class="eb">Since 1988</p><h2 class="h2" style="font-size:2.2rem">A family business <span class="g">that builds too</span></h2></div><p style="margin:0;opacity:.85">Murray Smith founded Regenta in 1988. He grew up on a council estate in Camden, and good homes for every kind of buyer have mattered to him ever since. Through Built by Regenta, we build homes ourselves too.</p></div>
+  <div class="card quote"><blockquote>&ldquo;I genuinely felt looked after, informed and represented every step of the way.&rdquo;</blockquote><cite>Imogen L., Shared Ownership &middot; Google review</cite></div>
+  <div class="card" style="display:flex;flex-direction:column;justify-content:space-between;gap:1.5rem"><div class="badge"><b>4.5</b><div><div class="stars">&#9733;&#9733;&#9733;&#9733;&frac12;</div><span class="muted" style="font-size:.85rem">From 90 reviews on Google</span></div></div><div class="links"><a href="#">Purchaser stories <span>&#8599;</span></a><a href="#">Shared Ownership FAQs <span>&#8599;</span></a><a href="#">Calculators <span>&#8599;</span></a></div></div>
+</div></section>
+<div class="wrap" style="padding-bottom:5rem"><div class="cta"><div><p class="eb">Start your search</p><h2 class="h2">See every home <span class="g">on the map</span></h2></div><div class="row"><a class="btn light" href="#">Map view</a><a class="btn" style="border-color:var(--line)" href="#">+44 (0)20 8502 5758</a></div></div></div>
+</main>
+
+<!-- ================= E: two kinds of buyer ================= -->
+<main class="opt" id="e"><div class="wrap">
+  <div class="e-hero"><p class="eb">About us</p><h1 class="h1">Whichever way <span class="g">you're buying</span></h1><p class="lead">Regenta sells new homes across London and the South East for developers and housing associations, for Shared Ownership and private sale. Here's how we help with each.</p></div>
+  <div class="e-paths">
+    <div class="e-path dark">
+      <div class="photo"><img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/6a6c716510f487aec021ff55_017_LowRes_2Bed_ShowApartment_TheAura_Regenta_2S2A8239.jpg" alt=""></div>
+      <div class="in"><p class="eb" style="margin:0">Shared Ownership</p><h2>Buy a share, <span class="g">rent the rest</span></h2>
+        <ul><li>Answers on eligibility, deposits, rent and staircasing in our FAQs</li><li>A calculator for your monthly costs</li><li>A sales team at each development to talk it through</li></ul>
+        <div class="row"><a class="btn light" href="#">Shared Ownership homes</a><a class="btn" style="border-color:var(--line)" href="#">FAQs</a></div></div>
+    </div>
+    <div class="e-path">
+      <div class="photo"><img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/6a22b363da1af9e360f2625c_084_HiRes_2Bed_UnitPhotography_EWS_PFP_4K2A5598_retouched.jpg" alt=""></div>
+      <div class="in"><p class="eb" style="margin:0">Private sale</p><h2>New homes <span class="g">to own outright</span></h2>
+        <ul><li>Apartments and houses across London and the South East</li><li>A Stamp Duty calculator, with first-time buyer relief</li><li>Viewings with the sales team on site</li></ul>
+        <div class="row"><a class="btn dark" href="#">Private sale homes</a><a class="btn" href="#">Stamp Duty calculator</a></div></div>
+    </div>
+  </div>
+</div>
+<section class="pad"><div class="wrap">
+  <p class="eb">Why buy through us</p>
+  <div class="e-band">
+    <div class="card"><b>Since 1988</b><p>Founded by Murray Smith, who grew up on a council estate in Camden.</p></div>
+    <div class="card"><b>We build too</b><p>Through Built by Regenta, we know what makes a new home well made.</p></div>
+    <div class="card dark"><b>4.5 on Google</b><p>From 90 reviews. &ldquo;I genuinely felt looked after, informed and represented every step of the way.&rdquo;</p></div>
+  </div>
+</div></section>
+<div class="wrap" style="padding-bottom:5rem"><div class="cta"><div><p class="eb">Not sure which?</p><h2 class="h2">Give us <span class="g">a call</span></h2></div><div class="row"><a class="btn light" href="#">+44 (0)20 8502 5758</a><a class="btn" style="border-color:var(--line)" href="#">All homes</a></div></div></div>
+</main>
+
+<!-- ================= F: bento ================= -->
+<main class="opt" id="f"><div class="wrap" style="padding-bottom:5rem">
+  <div class="f-hero"><div><p class="eb">About us</p><h1 class="h1">Regenta, <span class="g">at a glance</span></h1></div><a class="btn dark" href="#">Find your home</a></div>
+  <div class="f-bento">
+    <div class="img f-w2 f-h2"><img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a06/6842be83ba8b3885820e40b2_regenta-team-compressed.avif" alt=""><div><p class="t" style="font-size:1.6rem;max-width:26rem">We sell new homes across London and the South East for developers and housing associations.</p></div></div>
+    <div class="dark"><b class="big">1988</b><p>Founded by Murray Smith, who grew up on a council estate in Camden.</p></div>
+    <a href="#"><b class="big">4.5</b><p><span class="stars">&#9733;&#9733;&#9733;&#9733;&frac12;</span><br>From 90 reviews on Google. Read purchaser stories &#8599;</p></a>
+    <div class="f-w2"><p class="t">From first viewing to your keys</p><ol class="f-steps"><li>View, through the development's page</li><li>Reserve, with a reservation fee</li><li>Arrange your solicitor and mortgage</li><li>Exchange, typically 4 to 8 weeks after reserving</li><li>Keys, usually 1 to 4 weeks later</li></ol></div>
+    <a class="img" href="#"><img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/685ab436d4472da0bfd5977b_LowRes_Sitesales-Regenta-Headshots-UpdatedChoices_0006.webp" alt="" style="object-position:50% 20%"><div><b>Connor Smith</b><br><span style="font-size:.85rem;opacity:.8">Associate Director - Sales</span></div></a>
+    <a class="img" href="#"><img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/6842eb97c07258c136514e12_Andrejs%20Krutins.avif" alt="" style="object-position:50% 20%"><div><b>Andrejs Krutins</b><br><span style="font-size:.85rem;opacity:.8">Sales Manager</span></div></a>
+    <a href="#" class="f-w2"><p class="t">Shared Ownership, explained</p><p>Eligibility, deposits, rent and staircasing, plus a calculator for your monthly costs. &#8599;</p></a>
+    <a href="#" class="dark f-w2"><p class="t">Built by Regenta</p><p>We build homes too. &#8599;</p></a>
+    <a href="#" class="f-w2"><p class="t">Call us</p><p>+44 (0)20 8502 5758</p></a>
+  </div>
+</div></main>
+
+<script src="property-search-data.js"></script>
 <script>
   const NOTES = {
     a: 'A · Story-led. Green intro beside the team photo, three ways we help, the buying steps, Google rating and reviews, the 1988 story with Built by Regenta and Barnardo\'s, the sales team, then a call to action.',
     b: 'B · Questions-led. A photo band, then the questions buyers ask about us, with a sticky list to jump between them. Answers link to Property Search, the FAQs, calculators and purchaser stories.',
+    d: 'D · Places-led. Opens with where we sell: area filters over the live developments (from the CMS), then the 1988 story, a review, the Google rating and a link to Map view.',
+    e: 'E · Two kinds of buyer. Shared Ownership and private sale side by side, each with what we help with and where to go next, then three reasons to buy through us.',
+    f: 'F · Bento. Everything on one screen as tiles: team photo, 1988, Google rating, the buying steps, the sales team, Shared Ownership, Built by Regenta and the phone number.',
     c: 'C · Editorial. Full-screen team photo, a 1988 / 2013 / Today timeline, the buying steps as five cards, one big review, then the sales team.'
   };
   const show = (o) => {
@@ -291,6 +413,22 @@
   show(NOTES[location.hash.slice(1)] ? location.hash.slice(1) : 'a');
   // B: highlight the question in view
   const links = [...document.querySelectorAll('#toc a')];
+  // D: areas over the live developments (one card per development name)
+  (function () {
+    const seen = new Set();
+    const devs = (window.DEVS || []).filter((d) => { const k = d.name.replace(/ -.*$/, ''); if (seen.has(k)) return false; seen.add(k); return true; });
+    const regions = {};
+    devs.forEach((d) => { regions[d.region] = (regions[d.region] || 0) + 1; });
+    const box = document.getElementById('dRegions');
+    const grid = document.getElementById('dGrid');
+    const draw = (r) => {
+      grid.innerHTML = devs.filter((d) => !r || d.region === r).slice(0, 8).map((d) => '<a class="d-dev" href="#"><img src="' + d.img + '" alt=""><div><b>' + d.name + '</b><span>' + d.region + ' · ' + d.tenure.join(', ') + '</span></div></a>').join('');
+      box.querySelectorAll('button').forEach((b) => b.classList.toggle('on', (b.dataset.r || '') === (r || '')));
+    };
+    box.innerHTML = '<button data-r="">All areas<span>' + devs.length + '</span></button>' + Object.keys(regions).sort().map((r) => '<button data-r="' + r + '">' + r + '<span>' + regions[r] + '</span></button>').join('');
+    box.addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) draw(b.dataset.r); });
+    draw('');
+  })();
   const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) links.forEach((l) => l.classList.toggle('on', l.getAttribute('href') === '#' + e.target.id)); }), { rootMargin: '-30% 0px -60% 0px' });
   document.querySelectorAll('.b-item').forEach((el) => io.observe(el));
 </script>
