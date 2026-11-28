@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mock: buyer About us | Regenta</title>
+<script src="https://use.typekit.net/ptn3etu.js"></script>
+<script>try{Typekit.load();}catch(e){}</script>
+<style>
+  /* Mock only. A buyer-focused About us (agreed on the 20 Nov call: the current About us is for the
+     professional side). Facts are from the current site: founded 1988 by Murray Smith, the Camden story,
+     sells for developers and housing associations, Built by Regenta (2013), Barnardo's, 4.5 from 90 Google
+     reviews, real reviews and the buying steps from the Shared Ownership FAQs. Draft copy for Elle to check. */
+  :root { --green:#0b2b26; --sand:#e3e5db; --sand-2:#eef0e8; --line:rgba(227,229,219,.3); --line-d:rgba(11,43,38,.15); }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--sand); color:var(--green); font-family:area-normal, area, "Area Normal", system-ui, sans-serif; padding-bottom:7rem; }
+  a { color:inherit; }
+  img { display:block; max-width:100%; }
+  .g { font-family:Griffiths, serif; font-weight:400; }
+  .wrap { max-width:1376px; margin:0 auto; padding:0 2rem; }
+  .eb { font-size:.72rem; letter-spacing:.22em; text-transform:uppercase; font-weight:600; opacity:.65; margin:0 0 1rem; }
+  .h1 { font-size:clamp(2.8rem, 5.6vw, 5.2rem); line-height:.97; font-weight:700; margin:0; letter-spacing:-.01em; }
+  .h2 { font-size:clamp(2rem, 3.2vw, 3rem); line-height:1.02; font-weight:700; margin:0; }
+  .h1 .g, .h2 .g { font-size:1.12em; }
+  .lead { font-size:1.15rem; line-height:1.55; max-width:36rem; margin:1.5rem 0 0; }
+  p { line-height:1.55; }
+  .muted { opacity:.75; }
+  section.pad { padding:5.5rem 0; }
+  .btn { display:inline-flex; align-items:center; gap:.85rem; border-radius:99px; padding:1rem 1.8rem; font-size:1rem; border:1px solid currentColor; text-decoration:none; white-space:nowrap; transition:background-color .25s, color .25s, transform .25s; }
+  .btn.dark { background:var(--green); color:var(--sand); border-color:var(--green); }
+  .btn.light { background:var(--sand); color:var(--green); border-color:var(--sand); }
+  .btn:hover { transform:translateY(-2px); }
+  .btn svg { width:.8rem; height:.8rem; }
+  .row { display:flex; gap:.75rem; flex-wrap:wrap; }
+  .card { background:var(--sand-2); border-radius:1.5rem; padding:2.25rem; }
+  .card.dark { background:var(--green); color:var(--sand); }
+  .opt { display:none; } .opt.on { display:block; }
+  .note { font-size:.75rem; background:#fff8d6; border:1px dashed #c8b45c; border-radius:.5rem; padding:.35rem .6rem; display:inline-block; margin-top:1rem; }
+
+  /* switcher */
+  .sw { position:fixed; left:50%; bottom:1rem; transform:translateX(-50%); z-index:20; background:#fff; border:1px solid var(--line-d); border-radius:1.25rem; box-shadow:0 10px 30px rgba(11,43,38,.18); font-size:.85rem; width:min(980px, calc(100% - 2rem)); display:flex; gap:1rem; align-items:center; padding:.7rem 1rem; flex-wrap:wrap; }
+  .sw button { font:inherit; border:1px solid var(--line-d); background:none; border-radius:99px; padding:.45rem .9rem; cursor:pointer; color:var(--green); }
+  .sw button.on { background:var(--green); color:var(--sand); border-color:var(--green); }
+  .sw span { margin-left:auto; opacity:.65; font-size:.8rem; max-width:34rem; line-height:1.35; }
+  @media (max-width: 900px) { .sw span { display:none; } }
+
+  /* fake nav */
+  .nav { background:var(--green); color:var(--sand); }
+  .nav .wrap { display:flex; align-items:center; justify-content:space-between; height:5.5rem; }
+  .nav b { font-weight:600; letter-spacing:.12em; font-size:1.4rem; }
+  .nav nav { display:flex; gap:2rem; font-size:.7rem; letter-spacing:.2em; text-transform:uppercase; align-items:center; }
+  .nav nav i { font-style:normal; background:var(--sand); color:var(--green); border-radius:99px; padding:.7rem 1.1rem; letter-spacing:0; text-transform:none; font-size:.9rem; }
+  @media (max-width: 900px) { .nav nav { display:none; } }
+
+  /* shared blocks */
+  .photo { border-radius:1.5rem; overflow:hidden; position:relative; }
+  .photo img { width:100%; height:100%; object-fit:cover; }
+  .steps { list-style:none; padding:0; margin:0; counter-reset:s; display:grid; gap:0; }
+  .steps li { counter-increment:s; display:grid; grid-template-columns:3rem 1fr; gap:.75rem; padding:1.25rem 0; border-top:1px solid var(--line-d); }
+  .steps li::before { content:counter(s, decimal-leading-zero); font-size:.8rem; opacity:.55; padding-top:.3rem; }
+  .steps b { display:block; font-size:1.15rem; margin-bottom:.3rem; }
+  .steps p { margin:0; opacity:.8; }
+  .quote { display:flex; flex-direction:column; gap:1rem; justify-content:space-between; }
+  .quote blockquote { margin:0; font-family:Griffiths, serif; font-size:1.55rem; line-height:1.25; }
+  .quote cite { font-style:normal; font-size:.85rem; opacity:.7; }
+  .badge { display:flex; align-items:center; gap:1rem; }
+  .badge b { font-size:3rem; line-height:1; }
+  .stars { color:#e5a50a; letter-spacing:.1em; }
+  .team { display:grid; grid-template-columns:repeat(2, 1fr); gap:1rem; }
+  .person { position:relative; border-radius:1.25rem; overflow:hidden; aspect-ratio:4/5; background:#22403b; color:var(--sand); }
+  .person img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 18%; transition:transform .5s cubic-bezier(.23,1,.32,1); }
+  .person:hover img { transform:scale(1.04); }
+  .person::after { content:""; position:absolute; inset:0; background:linear-gradient(0deg, rgba(11,43,38,.92), rgba(11,43,38,0) 50%); }
+  .person div { position:absolute; left:1.25rem; bottom:1.1rem; z-index:1; }
+  .person b { display:block; font-size:1.25rem; }
+  .person span { font-size:.85rem; opacity:.8; }
+  .links a { display:flex; justify-content:space-between; padding:1rem 0; border-top:1px solid var(--line-d); text-decoration:none; transition:padding-left .3s cubic-bezier(.23,1,.32,1); }
+  .links a:hover { padding-left:.5rem; }
+  .cta { border-radius:1.5rem; background:var(--green); color:var(--sand); padding:3.5rem 3rem; display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; flex-wrap:wrap; }
+  .cta .h2 { max-width:34rem; }
+
+  /* ===== A: story-led ===== */
+  .a-hero { display:grid; grid-template-columns:1fr 1fr; gap:1rem; padding-top:3rem; }
+  .a-hero .card { display:flex; flex-direction:column; justify-content:space-between; min-height:36rem; padding:3.5rem 3rem 3rem; }
+  .a-hero .photo { min-height:36rem; }
+  .a-help { display:grid; grid-template-columns:repeat(3, 1fr); gap:1rem; margin-top:3rem; }
+  .a-help .card h3 { margin:1.5rem 0 .6rem; font-size:1.35rem; }
+  .a-help .card p { margin:0; opacity:.8; }
+  .a-help .ic { width:2.6rem; height:2.6rem; border-radius:50%; background:var(--green); color:var(--sand); display:grid; place-items:center; }
+  .a-help .ic svg { width:1.1rem; height:1.1rem; }
+  .a-how { display:grid; grid-template-columns:.9fr 1.4fr; gap:4rem; align-items:start; }
+  .a-proof { display:grid; grid-template-columns:.8fr 1.1fr 1.1fr; gap:1rem; }
+  .a-story { display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:center; }
+  .a-story .photo { aspect-ratio:4/3; }
+  .a-teamrow { display:grid; grid-template-columns:1fr 1.2fr; gap:4rem; align-items:end; }
+  @media (max-width: 900px) {
+    .a-hero, .a-help, .a-how, .a-proof, .a-story, .a-teamrow { grid-template-columns:1fr; gap:1rem; }
+    .a-hero .card, .a-hero .photo { min-height:0; } .a-hero .photo { aspect-ratio:4/3; }
+    .a-hero .card { padding:2.25rem 1.5rem; } .a-how, .a-story, .a-teamrow { gap:2rem; }
+    section.pad { padding:3.5rem 0; } .cta { padding:2.5rem 1.5rem; } .card { padding:1.75rem 1.25rem; }
+  }
+
+  /* ===== B: questions-led ===== */
+  .b-hero { padding-top:3rem; display:grid; grid-template-columns:1.1fr 1fr; gap:4rem; align-items:end; }
+  .b-band { margin-top:3rem; border-radius:1.5rem; overflow:hidden; aspect-ratio:21/8; }
+  .b-band img { width:100%; height:100%; object-fit:cover; object-position:50% 60%; }
+  .b-qa { display:grid; grid-template-columns:18rem 1fr; gap:4rem; align-items:start; }
+  .b-toc { position:sticky; top:2rem; display:flex; flex-direction:column; gap:.25rem; }
+  .b-toc a { text-decoration:none; padding:.6rem .9rem; border-radius:.75rem; font-size:.95rem; transition:background-color .2s; }
+  .b-toc a:hover, .b-toc a.on { background:var(--sand-2); }
+  .b-item { padding:2.5rem 0; border-top:1px solid var(--line-d); scroll-margin-top:2rem; }
+  .b-item:first-child { border-top:0; padding-top:0; }
+  .b-item h2 { font-size:1.9rem; margin:0 0 1rem; line-height:1.1; }
+  .b-item p { max-width:42rem; margin:.6rem 0 0; }
+  .b-item .row { margin-top:1.5rem; }
+  .b-item .steps { margin-top:1rem; max-width:44rem; }
+  .b-item .team { max-width:34rem; margin-top:1.5rem; }
+  .b-quotes { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:1.5rem; max-width:52rem; }
+  @media (max-width: 900px) { .b-hero, .b-qa, .b-quotes { grid-template-columns:1fr; gap:1.5rem; } .b-toc { display:none; } .b-band { aspect-ratio:4/3; } }
+
+  /* ===== C: one-scroll editorial ===== */
+  .c-hero { position:relative; min-height:calc(100vh - 5.5rem); display:flex; align-items:flex-end; color:var(--sand); }
+  .c-hero img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .c-hero::after { content:""; position:absolute; inset:0; background:linear-gradient(0deg, rgba(11,43,38,.92) 0%, rgba(11,43,38,.25) 55%, rgba(11,43,38,.1)); }
+  .c-hero .wrap { position:relative; z-index:1; width:100%; padding-bottom:4rem; display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; flex-wrap:wrap; }
+  .c-time { display:grid; grid-template-columns:repeat(3, 1fr); gap:1rem; }
+  .c-time .card b { font-size:3.2rem; line-height:1; display:block; margin-bottom:1rem; font-weight:700; }
+  .c-time .card p { margin:0; opacity:.8; }
+  .c-journey { display:grid; grid-template-columns:repeat(5, 1fr); gap:.75rem; margin-top:2.5rem; }
+  .c-journey div { background:var(--sand-2); border-radius:1.25rem; padding:1.5rem; min-height:13rem; display:flex; flex-direction:column; gap:.6rem; }
+  .c-journey i { font-style:normal; font-size:.8rem; opacity:.55; }
+  .c-journey b { font-size:1.1rem; }
+  .c-journey p { margin:0; font-size:.92rem; opacity:.8; }
+  .c-quote { text-align:center; max-width:52rem; margin:0 auto; }
+  .c-quote blockquote { margin:0; font-family:Griffiths, serif; font-size:clamp(1.8rem, 3.2vw, 2.8rem); line-height:1.2; }
+  .c-quote cite { display:block; margin-top:1.5rem; font-style:normal; opacity:.7; }
+  @media (max-width: 900px) { .c-time, .c-journey { grid-template-columns:1fr; } .c-journey div { min-height:0; } .c-hero { min-height:80vh; } }
+</style>
+</head>
+<body>
+
+<div class="sw">
+  <b>Option</b> <button data-o="a" class="on">A</button> <button data-o="b">B</button> <button data-o="c">C</button>
+  <span id="note"></span>
+</div>
+
+<header class="nav"><div class="wrap"><b>REGENTA</b><nav><span>FAQs</span><span>Calculators</span><span>Purchaser stories</span><span>About us</span><span>Contact us</span><i>Properties</i></nav></div></header>
+
+<!-- ================= A: story-led ================= -->
+<main class="opt on" id="a"><div class="wrap">
+  <div class="a-hero">
+    <div class="card dark">
+      <div>
+        <p class="eb">About us</p>
+        <h1 class="h1">Helping you find <span class="g">your new home</span></h1>
+        <p class="lead" style="opacity:.85">Regenta sells new homes across London and the South East for developers and housing associations, including Shared Ownership and private sale. Our sales teams work on site at each development, so you'll deal with people who know the homes inside out.</p>
+      </div>
+      <div class="row"><a class="btn light" href="#">Find your home <svg viewBox="0 0 12 12"><path d="M0 11 4.2 6.9a4.3 4.3 0 1 1 .9.9L.9 12z" fill="currentColor"/></svg></a><a class="btn" style="border-color:var(--line)" href="#">Call us</a></div>
+    </div>
+    <div class="photo"><img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a06/6842be83ba8b3885820e40b2_regenta-team-compressed.avif" alt=""></div>
+  </div>
+
+  <div class="a-help">
+    <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11 12 4l9 7v9H3z"/></svg></div><h3>Homes across London</h3><p>From apartments in Greenwich to family homes in Essex, browse every development we're selling in one place.</p></div>
+    <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg></div><h3>Shared Ownership, explained</h3><p>Our FAQs and calculators walk you through how it works, what it costs each month and how staircasing works.</p></div>
+    <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></div><h3>A team on site</h3><p>Each development has its own sales team who'll show you round, answer your questions and guide you through to getting your keys.</p></div>
+  </div>
+</div>
+
+<section class="pad"><div class="wrap a-how">
+  <div><p class="eb">Buying with us</p><h2 class="h2">From first viewing <span class="g">to your keys</span></h2><p class="lead muted">Every purchase is a little different, but most follow these steps.</p><p class="note">Draft copy, from the Shared Ownership FAQs. Elle to check.</p></div>
+  <ol class="steps">
+    <li><div><b>Find a home and book a viewing</b><p>Browse the developments, then book a viewing through the development's page or by calling its sales team.</p></div></li>
+    <li><div><b>Reserve</b><p>A reservation fee secures the home while the legal work and your mortgage are arranged.</p></div></li>
+    <li><div><b>Mortgage and solicitor</b><p>You appoint a solicitor (a panel familiar with Shared Ownership may be available) and arrange your mortgage.</p></div></li>
+    <li><div><b>Exchange</b><p>Both sides become legally committed. This is typically four to eight weeks after reserving.</p></div></li>
+    <li><div><b>Completion and keys</b><p>Usually one to four weeks after exchange. Then the home is yours.</p></div></li>
+  </ol>
+</div></section>
+
+<div class="wrap">
+  <div class="a-proof">
+    <div class="card dark badge" style="flex-direction:column;align-items:flex-start;justify-content:space-between"><p class="eb" style="margin:0">Google reviews</p><div><b>4.5</b><div class="stars">★★★★½</div><p class="muted" style="margin:.4rem 0 0">From 90 reviews on Google</p></div><a class="btn light" href="#">Purchaser stories</a></div>
+    <div class="card quote"><blockquote>“I genuinely felt looked after, informed and represented every step of the way.”</blockquote><cite>Imogen L., Shared Ownership, Brighton · Google review</cite></div>
+    <div class="card quote"><blockquote>“She actually called me to let me know when a flat that was affordable for me came back up…”</blockquote><cite>Danielle D. · Google review</cite></div>
+  </div>
+</div>
+
+<section class="pad"><div class="wrap a-story">
+  <div class="photo"><img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a06/6899c28d310c33ce2925a200_regenta-social-value.webp" alt=""></div>
+  <div>
+    <p class="eb">Since 1988</p>
+    <h2 class="h2">A family business <span class="g">that builds too</span></h2>
+    <p class="lead muted">Murray Smith founded Regenta in 1988. He grew up on a council estate in Camden, and that's where his belief in good homes for every kind of buyer comes from.</p>
+    <p class="muted">Through Built by Regenta, we also build homes ourselves, so we know what makes a new home well made. And we've supported Barnardo's for years, including creating the award-winning Barnardo's Garden Village in Barkingside.</p>
+    <div class="row" style="margin-top:1.5rem"><a class="btn dark" href="#">Built by Regenta</a></div>
+  </div>
+</div></section>
+
+<div class="wrap">
+  <div class="a-teamrow">
+    <div><p class="eb">Your sales team</p><h2 class="h2">The people <span class="g">you'll meet</span></h2><p class="lead muted">Our sales team are on site at each development, led by Connor and Andrejs.</p><p class="note">Elle: who should appear here? Photos from the current About us.</p></div>
+    <div class="team">
+      <div class="person"><img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/685ab436d4472da0bfd5977b_LowRes_Sitesales-Regenta-Headshots-UpdatedChoices_0006.webp" alt=""><div><b>Connor Smith</b><span>Associate Director - Sales</span></div></div>
+      <div class="person"><img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/6842eb97c07258c136514e12_Andrejs%20Krutins.avif" alt=""><div><b>Andrejs Krutins</b><span>Sales Manager</span></div></div>
+    </div>
+  </div>
+</div>
+
+<section class="pad"><div class="wrap">
+  <div class="cta"><div><p class="eb">Start your search</p><h2 class="h2">Find a home <span class="g">that's right for you</span></h2></div><div class="row"><a class="btn light" href="#">Find your home</a><a class="btn" style="border-color:var(--line)" href="#">+44 (0)20 8502 5758</a></div></div>
+</div></section>
+</main>
+
+<!-- ================= B: questions-led ================= -->
+<main class="opt" id="b"><div class="wrap">
+  <div class="b-hero">
+    <div><p class="eb">About us</p><h1 class="h1">New homes, <span class="g">sold by people who care</span></h1></div>
+    <p class="lead" style="margin:0">Regenta sells new homes across London and the South East for developers and housing associations. Here are the questions buyers most often ask about us.</p>
+  </div>
+  <div class="b-band"><img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a06/6842bfb67dee92929368c880_regenta-about.avif" alt=""></div>
+</div>
+<section class="pad"><div class="wrap b-qa">
+  <nav class="b-toc" id="toc">
+    <a href="#b1" class="on">Who are Regenta?</a>
+    <a href="#b2">Are you the developer?</a>
+    <a href="#b3">How do I book a viewing?</a>
+    <a href="#b4">What happens after I reserve?</a>
+    <a href="#b5">Who will I deal with?</a>
+    <a href="#b6">What do buyers say?</a>
+  </nav>
+  <div>
+    <div class="b-item" id="b1"><h2>Who are Regenta?</h2><p>We're a London new homes sales and marketing company, founded by Murray Smith in 1988. We sell homes for developers and housing associations, including Shared Ownership and private sale.</p><p>Murray grew up on a council estate in Camden, and that's where his belief in good homes for every kind of buyer comes from.</p></div>
+    <div class="b-item" id="b2"><h2>Are you the developer?</h2><p>Mostly we sell on behalf of the developer or housing association that built the homes. Each development page tells you who that is.</p><p>Through Built by Regenta, we also build homes ourselves.</p><div class="row"><a class="btn dark" href="#">Built by Regenta</a></div></div>
+    <div class="b-item" id="b3"><h2>How do I book a viewing?</h2><p>Find the development on Property Search and use the enquiry form or phone number on its page. That goes straight to its sales team.</p><div class="row"><a class="btn dark" href="#">Find your home</a></div></div>
+    <div class="b-item" id="b4"><h2>What happens after I reserve?</h2><p class="muted">Every purchase is a little different, but most follow these steps.</p><p class="note">Draft copy, from the Shared Ownership FAQs. Elle to check.</p>
+      <ol class="steps"><li><div><b>Reserve</b><p>A reservation fee secures the home while the legal work and your mortgage are arranged.</p></div></li><li><div><b>Mortgage and solicitor</b><p>You appoint a solicitor and arrange your mortgage.</p></div></li><li><div><b>Exchange</b><p>Typically four to eight weeks after reserving.</p></div></li><li><div><b>Completion and keys</b><p>Usually one to four weeks after exchange.</p></div></li></ol>
+      <div class="links" style="max-width:44rem;margin-top:1.5rem"><a href="#">Shared Ownership FAQs <span>↗</span></a><a href="#">Shared Ownership calculator <span>↗</span></a><a href="#">Stamp Duty calculator <span>↗</span></a></div></div>
+    <div class="b-item" id="b5"><h2>Who will I deal with?</h2><p>The sales team at the development, who'll show you round and guide you through to getting your keys. Our sales team is led by Connor and Andrejs.</p>
+      <div class="team"><div class="person"><img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/685ab436d4472da0bfd5977b_LowRes_Sitesales-Regenta-Headshots-UpdatedChoices_0006.webp" alt=""><div><b>Connor Smith</b><span>Associate Director - Sales</span></div></div><div class="person"><img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/6842eb97c07258c136514e12_Andrejs%20Krutins.avif" alt=""><div><b>Andrejs Krutins</b><span>Sales Manager</span></div></div></div></div>
+    <div class="b-item" id="b6"><h2>What do buyers say?</h2><p>We're rated 4.5 from 90 reviews on Google.</p>
+      <div class="b-quotes"><div class="card quote"><blockquote>“I genuinely felt looked after, informed and represented every step of the way.”</blockquote><cite>Imogen L., Shared Ownership, Brighton</cite></div><div class="card quote"><blockquote>“She actually called me to let me know when a flat that was affordable for me came back up…”</blockquote><cite>Danielle D.</cite></div></div>
+      <div class="row"><a class="btn dark" href="#">Read purchaser stories</a></div></div>
+  </div>
+</div></section>
+<div class="wrap" style="padding-bottom:5rem"><div class="cta"><div><p class="eb">Any other questions?</p><h2 class="h2">Give us <span class="g">a call</span></h2></div><div class="row"><a class="btn light" href="#">+44 (0)20 8502 5758</a><a class="btn" style="border-color:var(--line)" href="#">Find your home</a></div></div></div>
+</main>
+
+<!-- ================= C: one-scroll editorial ================= -->
+<main class="opt" id="c">
+  <div class="c-hero"><img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a06/6842be83ba8b3885820e40b2_regenta-team-compressed.avif" alt="">
+    <div class="wrap"><div><p class="eb">About us</p><h1 class="h1" style="max-width:48rem">The people behind <span class="g">your new home</span></h1><p class="lead" style="opacity:.85">Regenta sells new homes across London and the South East for developers and housing associations, including Shared Ownership and private sale.</p></div><a class="btn light" href="#">Find your home</a></div>
+  </div>
+  <section class="pad"><div class="wrap">
+    <div class="c-time">
+      <div class="card"><b>1988</b><p>Murray Smith founds the company. He grew up on a council estate in Camden, and good homes for every kind of buyer have mattered to him ever since.</p></div>
+      <div class="card"><b>2013</b><p>Built by Regenta starts building homes of our own, so we know what makes a new home well made.</p></div>
+      <div class="card dark"><b>Today</b><p>Sales teams on site at developments across London and the South East, from Greenwich to Erith.</p></div>
+    </div>
+  </div></section>
+  <div class="wrap">
+    <p class="eb">Buying with us</p><h2 class="h2">From first viewing <span class="g">to your keys</span></h2><p class="note">Draft copy, from the Shared Ownership FAQs. Elle to check.</p>
+    <div class="c-journey">
+      <div><i>01</i><b>View</b><p>Book through the development's page or its sales team.</p></div>
+      <div><i>02</i><b>Reserve</b><p>A reservation fee secures the home.</p></div>
+      <div><i>03</i><b>Arrange</b><p>Your solicitor and mortgage.</p></div>
+      <div><i>04</i><b>Exchange</b><p>Typically four to eight weeks after reserving.</p></div>
+      <div><i>05</i><b>Keys</b><p>Completion, usually one to four weeks later.</p></div>
+    </div>
+  </div>
+  <section class="pad"><div class="wrap c-quote"><p class="eb">4.5 from 90 Google reviews</p><blockquote>“I genuinely felt looked after, informed and represented every step of the way.”</blockquote><cite>Imogen L., Shared Ownership, Brighton</cite><div class="row" style="justify-content:center;margin-top:2rem"><a class="btn dark" href="#">Read purchaser stories</a></div></div></section>
+  <div class="wrap a-teamrow" style="padding-bottom:5rem">
+    <div><p class="eb">Your sales team</p><h2 class="h2">The people <span class="g">you'll meet</span></h2><p class="lead muted">Led by Connor and Andrejs, our sales teams are on site at each development.</p><div class="links" style="margin-top:2rem"><a href="#">Shared Ownership FAQs <span>↗</span></a><a href="#">Calculators <span>↗</span></a><a href="#">Contact us <span>↗</span></a></div></div>
+    <div class="team"><div class="person"><img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/685ab436d4472da0bfd5977b_LowRes_Sitesales-Regenta-Headshots-UpdatedChoices_0006.webp" alt=""><div><b>Connor Smith</b><span>Associate Director - Sales</span></div></div><div class="person"><img src="https://cdn.prod.website-files.com/68362e432005a0afe1416a15/6842eb97c07258c136514e12_Andrejs%20Krutins.avif" alt=""><div><b>Andrejs Krutins</b><span>Sales Manager</span></div></div></div>
+  </div>
+</main>
+
+<script>
+  const NOTES = {
+    a: 'A · Story-led. Green intro beside the team photo, three ways we help, the buying steps, Google rating and reviews, the 1988 story with Built by Regenta and Barnardo\'s, the sales team, then a call to action.',
+    b: 'B · Questions-led. A photo band, then the questions buyers ask about us, with a sticky list to jump between them. Answers link to Property Search, the FAQs, calculators and purchaser stories.',
+    c: 'C · Editorial. Full-screen team photo, a 1988 / 2013 / Today timeline, the buying steps as five cards, one big review, then the sales team.'
+  };
+  const show = (o) => {
+    document.querySelectorAll('.opt').forEach((m) => m.classList.toggle('on', m.id === o));
+    document.querySelectorAll('[data-o]').forEach((b) => b.classList.toggle('on', b.dataset.o === o));
+    document.getElementById('note').textContent = NOTES[o];
+    history.replaceState(null, '', '#' + o);
+  };
+  document.querySelectorAll('[data-o]').forEach((b) => b.onclick = () => { show(b.dataset.o); scrollTo(0, 0); });
+  show(NOTES[location.hash.slice(1)] ? location.hash.slice(1) : 'a');
+  // B: highlight the question in view
+  const links = [...document.querySelectorAll('#toc a')];
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) links.forEach((l) => l.classList.toggle('on', l.getAttribute('href') === '#' + e.target.id)); }), { rootMargin: '-30% 0px -60% 0px' });
+  document.querySelectorAll('.b-item').forEach((el) => io.observe(el));
+</script>
+</body>
+</html>
